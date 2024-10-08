@@ -64,11 +64,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":ottu-android-checkout"))
-    implementation("androidx.navigation:navigation-fragment-ktx:$2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:$2.7.7")
-//    implementation("com.github.ottuco:ottu-android-checkout:1.0.4")
+    //implementation(project(":ottu-flutter-checkout"))
+    //implementation("com.ottu.flutter.checkout:ottu-flutter-checkout:1.0.3")
 }
-
-// Google Play services Gradle plugin
-//apply(plugin = "com.google.gms.google-services")

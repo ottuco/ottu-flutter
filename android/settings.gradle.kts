@@ -2,12 +2,41 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.util.Properties
 
+pluginManagement {
+    fun flutterSdkPathFun(): String {
+        val localProperties = java.util.Properties()
+        val localPropertiesFile = java.io.File(rootProject.projectDir, "local.properties").toPath()
+        if (java.nio.file.Files.exists(localPropertiesFile)) {
+            java.nio.file.Files.newBufferedReader(localPropertiesFile).use { reader ->
+                localProperties.load(reader)
+            }
+        }
+        val flutterSdkPath = localProperties.getProperty("flutter.sdk")
+        assert(flutterSdkPath != null) { "flutter.sdk not set in local.properties" }
+        return flutterSdkPath
+    }
 
-val flutterProjectRoot = rootDir.toPath().parent
+    val flutterSdkPath = flutterSdkPathFun()
 
+    extra.apply {
+        set("flutterSdkPath", flutterSdkPath)
+    }
+
+    includeBuild("${flutterSdkPath}/packages/flutter_tools/gradle")
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id("dev.flutter.flutter-plugin-loader") version "1.0.0"
+    id("com.android.application") version "8.3.2" apply false
+    id("org.jetbrains.kotlin.android") version "2.0.20" apply false
+}
 
 val localProperties = Properties()
-
 val localPropertiesFile = File(rootDir, "local.properties")
 if (localPropertiesFile.exists()) {
     FileInputStream(localPropertiesFile).use { stream ->
@@ -16,88 +45,53 @@ if (localPropertiesFile.exists()) {
 } else {
     throw FileNotFoundException("local.properties file not found at ${localPropertiesFile.absolutePath}")
 }
+// Check if :ottu-android-checkout is included as a dependency
+val appBuildGradleFile = File(rootProject.projectDir, "app/build.gradle.kts")
+val ottuSdkPath: String? = localProperties.getProperty("ottuSdk")
+val ottuSdkFile = ottuSdkPath?.let { File(ottuSdkPath, "build.gradle.kts") }
+//println("Gradle build file: $appBuildGradleFile")
+println("Ottu sdk build file: $ottuSdkFile")
 
-pluginManagement {
-
-    val flutterSdkPath: String? = "/Users/vi/Downloads/flutter"
-    //val flutterSdkPath: String? = localProperties.getProperty("flutter.sdk")
-    assert(flutterSdkPath != null) { "flutter.sdk not set in local.properties" }
-    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
-        gradlePluginPortal()
-        flatDir {
-            dirs = setOf(file("libs"))
-        }
+if (ottuSdkFile != null) {
+    //println("Gradle build file: $appBuildGradleFile")
+    //val buildGradleContent = appBuildGradleFile.readLines()
+    val ottuSdkContent = ottuSdkFile.readLines()
+    //val isDependencyExist = buildGradleContent.any { line ->
+    val isDependencyExist = ottuSdkContent.any { line ->
+        /*line.contains("""implementation(project(":ottu-flutter-checkout"))""") && !line.trim()
+            .startsWith("//")*/
+        line.contains("""implementation("com.ottu.checkout:ottu-android-checkout:1.0.3")""") && !line.trim()
+            .startsWith("//")
     }
-}
-
-
-/*pluginManagement {
-
-    val flutterSdkPath = localProperties.getProperty("flutter.sdk")
-    assert(flutterSdkPath != null) { "flutter.sdk not set in local.properties" }
-
-    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
-
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
+    if (isDependencyExist) {
+        println("Has ottu local project dependency, includeBuild: $ottuSdkPath")
+        includeBuild(ottuSdkPath!!)
     }
-}*/
-
-plugins {
-    id("dev.flutter.flutter-plugin-loader") version "1.0.0"
-    id("com.android.application") version "7.3.1" apply false
-    id("com.android.library") version "7.3.1" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.23" apply false
-    id("org.jetbrains.kotlin.plugin.parcelize") version "1.9.23" apply false
-    id("com.google.devtools.ksp") version "1.9.23-1.0.19" apply false
+} else {
+    println("otu sdk file has not found at $appBuildGradleFile")
 }
 
 include(":app")
 
-// Check if :ottu-android-checkout is included as a dependency
-val appBuildGradleFile = File(rootProject.projectDir, "app/build.gradle.kts")
+/*
+val flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
 
-val ottuSdkPath: String? = localProperties.getProperty("ottuSdk")
+val pluginsProperties = Properties()
+val pluginsFile = File(flutterProjectRoot.toFile(), ".flutter-plugins").toPath()
 
-dependencyResolutionManagement {
-    versionCatalogs {
-        create("libs") {
-            from(files("${ottuSdkPath?.substring(0, ottuSdkPath.lastIndexOf("/"))}/gradle/libs.versions.toml"))
-
-            version("agp", "7.3.1")
-            //version("kotlin", "2.0.20")
-        }
-
+if (Files.exists(pluginsFile)) {
+    Files.newBufferedReader(pluginsFile).use { reader ->
+        pluginsProperties.load(reader)
     }
 }
 
-if (appBuildGradleFile.exists()) {
-    val buildGradleContent = appBuildGradleFile.readLines()
-    val isDependencyExist = buildGradleContent.any { line ->
-        line.contains("""implementation(project(":ottu-android-checkout"))""") && !line.trim()
-            .startsWith("//")
+pluginsProperties.forEach{ name, path ->
+    val pluginDirectory = flutterProjectRoot.resolve(path as String).resolve("android").toFile()
+    val settings = flutterProjectRoot.resolve(path).resolve("android/settings.gradle.kts").toFile()
+    include(":$name")
+    project(":$name").projectDir = pluginDirectory
+
+    if (settings.exists()) {
+        apply(settings)
     }
-    if (isDependencyExist) {
-        if (ottuSdkPath == null) {
-            throw GradleException(
-                "Property 'ottuSdk' not found in local.properties. " +
-                        "Use this: \"ottuSdk=/path/to/your/ottu-android-checkout/app\" with the actual path to your module."
-            )
-        } else {
-            println("Has ottu sdk: $ottuSdkPath")
-        }
-        include(":ottu-android-checkout")
-        project(":ottu-android-checkout").projectDir = File(ottuSdkPath)
-    }
-}
+}*/

@@ -2,3 +2,11 @@
 /build
 .idea
 .dart_tool
+android/.*
+android/.idea/
+android/.gradle
+android/.gradle/*.*
+pubspec.lock
+.*
+*.iml
+/android/.gradle/
