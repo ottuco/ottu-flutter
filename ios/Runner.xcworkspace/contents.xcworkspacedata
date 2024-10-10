@@ -2,15 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "absolute:/Users/vi/Downloads/AS-Projects/ottu-ios-checkout/ottu-checkout-sdk.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "absolute:/Users/vi/Downloads/AS-Projects/ottu-sample2/ios/Runner.xcodeproj">
+      location = "group:Runner.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:Runner.xcodeproj">
    </FileRef>
 </Workspace>
