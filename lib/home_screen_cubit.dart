@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
-import 'package:ottu_flutter_checkout/ottu_checkout.dart';
+import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/api/billing_address.dart';
 import 'package:ottu_flutter_checkout_sample/api/create_transaction_request.dart';
 import 'package:ottu_flutter_checkout_sample/api/session_response.dart';
@@ -153,6 +153,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         apiKey: state.apiKey,
         sessionId: state.sessionId ?? "",
         amount: amount,
+        showPaymentDetails: state.showPaymentDetails,
         formsOfPayment: state.formsOfPaymentChecked?.entries
                 .where((entry) => entry.value)
                 .map((entry) => entry.key)

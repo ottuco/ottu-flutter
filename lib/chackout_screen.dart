@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
-import 'package:ottu_flutter_checkout/ottu_checkout.dart';
+import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 
 const _defaultCheckoutViewHeight = 400;
 const _methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT";
