@@ -32,12 +32,11 @@ dependencies:
     sdk: flutter
 
   ottu_flutter_checkout:
-    # When depending on this package from a real application you should use:
-    #   ottu_flutter_checkout: ^x.y.z
-    # See https://dart.dev/tools/pub/dependencies#version-constraints
-    # The example app is bundled with the plugin so we use a path dependency on
-    # the parent directory to use the current plugin's version.
-    path: ../ottu_flutter_checkout
+    #to use ottu_flutter_checkout sdk from the local source uncomment line below and comment 3 lines with git specification
+    #path: ../ottu_flutter_checkout
+    git:
+      url: git@github.com:ottuco/ottu-flutter-checkout.git
+      ref: main
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
