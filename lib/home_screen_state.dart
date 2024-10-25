@@ -14,19 +14,20 @@ final class HomeScreenState extends Equatable {
   final bool? preloadPayload;
   final Map<String, bool>? formsOfPaymentChecked;
 
-  const HomeScreenState(
-      {required this.merchantId,
-      required this.apiKey,
-      this.sessionId,
-      this.amount,
-      this.currencyCode,
-      this.phoneNumber,
-      this.customerId,
-      this.showPaymentDetails = true,
-      this.preloadPayload,
-      this.newCard,
-      this.noForms,
-      this.formsOfPaymentChecked});
+  const HomeScreenState({
+    required this.merchantId,
+    required this.apiKey,
+    this.sessionId,
+    this.amount,
+    this.currencyCode,
+    this.phoneNumber,
+    this.customerId,
+    this.showPaymentDetails = true,
+    this.preloadPayload,
+    this.newCard,
+    this.noForms,
+    this.formsOfPaymentChecked,
+  });
 
   HomeScreenState copyWith({
     String? merchantId,
@@ -43,20 +44,18 @@ final class HomeScreenState extends Equatable {
     Map<String, bool>? formsOfPaymentChecked,
   }) {
     return HomeScreenState(
-      merchantId: merchantId ?? this.merchantId,
-      apiKey: apiKey ?? this.apiKey,
-      sessionId: sessionId ?? this.sessionId,
-      amount: amount ?? this.amount,
-      currencyCode: currencyCode ?? this.currencyCode,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      customerId: customerId ?? this.customerId,
-      showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
-      newCard: newCard ?? this.newCard,
-      noForms: noForms ?? this.noForms,
-      preloadPayload: preloadPayload ?? this.preloadPayload,
-      formsOfPaymentChecked:
-          formsOfPaymentChecked ?? this.formsOfPaymentChecked,
-    );
+        merchantId: merchantId ?? this.merchantId,
+        apiKey: apiKey ?? this.apiKey,
+        sessionId: sessionId ?? this.sessionId,
+        amount: amount ?? this.amount,
+        currencyCode: currencyCode ?? this.currencyCode,
+        phoneNumber: phoneNumber ?? this.phoneNumber,
+        customerId: customerId ?? this.customerId,
+        showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
+        newCard: newCard ?? this.newCard,
+        noForms: noForms ?? this.noForms,
+        preloadPayload: preloadPayload ?? this.preloadPayload,
+        formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked);
   }
 
   @override

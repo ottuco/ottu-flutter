@@ -33,10 +33,10 @@ dependencies:
 
   ottu_flutter_checkout:
     #to use ottu_flutter_checkout sdk from the local source uncomment line below and comment 3 lines with git specification
-    #path: ../ottu_flutter_checkout
-    git:
-      url: git@github.com:ottuco/ottu-flutter-checkout.git
-      ref: main
+    path: ../ottu_flutter_checkout
+    #git:
+    #  url: git@github.com:ottuco/ottu-flutter-checkout.git
+    #  ref: main
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -47,6 +47,7 @@ dependencies:
   json_annotation: ^4.9.0
   cupertino_icons: 1.0.8
   logger: 2.4.0
+  flutter_colorpicker: 1.1.0
 
 dev_dependencies:
   flutter_test:

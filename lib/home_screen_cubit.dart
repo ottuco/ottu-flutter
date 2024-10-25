@@ -42,6 +42,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   final GoRouter _navigator;
   final _logger = Logger();
   final _dio = Dio();
+  CheckoutTheme _theme = CheckoutTheme();
 
   HomeScreenCubit({required GoRouter navigator})
       : _navigator = navigator,
@@ -60,14 +61,11 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               "token_pay": true
             })));
 
-  void getSessionId(
-      {required String merchantId, required String apiKey}) async {
+  void getSessionId({required String merchantId, required String apiKey}) async {
     _logger.d("getSessionId");
     final language = Platform.localeName.split("_")[0];
     final request = CreateTransactionRequest(
-        amount: state.amount != null
-            ? (double.tryParse(state.amount!).toString() ?? "0.0")
-            : "0.0",
+        amount: state.amount != null ? (double.tryParse(state.amount!).toString() ?? "0.0") : "0.0",
         currencyCode: state.currencyCode ?? "",
         pgCodes: pgCodes,
         type: transactionType,
@@ -78,11 +76,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         customerFirstName: customerFirstName,
         customerLastName: customerLastName,
         customerEmail: customerEmail,
-        billingAddress: BillingAddress(
-            country: billingCountry, city: billingCity, line1: "something"));
+        billingAddress:
+            BillingAddress(country: billingCountry, city: billingCity, line1: "something"));
 
-    _dio.interceptors
-        .add(LogInterceptor(responseBody: true, requestBody: true));
+    _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
 
     final response = await _dio.post(
       'https://$merchantId/b/checkout/v1/pymt-txn',
@@ -146,8 +143,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
   void onPay() async {
     _logger.d("onPay");
-    final amount =
-        state.amount != null ? double.tryParse(state.amount!) ?? 0.1 : 0.1;
+    final amount = state.amount != null ? double.tryParse(state.amount!) ?? 0.1 : 0.1;
     final args = CheckoutArguments(
         merchantId: state.merchantId,
         apiKey: state.apiKey,
@@ -160,5 +156,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
                 .toList() ??
             []);
     _navigator.push("/checkout", extra: args);
+  }
+
+  void onThemeCustomization() async {
+    _logger.d("onThemeCustomization");
+    final theme = await _navigator.push<CheckoutTheme>("/theme_customization", extra: _theme);
+    if (theme != null) {
+      _theme = _theme;
+    }
   }
 }

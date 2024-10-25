@@ -11,3 +11,5 @@ pubspec.lock
 *.iml
 /android/.gradle/
 ios/Podfile.lock
+ios/.symlinks
+ios/Flutter/ephemeral/*/.swiftpm

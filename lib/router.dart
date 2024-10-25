@@ -4,6 +4,8 @@ import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/chackout_screen.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen_cubit.dart';
+import 'package:ottu_flutter_checkout_sample/theme/theme_customization_screen.dart';
+import 'package:ottu_flutter_checkout_sample/theme/theme_customization_screen_cubit.dart';
 
 // GoRouter configuration
 final router = GoRouter(
@@ -16,7 +18,15 @@ final router = GoRouter(
             )),
     GoRoute(
       path: '/checkout',
-      builder: (context, state) => CheckoutScreen(title: "Checkout", checkoutArguments: state.extra as CheckoutArguments),
-    )
+      builder: (context, state) =>
+          CheckoutScreen(title: "Checkout", checkoutArguments: state.extra as CheckoutArguments),
+    ),
+    GoRoute(
+        path: '/theme_customization',
+        builder: (context, state) => BlocProvider(
+              create: (_) => ThemeCustomizationScreenCubit(
+                  navigator: GoRouter.of(context), theme: state.extra as CheckoutTheme),
+              child: const ThemeCustomizationScreen(),
+            ))
   ],
 );

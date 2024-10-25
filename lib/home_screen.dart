@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         border: UnderlineInputBorder(),
                         labelText: 'Amount',
                       ),
-                      keyboardType: TextInputType.number,
+                      keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.digitsOnly
                       ],
@@ -268,7 +268,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ]),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          context.read<HomeScreenCubit>().onThemeCustomization();
+                        },
                         child: const Text("Theme customization")),
                     const SizedBox(height: 16),
                     ElevatedButton(
