@@ -6,7 +6,6 @@ part of 'billing_address.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-
 BillingAddress _$BillingAddressFromJson(Map<String, dynamic> json) =>
     BillingAddress(
       country: json['country'] as String?,

@@ -12,6 +12,7 @@ final class HomeScreenState extends Equatable {
   final bool? newCard;
   final bool? noForms;
   final bool? preloadPayload;
+  final bool hasSessionLoaded;
   final Map<String, bool>? formsOfPaymentChecked;
 
   const HomeScreenState({
@@ -26,6 +27,7 @@ final class HomeScreenState extends Equatable {
     this.preloadPayload,
     this.newCard,
     this.noForms,
+    this.hasSessionLoaded = false,
     this.formsOfPaymentChecked,
   });
 
@@ -41,6 +43,7 @@ final class HomeScreenState extends Equatable {
     bool? newCard,
     bool? noForms,
     bool? preloadPayload,
+    bool? hasSessionLoaded,
     Map<String, bool>? formsOfPaymentChecked,
   }) {
     return HomeScreenState(
@@ -55,6 +58,7 @@ final class HomeScreenState extends Equatable {
         newCard: newCard ?? this.newCard,
         noForms: noForms ?? this.noForms,
         preloadPayload: preloadPayload ?? this.preloadPayload,
+        hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
         formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked);
   }
 
@@ -69,6 +73,7 @@ final class HomeScreenState extends Equatable {
         sessionId,
         preloadPayload,
         phoneNumber,
+        hasSessionLoaded,
         formsOfPaymentChecked.hashCode
       ];
 }

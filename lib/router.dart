@@ -25,7 +25,7 @@ final router = GoRouter(
         path: '/theme_customization',
         builder: (context, state) => BlocProvider(
               create: (_) => ThemeCustomizationScreenCubit(
-                  navigator: GoRouter.of(context), theme: state.extra as CheckoutTheme),
+                  navigator: GoRouter.of(context), theme: state.extra as CheckoutTheme?),
               child: const ThemeCustomizationScreen(),
             ))
   ],

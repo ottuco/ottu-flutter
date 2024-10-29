@@ -14,12 +14,3 @@ ApiTransactionDetails _$ApiTransactionDetailsFromJson(
       json['customer_phone'] as String?,
       json['currency_code'] as String,
     );
-
-Map<String, dynamic> _$ApiTransactionDetailsToJson(
-    ApiTransactionDetails instance) =>
-    <String, dynamic>{
-      'amount': instance.amount,
-      'customer_id': instance.customerId,
-      'customer_phone': instance.customerPhone,
-      'currency_code': instance.currencyCode,
-    };

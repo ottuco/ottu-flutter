@@ -6,7 +6,6 @@ part of 'create_transaction_request.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-
 CreateTransactionRequest _$CreateTransactionRequestFromJson(
         Map<String, dynamic> json) =>
     CreateTransactionRequest(
@@ -27,19 +26,20 @@ CreateTransactionRequest _$CreateTransactionRequestFromJson(
       includeSdkSetupPreload: json['include_sdk_setup_preload'] as bool,
       language: json['language'] as String,
     );
+
 Map<String, dynamic> _$CreateTransactionRequestToJson(
-    CreateTransactionRequest instance) =>
+        CreateTransactionRequest instance) =>
     <String, dynamic>{
-          'amount': instance.amount,
-          'currency_code': instance.currencyCode,
-          'pg_codes': instance.pgCodes,
-          'type': instance.type,
-          'customer_id': instance.customerId,
-          'customer_phone': instance.customerPhone,
-          'customer_first_name': instance.customerFirstName,
-          'customer_last_name': instance.customerLastName,
-          'customer_email': instance.customerEmail,
-          'billing_address': instance.billingAddress,
-          'include_sdk_setup_preload': instance.includeSdkSetupPreload,
-          'language': instance.language,
+      'amount': instance.amount,
+      'currency_code': instance.currencyCode,
+      'pg_codes': instance.pgCodes,
+      'type': instance.type,
+      'customer_id': instance.customerId,
+      'customer_phone': instance.customerPhone,
+      'customer_first_name': instance.customerFirstName,
+      'customer_last_name': instance.customerLastName,
+      'customer_email': instance.customerEmail,
+      'billing_address': instance.billingAddress,
+      'include_sdk_setup_preload': instance.includeSdkSetupPreload,
+      'language': instance.language,
     };

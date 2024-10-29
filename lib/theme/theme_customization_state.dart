@@ -2,9 +2,9 @@ import 'package:equatable/equatable.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 
 final class ThemeCustomizationState extends Equatable {
-  final CheckoutTheme theme;
+  final CheckoutTheme? theme;
 
-  const ThemeCustomizationState({required this.theme});
+  const ThemeCustomizationState({this.theme});
 
   ThemeCustomizationState copyWith({
     CheckoutTheme? theme,
@@ -16,6 +16,6 @@ final class ThemeCustomizationState extends Equatable {
 
   @override
   List<Object?> get props => [
-        theme.hashCode,
+        theme?.hashCode,
       ];
 }

@@ -42,7 +42,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   final GoRouter _navigator;
   final _logger = Logger();
   final _dio = Dio();
-  CheckoutTheme _theme = CheckoutTheme();
+  CheckoutTheme? _theme;
 
   HomeScreenCubit({required GoRouter navigator})
       : _navigator = navigator,
@@ -63,6 +63,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
   void getSessionId({required String merchantId, required String apiKey}) async {
     _logger.d("getSessionId");
+    emit(state.copyWith(hasSessionLoaded: false));
     final language = Platform.localeName.split("_")[0];
     final request = CreateTransactionRequest(
         amount: state.amount != null ? (double.tryParse(state.amount!).toString() ?? "0.0") : "0.0",
@@ -95,7 +96,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
     if (response.data != null) {
       final sessionResponse = SessionResponse.fromJson(response.data);
-      emit(state.copyWith(sessionId: sessionResponse.sessionId));
+      emit(state.copyWith(sessionId: sessionResponse.sessionId, hasSessionLoaded: true));
     }
   }
 
@@ -154,15 +155,15 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
                 .where((entry) => entry.value)
                 .map((entry) => entry.key)
                 .toList() ??
-            []);
+            [], theme: _theme);
     _navigator.push("/checkout", extra: args);
   }
 
   void onThemeCustomization() async {
     _logger.d("onThemeCustomization");
-    final theme = await _navigator.push<CheckoutTheme>("/theme_customization", extra: _theme);
+    final theme = await _navigator.push<CheckoutTheme?>("/theme_customization", extra: _theme);
     if (theme != null) {
-      _theme = _theme;
+      _theme = theme;
     }
   }
 }
