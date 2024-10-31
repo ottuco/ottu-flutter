@@ -85,31 +85,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
           //    ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child:
-              ElevatedButton(onPressed: () {}, child: const Text("Run Ottu")),
-        ),
         const SizedBox(height: 80),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              "$_counter",
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-        SizedBox(height: 80),
-      ])),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ])), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
