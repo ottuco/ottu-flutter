@@ -492,7 +492,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
       ValueListenableBuilder(
           valueListenable: btn,
           builder: (context, value, __) =>
-              _colorOptionItem(value?.uncheckedTrackTintColor, "uncheckedTrackTintColor", (color) {
+              _colorOptionItem(value?.uncheckedTrackTintColor, "Unchecked Track", (color) {
                 btn.value =
                     (value ?? ch.SwitchComponent()).copyWith(uncheckedTrackTintColor: color);
               })),
@@ -501,7 +501,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
       ValueListenableBuilder(
           valueListenable: btn,
           builder: (context, value, __) =>
-              _colorOptionItem(value?.checkedTrackDecorationColor, "Checked Track", (color) {
+              _colorOptionItem(value?.checkedTrackDecorationColor, "Checked Track Decoration", (color) {
                 btn.value =
                     (value ?? ch.SwitchComponent()).copyWith(checkedTrackDecorationColor: color);
               })),
