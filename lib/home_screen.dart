@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
-                          value: false,
+                          value:  state.preloadPayload ?? false,
                           onChanged: (bool? value) {
                             context.read<HomeScreenCubit>().onPreloadPayloadChecked(value);
                           },
@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
-                          value: false,
+                          value:  state.noForms ?? false,
                           onChanged: (bool? value) {
                             context.read<HomeScreenCubit>().onNoFormsChecked(value);
                           },

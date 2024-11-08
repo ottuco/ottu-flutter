@@ -43,6 +43,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   final _logger = Logger();
   final _dio = Dio();
   CheckoutTheme? _theme;
+  String? _apiTransactionDetails;
 
   HomeScreenCubit({required GoRouter navigator})
       : _navigator = navigator,
@@ -96,6 +97,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
     if (response.data != null) {
       final sessionResponse = SessionResponse.fromJson(response.data);
+      _apiTransactionDetails = sessionResponse.transactionDetails;
       emit(state.copyWith(sessionId: sessionResponse.sessionId, hasSessionLoaded: true));
     }
   }
@@ -103,7 +105,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   void onFormsOfPaymentChecked(String key, bool isChecked) {
     final payments = state.formsOfPaymentChecked ?? Map.from({});
     payments[key] = isChecked;
-    emit(state.copyWith(formsOfPaymentChecked: Map.from(payments)));
+    emit(state.copyWith(
+        formsOfPaymentChecked: Map.from(payments), noForms: isChecked ? false : null));
   }
 
   void onShowPaymentDetailsChecked(bool isChecked) async {
@@ -115,7 +118,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   }
 
   void onNoFormsChecked(bool? isChecked) async {
-    emit(state.copyWith(noForms: isChecked));
+    emit(state.copyWith(
+        noForms: isChecked, formsOfPaymentChecked: isChecked == true ? Map.from({}) : null));
   }
 
   void onPreloadPayloadChecked(bool? isChecked) async {
@@ -151,11 +155,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         sessionId: state.sessionId ?? "",
         amount: amount,
         showPaymentDetails: state.showPaymentDetails,
+        apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
         formsOfPayment: state.formsOfPaymentChecked?.entries
                 .where((entry) => entry.value)
                 .map((entry) => entry.key)
                 .toList() ??
-            [], theme: _theme);
+            [],
+        theme: _theme);
     _navigator.push("/checkout", extra: args);
   }
 
