@@ -141,8 +141,8 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
-				1429EFFD2CD4F19A00DD80DA /* XCLocalSwiftPackageReference "../../ottu_flutter_checkout/ios/ottu_flutter_checkout" */,
+				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
+				1429EFFD2CD4F19A00DD80DA /* XCLocalSwiftPackageReference "ottu_flutter_checkout" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -510,11 +510,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		1429EFFD2CD4F19A00DD80DA /* XCLocalSwiftPackageReference "../../ottu_flutter_checkout/ios/ottu_flutter_checkout" */ = {
+		1429EFFD2CD4F19A00DD80DA /* XCLocalSwiftPackageReference "ottu_flutter_checkout" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../ottu_flutter_checkout/ios/ottu_flutter_checkout;
 		};
-		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
+		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};

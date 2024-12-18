@@ -28,18 +28,27 @@ CreateTransactionRequest _$CreateTransactionRequestFromJson(
     );
 
 Map<String, dynamic> _$CreateTransactionRequestToJson(
-        CreateTransactionRequest instance) =>
-    <String, dynamic>{
-      'amount': instance.amount,
-      'currency_code': instance.currencyCode,
-      'pg_codes': instance.pgCodes,
-      'type': instance.type,
-      'customer_id': instance.customerId,
-      'customer_phone': instance.customerPhone,
-      'customer_first_name': instance.customerFirstName,
-      'customer_last_name': instance.customerLastName,
-      'customer_email': instance.customerEmail,
-      'billing_address': instance.billingAddress,
-      'include_sdk_setup_preload': instance.includeSdkSetupPreload,
-      'language': instance.language,
-    };
+    CreateTransactionRequest instance) {
+  final val = <String, dynamic>{
+    'amount': instance.amount,
+    'currency_code': instance.currencyCode,
+    'pg_codes': instance.pgCodes,
+    'type': instance.type,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('customer_id', instance.customerId);
+  val['customer_phone'] = instance.customerPhone;
+  val['customer_first_name'] = instance.customerFirstName;
+  val['customer_last_name'] = instance.customerLastName;
+  val['customer_email'] = instance.customerEmail;
+  val['billing_address'] = instance.billingAddress;
+  val['include_sdk_setup_preload'] = instance.includeSdkSetupPreload;
+  val['language'] = instance.language;
+  return val;
+}

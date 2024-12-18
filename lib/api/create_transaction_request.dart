@@ -11,7 +11,7 @@ class CreateTransactionRequest {
   @JsonKey(name: "pg_codes")
   final List<String> pgCodes;
   final String type;
-  @JsonKey(name: "customer_id")
+  @JsonKey(name: "customer_id", includeIfNull: false)
   final String? customerId;
   @JsonKey(name: "customer_phone")
   final String? customerPhone;

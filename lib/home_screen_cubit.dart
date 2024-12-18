@@ -71,7 +71,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         currencyCode: state.currencyCode ?? "",
         pgCodes: pgCodes,
         type: transactionType,
-        customerId: state.customerId,
+        customerId: state.customerId?.isNotEmpty == true ? state.customerId : null,
         customerPhone: state.phoneNumber,
         includeSdkSetupPreload: state.preloadPayload ?? false,
         language: language,
@@ -149,6 +149,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   void onPay() async {
     _logger.d("onPay");
     final amount = state.amount != null ? double.tryParse(state.amount!) ?? 0.1 : 0.1;
+    final formOfPayments = state.formsOfPaymentChecked?.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
     final args = CheckoutArguments(
         merchantId: state.merchantId,
         apiKey: state.apiKey,
@@ -156,11 +160,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         amount: amount,
         showPaymentDetails: state.showPaymentDetails,
         apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
-        formsOfPayment: state.formsOfPaymentChecked?.entries
-                .where((entry) => entry.value)
-                .map((entry) => entry.key)
-                .toList() ??
-            [],
+        formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
         theme: _theme);
     _navigator.push("/checkout", extra: args);
   }
