@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,8 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Customer App Form'),
-        actions: <Widget>[
-        ],
+        actions: <Widget>[],
       ),
       body: BlocListener<HomeScreenCubit, HomeScreenState>(
         listenWhen: (previous, current) =>
@@ -141,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
-                          value:  state.preloadPayload ?? false,
+                          value: state.preloadPayload ?? false,
                           onChanged: (bool? value) {
                             context.read<HomeScreenCubit>().onPreloadPayloadChecked(value);
                           },
@@ -151,25 +152,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
-                          value:  state.noForms ?? false,
+                          value: state.noForms ?? false,
                           onChanged: (bool? value) {
                             context.read<HomeScreenCubit>().onNoFormsChecked(value);
                           },
                         ),
                         const Text('No forms of payment')
                       ]),
-                      Row(children: [
-                        Checkbox(
-                          checkColor: Colors.white,
-                          value: state.formsOfPaymentChecked?['google_pay'] ?? false,
-                          onChanged: (bool? value) {
-                            context
-                                .read<HomeScreenCubit>()
-                                .onFormsOfPaymentChecked('google_pay', value ?? false);
-                          },
-                        ),
-                        const Text('Google pay')
-                      ]),
+                      nativePayMethod(value: state.formsOfPaymentChecked?[nativePayMethodKey] ?? false),
                       Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
@@ -270,5 +260,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 }))),
       ),
     );
+  }
+
+  Widget nativePayMethod({bool value = false}) {
+    return Row(children: [
+      Checkbox(
+        checkColor: Colors.white,
+        value: value,
+        onChanged: (bool? value) {
+          context.read<HomeScreenCubit>().onFormsOfPaymentChecked(nativePayMethodKey, value ?? false);
+        },
+      ),
+      Text(_nativePayMethodName())
+    ]);
+  }
+
+  String _nativePayMethodName() {
+    if (Platform.isAndroid) {
+      return 'Google pay';
+    } else if (Platform.isIOS) {
+      return 'Apple pay';
+    } else {
+      return 'Native pay';
+    }
   }
 }

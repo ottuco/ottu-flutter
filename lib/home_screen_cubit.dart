@@ -26,7 +26,7 @@ const pgCodes = [
   "nbk-mpgs",
   "gbk-cc",
   "tamara",
-  "tabby"
+  "tabby",
 ];
 
 const customerFirstName = "John";
@@ -36,7 +36,8 @@ const billingCountry = "KW";
 const billingCity = "Kuwait City";
 
 //    const customerPhone = "966557877988"
-const customerPhone = "99459272";
+const _customerPhone = "99459272";
+const nativePayMethodKey = 'native_pay';
 
 class HomeScreenCubit extends Cubit<HomeScreenState> {
   final GoRouter _navigator;
@@ -51,10 +52,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
             merchantId: merchantId,
             apiKey: apiKey,
             currencyCode: currencyCode,
-            phoneNumber: customerPhone,
+            phoneNumber: _customerPhone,
             customerId: customerId,
             formsOfPaymentChecked: Map.from({
-              "google_pay": true,
+              nativePayMethodKey: true,
               "redirect": true,
               "flex_methods": true,
               "stc_pay": true,
@@ -69,7 +70,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     final request = CreateTransactionRequest(
         amount: state.amount != null ? (double.tryParse(state.amount!).toString() ?? "0.0") : "0.0",
         currencyCode: state.currencyCode ?? "",
-        pgCodes: pgCodes,
+        pgCodes: pgCodesNative(),
         type: transactionType,
         customerId: state.customerId?.isNotEmpty == true ? state.customerId : null,
         customerPhone: state.phoneNumber,
@@ -151,7 +152,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     final amount = state.amount != null ? double.tryParse(state.amount!) ?? 0.1 : 0.1;
     final formOfPayments = state.formsOfPaymentChecked?.entries
         .where((entry) => entry.value)
-        .map((entry) => entry.key)
+        .map((entry) => _nativePaymentKey(entry.key))
         .toList();
     final args = CheckoutArguments(
         merchantId: state.merchantId,
@@ -171,5 +172,32 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     if (theme != null) {
       _theme = theme;
     }
+  }
+
+  String _nativePaymentKey(String key) {
+    if (key == nativePayMethodKey) {
+      return _nativePayMethodKey();
+    } else {
+      return key;
+    }
+  }
+
+  String _nativePayMethodKey() {
+    if (Platform.isAndroid) {
+      return 'google_pay';
+    } else if (Platform.isIOS) {
+      return 'apple_pay';
+    } else {
+      return 'native_pay';
+    }
+  }
+
+  List<String> pgCodesNative() {
+    final codes = List.of(pgCodes);
+    if (Platform.isIOS) {
+      codes.add("apple-pay-nbk");
+    }
+
+    return codes;
   }
 }
