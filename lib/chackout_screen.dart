@@ -74,7 +74,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         const Padding(
             padding: EdgeInsets.all(12.0),
             child: Text(
-                "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements")),
+                "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements,"
+                    " Some users UI elements, Some users UI elements, Some users UI elements,"
+                    " Some users UI elements, Some users UI elements, Some users UI elements")),
       ])), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
