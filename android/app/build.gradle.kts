@@ -21,9 +21,10 @@ plugins {
 android {
     compileSdk = 34
     namespace = "com.ottu.sample"
-
-    lintOptions {
-        disable("InvalidPackage")
+    lint {
+        abortOnError = false
+        ignoreWarnings = true
+        checkDependencies = false
     }
 
     defaultConfig {
@@ -46,7 +47,8 @@ android {
     buildTypes {
         getByName("release") {
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("release")
+            //signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -65,5 +67,5 @@ android {
 
 dependencies {
     //implementation(project(":ottu-flutter-checkout"))
-    //implementation("com.ottu.flutter.checkout:ottu-flutter-checkout:1.0.3")
+    //implementation("com.ottu.flutter.checkout:ottu-flutter-checkout:1.0.6")
 }

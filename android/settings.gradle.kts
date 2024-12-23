@@ -46,29 +46,31 @@ if (localPropertiesFile.exists()) {
     throw FileNotFoundException("local.properties file not found at ${localPropertiesFile.absolutePath}")
 }
 // Check if :ottu-android-checkout is included as a dependency
-val appBuildGradleFile = File(rootProject.projectDir, "app/build.gradle.kts")
-val ottuSdkPath: String? = localProperties.getProperty("ottuSdk")
-val ottuSdkFile = ottuSdkPath?.let { File(ottuSdkPath, "build.gradle.kts") }
+//val appBuildGradleFile = File(rootProject.projectDir, "app/build.gradle.kts")
+val flutterOttuSdkPath: String? = localProperties.getProperty("flutterOttuSdk")
+val flutterOttuSdkFile = flutterOttuSdkPath?.let { File(flutterOttuSdkPath, "build.gradle.kts") }
 //println("Gradle build file: $appBuildGradleFile")
-println("Ottu sdk build file: $ottuSdkFile")
+println("Flutter Ottu sdk build file: $flutterOttuSdkFile")
 
-if (ottuSdkFile != null) {
+if (flutterOttuSdkFile != null) {
     //println("Gradle build file: $appBuildGradleFile")
     //val buildGradleContent = appBuildGradleFile.readLines()
-    val ottuSdkContent = ottuSdkFile.readLines()
+    val gradleBuildContent = flutterOttuSdkFile.readLines()
     //val isDependencyExist = buildGradleContent.any { line ->
-    val isDependencyExist = ottuSdkContent.any { line ->
+    val isDependencyExist = gradleBuildContent.any { line ->
         /*line.contains("""implementation(project(":ottu-flutter-checkout"))""") && !line.trim()
             .startsWith("//")*/
-        line.contains("""implementation("com.ottu.checkout:ottu-android-checkout:1.0.3")""") && !line.trim()
+        line.contains("""implementation("com.ottu.checkout:ottu-android-checkout:1.0.6")""") && !line.trim()
             .startsWith("//")
     }
     if (isDependencyExist) {
-        println("Has ottu local project dependency, includeBuild: $ottuSdkPath")
-        includeBuild(ottuSdkPath!!)
+        println("Has flutter ottu local project dependency, includeBuild: $flutterOttuSdkPath")
+        includeBuild(flutterOttuSdkPath!!)
+    } else {
+        println("Has no ottu local project dependency")
     }
 } else {
-    println("otu sdk file has not found at $appBuildGradleFile")
+    println("otu sdk file has not found at $flutterOttuSdkFile")
 }
 
 include(":app")

@@ -13,3 +13,4 @@ pubspec.lock
 ios/Podfile.lock
 ios/.symlinks
 ios/Flutter/ephemeral/*/.swiftpm
+/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved

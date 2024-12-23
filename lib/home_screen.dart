@@ -16,7 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final amountEditingController = TextEditingController();
+  late TextEditingController amountEditingController;
   late TextEditingController currencyCodeEditingController;
   late TextEditingController merchantIdEditingController;
   late TextEditingController apiKeyEditingController;
@@ -26,7 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    final state = context.read<HomeScreenCubit>().state;
+    final state = context
+        .read<HomeScreenCubit>()
+        .state;
+    amountEditingController = TextEditingController(text: state.amount);
     currencyCodeEditingController = TextEditingController(text: state.currencyCode);
     merchantIdEditingController = TextEditingController(text: state.merchantId);
     apiKeyEditingController = TextEditingController(text: state.apiKey);
@@ -45,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: BlocListener<HomeScreenCubit, HomeScreenState>(
         listenWhen: (previous, current) =>
-            previous.hasSessionLoaded != current.hasSessionLoaded && current.hasSessionLoaded,
+        previous.hasSessionLoaded != current.hasSessionLoaded && current.hasSessionLoaded,
         listener: (context, state) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             duration: Duration(seconds: 1),
@@ -159,7 +162,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Text('No forms of payment')
                       ]),
-                      nativePayMethod(value: state.formsOfPaymentChecked?[nativePayMethodKey] ?? false),
+                      nativePayMethod(
+                          value: state.formsOfPaymentChecked?[nativePayMethodKey] ?? false),
                       Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
@@ -172,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Text('Redirect')
                       ]),
-                      Row(children: [
+                      /*              Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
                           value: state.formsOfPaymentChecked?['flex_methods'] ?? false,
@@ -183,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                         const Text('Flex methods')
-                      ]),
+                      ]),*/
                       Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
@@ -220,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Text('Token Pay')
                       ]),
-                      Row(children: [
+                      /* Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
                           value: state.newCard ?? false,
@@ -229,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                         const Text('Add new Card')
-                      ]),
+                      ]),*/
                       const SizedBox(height: 16),
                       ElevatedButton(
                           onPressed: () {
@@ -250,9 +254,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ElevatedButton(
                           onPressed: state.sessionId != null
                               ? () {
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                  context.read<HomeScreenCubit>().onPay();
-                                }
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            context.read<HomeScreenCubit>().onPay();
+                          }
                               : null,
                           child: const Text("Pay")),
                     ],
@@ -263,16 +267,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget nativePayMethod({bool value = false}) {
-    return Row(children: [
-      Checkbox(
-        checkColor: Colors.white,
-        value: value,
-        onChanged: (bool? value) {
-          context.read<HomeScreenCubit>().onFormsOfPaymentChecked(nativePayMethodKey, value ?? false);
-        },
-      ),
-      Text(_nativePayMethodName())
-    ]);
+    if (Platform.isAndroid) {
+      return SizedBox.shrink();
+    } else {
+      return Row(children: [
+        Checkbox(
+          checkColor: Colors.white,
+          value: value,
+          onChanged: (bool? value) {
+            context
+                .read<HomeScreenCubit>()
+                .onFormsOfPaymentChecked(nativePayMethodKey, value ?? false);
+          },
+        ),
+        Text(_nativePayMethodName())
+      ]);
+    }
   }
 
   String _nativePayMethodName() {

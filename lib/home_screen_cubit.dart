@@ -49,6 +49,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   HomeScreenCubit({required GoRouter navigator})
       : _navigator = navigator,
         super(HomeScreenState(
+            amount: "10",
             merchantId: merchantId,
             apiKey: apiKey,
             currencyCode: currencyCode,
