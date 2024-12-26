@@ -56,7 +56,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
             phoneNumber: _customerPhone,
             customerId: customerId,
             formsOfPaymentChecked: Map.from({
-              nativePayMethodKey: true,
+              nativePayMethodKey: _hasNativePaymentAllowed(),
               "redirect": true,
               "flex_methods": true,
               "stc_pay": true,
@@ -200,5 +200,15 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     }
 
     return codes;
+  }
+}
+
+bool _hasNativePaymentAllowed() {
+  if (Platform.isAndroid) {
+    return false;
+  } else if (Platform.isIOS) {
+    return true;
+  } else {
+    return true;
   }
 }
