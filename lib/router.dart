@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/chackout_screen.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen_cubit.dart';
+import 'package:ottu_flutter_checkout_sample/main.dart';
 import 'package:ottu_flutter_checkout_sample/theme/theme_customization_screen.dart';
 import 'package:ottu_flutter_checkout_sample/theme/theme_customization_screen_cubit.dart';
 
@@ -13,7 +15,9 @@ final router = GoRouter(
     GoRoute(
         path: '/',
         builder: (context, state) => BlocProvider(
-              create: (_) => HomeScreenCubit(navigator: GoRouter.of(context)),
+              create: (_) => HomeScreenCubit(
+                  navigator: GoRouter.of(context),
+                  themeModeNotifier: context.watch<ThemeModeNotifierHolder>()),
               child: const HomeScreen(),
             )),
     GoRoute(

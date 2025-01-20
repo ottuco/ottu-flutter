@@ -74,6 +74,6 @@ final class HomeScreenState extends Equatable {
         preloadPayload,
         phoneNumber,
         hasSessionLoaded,
-        formsOfPaymentChecked.hashCode
+        formsOfPaymentChecked.hashCode,
       ];
 }

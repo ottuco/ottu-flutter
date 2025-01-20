@@ -9,6 +9,7 @@ import 'package:ottu_flutter_checkout_sample/api/billing_address.dart';
 import 'package:ottu_flutter_checkout_sample/api/create_transaction_request.dart';
 import 'package:ottu_flutter_checkout_sample/api/session_response.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen_state.dart';
+import 'package:ottu_flutter_checkout_sample/main.dart';
 
 const merchantId = "alpha.ottu.net";
 const apiKey = "cHSLW0bE.56PLGcUYEhRvzhHVVO9CbF68hmDiXcPI";
@@ -45,9 +46,11 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   final _dio = Dio();
   CheckoutTheme? _theme;
   String? _apiTransactionDetails;
+  ThemeModeNotifierHolder _themeModeNotifier;
 
-  HomeScreenCubit({required GoRouter navigator})
+  HomeScreenCubit({required GoRouter navigator, required ThemeModeNotifierHolder themeModeNotifier})
       : _navigator = navigator,
+        _themeModeNotifier = themeModeNotifier,
         super(HomeScreenState(
             amount: "10",
             merchantId: merchantId,
@@ -172,6 +175,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     final theme = await _navigator.push<CheckoutTheme?>("/theme_customization", extra: _theme);
     if (theme != null) {
       _theme = theme;
+      _themeModeNotifier.themeModeNotifier.value = theme.uiMode.toThemeMode();
     }
   }
 
