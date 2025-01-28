@@ -359,9 +359,44 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
       ValueListenableBuilder(
           valueListenable: btn,
           builder: (context, btnValue, __) =>
-              _colorOptionItem(btnValue?.textColor.color, "Button Color", (color) {
-                btn.value = (btnValue ?? ch.ButtonComponent())
-                    .copyWith(textColor: ch.ColorState(color: color));
+              _colorOptionItem(btnValue?.rippleColor?.color, "Button Color", (color) {
+                final button = (btnValue ?? ch.ButtonComponent());
+                btn.value = button.copyWith(
+                    rippleColor: (button.rippleColor ?? ch.RippleColor()).copyWith(color: color));
+              })),
+      const SizedBox(height: dividerPadding),
+      subDivider(),
+      const SizedBox(height: dividerPadding),
+      ValueListenableBuilder(
+          valueListenable: btn,
+          builder: (context, btnValue, __) => _colorOptionItem(
+                  btnValue?.rippleColor?.colorDisabled, "Button Disabled Color", (color) {
+                final button = (btnValue ?? ch.ButtonComponent());
+                btn.value = button.copyWith(
+                    rippleColor:
+                        (button.rippleColor ?? ch.RippleColor()).copyWith(colorDisabled: color));
+              })),
+      const SizedBox(height: dividerPadding),
+      subDivider(),
+      const SizedBox(height: dividerPadding),
+      ValueListenableBuilder(
+          valueListenable: btn,
+          builder: (context, btnValue, __) =>
+              _colorOptionItem(btnValue?.textColor?.color, "Text Color", (color) {
+                final button = (btnValue ?? ch.ButtonComponent());
+                final c = button.textColor ?? ch.ColorState();
+                btn.value = button.copyWith(textColor: c.copyWith(color: color));
+              })),
+      const SizedBox(height: dividerPadding),
+      subDivider(),
+      const SizedBox(height: dividerPadding),
+      ValueListenableBuilder(
+          valueListenable: btn,
+          builder: (context, btnValue, __) =>
+              _colorOptionItem(btnValue?.textColor?.colorDisabled, "Text disabled Color", (color) {
+                final button = (btnValue ?? ch.ButtonComponent());
+                final c = button.textColor ?? ch.ColorState();
+                btn.value = button.copyWith(textColor: c.copyWith(colorDisabled: color));
               })),
       const SizedBox(height: 10),
       ElevatedButton(
@@ -500,8 +535,8 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
       subDivider(),
       ValueListenableBuilder(
           valueListenable: btn,
-          builder: (context, value, __) =>
-              _colorOptionItem(value?.checkedTrackDecorationColor, "Checked Track Decoration", (color) {
+          builder: (context, value, __) => _colorOptionItem(
+                  value?.checkedTrackDecorationColor, "Checked Track Decoration", (color) {
                 btn.value =
                     (value ?? ch.SwitchComponent()).copyWith(checkedTrackDecorationColor: color);
               })),
