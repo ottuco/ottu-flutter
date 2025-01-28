@@ -64,7 +64,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               "flex_methods": true,
               "stc_pay": true,
               "ottu_pg": true,
-              "token_pay": true
+              "token_pay": true,
+              "direct": true,
             })));
 
   void getSessionId({required String merchantId, required String apiKey}) async {
@@ -116,10 +117,6 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
   void onShowPaymentDetailsChecked(bool isChecked) async {
     emit(state.copyWith(showPaymentDetails: isChecked));
-  }
-
-  void onNewCardChecked(bool? isChecked) async {
-    emit(state.copyWith(newCard: isChecked));
   }
 
   void onNoFormsChecked(bool? isChecked) async {

@@ -26,9 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    final state = context
-        .read<HomeScreenCubit>()
-        .state;
+    final state = context.read<HomeScreenCubit>().state;
     amountEditingController = TextEditingController(text: state.amount);
     currencyCodeEditingController = TextEditingController(text: state.currencyCode);
     merchantIdEditingController = TextEditingController(text: state.merchantId);
@@ -48,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: BlocListener<HomeScreenCubit, HomeScreenState>(
         listenWhen: (previous, current) =>
-        previous.hasSessionLoaded != current.hasSessionLoaded && current.hasSessionLoaded,
+            previous.hasSessionLoaded != current.hasSessionLoaded && current.hasSessionLoaded,
         listener: (context, state) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             duration: Duration(seconds: 1),
@@ -224,16 +222,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const Text('Token Pay')
                       ]),
-                      /* Row(children: [
+                      Row(children: [
                         Checkbox(
                           checkColor: Colors.white,
-                          value: state.newCard ?? false,
+                          value: state.formsOfPaymentChecked?['direct'] ?? false,
                           onChanged: (bool? value) {
-                            context.read<HomeScreenCubit>().onNewCardChecked(value);
+                            context
+                                .read<HomeScreenCubit>()
+                                .onFormsOfPaymentChecked('direct', value ?? false);
                           },
                         ),
                         const Text('Add new Card')
-                      ]),*/
+                      ]),
                       const SizedBox(height: 16),
                       ElevatedButton(
                           onPressed: () {
@@ -254,9 +254,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ElevatedButton(
                           onPressed: state.sessionId != null
                               ? () {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            context.read<HomeScreenCubit>().onPay();
-                          }
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  context.read<HomeScreenCubit>().onPay();
+                                }
                               : null,
                           child: const Text("Pay")),
                     ],

@@ -9,7 +9,6 @@ final class HomeScreenState extends Equatable {
   final String? phoneNumber;
   final String? customerId;
   final bool showPaymentDetails;
-  final bool? newCard;
   final bool? noForms;
   final bool? preloadPayload;
   final bool hasSessionLoaded;
@@ -25,7 +24,6 @@ final class HomeScreenState extends Equatable {
     this.customerId,
     this.showPaymentDetails = true,
     this.preloadPayload,
-    this.newCard,
     this.noForms,
     this.hasSessionLoaded = false,
     this.formsOfPaymentChecked,
@@ -40,7 +38,6 @@ final class HomeScreenState extends Equatable {
     String? phoneNumber,
     String? customerId,
     bool? showPaymentDetails,
-    bool? newCard,
     bool? noForms,
     bool? preloadPayload,
     bool? hasSessionLoaded,
@@ -55,7 +52,6 @@ final class HomeScreenState extends Equatable {
         phoneNumber: phoneNumber ?? this.phoneNumber,
         customerId: customerId ?? this.customerId,
         showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
-        newCard: newCard ?? this.newCard,
         noForms: noForms ?? this.noForms,
         preloadPayload: preloadPayload ?? this.preloadPayload,
         hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
@@ -66,7 +62,6 @@ final class HomeScreenState extends Equatable {
   List<Object?> get props => [
         showPaymentDetails,
         amount,
-        newCard,
         currencyCode,
         noForms,
         customerId,
