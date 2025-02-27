@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
+import 'package:ottu_flutter_checkout_sample/PGCodes.dart';
 import 'package:ottu_flutter_checkout_sample/api/billing_address.dart';
 import 'package:ottu_flutter_checkout_sample/api/create_transaction_request.dart';
 import 'package:ottu_flutter_checkout_sample/api/session_response.dart';
@@ -16,20 +19,6 @@ const apiKey = "cHSLW0bE.56PLGcUYEhRvzhHVVO9CbF68hmDiXcPI";
 const customerId = "john2";
 const currencyCode = "KWD";
 const transactionType = "e_commerce";
-
-const pgCodes = [
-  "mpgs-testing",
-  "ottu_pg_kwd_tkn",
-  "knet-staging",
-  "benefit",
-  "benefitpay",
-  "stc_pay",
-  "nbk-mpgs",
-  "gbk-cc",
-  "tamara",
-  "tabby",
-];
-
 const customerFirstName = "John";
 const customerLastName = "Smith";
 const customerEmail = "john1@some.mail";
@@ -63,15 +52,28 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               "redirect": true,
               "flex_methods": true,
               "stc_pay": true,
-              "ottu_pg": true,
               "token_pay": true,
-              "direct": true,
+              "card_onsite": true,
+            }),
+            pgCodesChecked: Map.from({
+              PGCode.mpgs: true,
+              PGCode.tap_pg: true,
+              PGCode.knet: true,
+              PGCode.benefit: true,
+              PGCode.benefitpay: true,
+              PGCode.stc_pay: true,
+              PGCode.nbk_mpgs: true,
+              PGCode.urpay: true,
+             // PGCode.tamara: true,
+             // PGCode.tabby: true,
             })));
 
   void getSessionId({required String merchantId, required String apiKey}) async {
     _logger.d("getSessionId");
     emit(state.copyWith(hasSessionLoaded: false));
     final language = Platform.localeName.split("_")[0];
+    final cardExpiryTime =
+        state.cardExpiryTime?.isNotEmpty == true ? int.tryParse(state.cardExpiryTime!) : null;
     final request = CreateTransactionRequest(
         amount: state.amount != null ? (double.tryParse(state.amount!).toString() ?? "0.0") : "0.0",
         currencyCode: state.currencyCode ?? "",
@@ -85,26 +87,39 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         customerLastName: customerLastName,
         customerEmail: customerEmail,
         billingAddress:
-            BillingAddress(country: billingCountry, city: billingCity, line1: "something"));
+            BillingAddress(country: billingCountry, city: billingCity, line1: "something"),
+        cardAcceptanceCriteria:
+            cardExpiryTime != null ? CardAcceptanceCriteria(minExpiryTime: cardExpiryTime) : null);
 
     _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
+    try {
+      final response = await _dio.post(
+        'https://$merchantId/b/checkout/v1/pymt-txn',
+        data: request.toJson(),
+        options: Options(
+          headers: {
+            Headers.contentTypeHeader: Headers.jsonContentType,
+            "Authorization": "Api-Key $apiKey",
+            "Accept-Language": language,
+          },
+        ),
+      );
 
-    final response = await _dio.post(
-      'https://$merchantId/b/checkout/v1/pymt-txn',
-      data: request.toJson(),
-      options: Options(
-        headers: {
-          Headers.contentTypeHeader: Headers.jsonContentType,
-          "Authorization": "Api-Key $apiKey",
-          "Accept-Language": language,
-        },
-      ),
-    );
-
-    if (response.data != null) {
-      final sessionResponse = SessionResponse.fromJson(response.data);
-      _apiTransactionDetails = sessionResponse.transactionDetails;
-      emit(state.copyWith(sessionId: sessionResponse.sessionId, hasSessionLoaded: true));
+      if (response.data != null) {
+        final sessionResponse = SessionResponse.fromJson(response.data);
+        _apiTransactionDetails = sessionResponse.transactionDetails;
+        emit(state.copyWith(sessionId: sessionResponse.sessionId, hasSessionLoaded: true));
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        _logger.e("getSessionId ${e.response?.data}");
+        print("getSessionId ${e.response?.headers}");
+        print("getSessionId ${e.response?.requestOptions}");
+      } else {
+        // Something happened in setting up or sending the request that triggered an Error
+        print("getSessionId ${e.requestOptions}");
+        print("getSessionId ${e.message}");
+      }
     }
   }
 
@@ -113,6 +128,16 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     payments[key] = isChecked;
     emit(state.copyWith(
         formsOfPaymentChecked: Map.from(payments), noForms: isChecked ? false : null));
+  }
+
+  void onPgCodeChecked(PGCode pgCode, bool isChecked) {
+    final codes = state.pgCodesChecked ?? Map.from({});
+    codes[pgCode] = isChecked;
+    final related = PGCode.values.firstWhereOrNull((code) => code.code == pgCode.inverselyRelated);
+    if (isChecked && related != null) {
+      codes[related] = false;
+    }
+    emit(state.copyWith(pgCodesChecked: Map.from(codes)));
   }
 
   void onShowPaymentDetailsChecked(bool isChecked) async {
@@ -138,6 +163,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
   void onPhoneNumberChanged(String number) async {
     emit(state.copyWith(phoneNumber: number));
+  }
+
+  void onCardExpiryTimeChanged(String time) async {
+    emit(state.copyWith(cardExpiryTime: time));
   }
 
   void onCustomerIdChanged(String customerId) async {
@@ -187,7 +216,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   String _nativePayMethodKey() {
     if (Platform.isAndroid) {
       return 'google_pay';
-    } else if (Platform.isIOS) {
+    } else if (Platform.isIOS && kReleaseMode) {
       return 'apple_pay';
     } else {
       return 'native_pay';
@@ -195,12 +224,15 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   }
 
   List<String> pgCodesNative() {
-    final codes = List.of(pgCodes);
-    if (Platform.isIOS) {
-      codes.add("apple-pay-nbk");
+    final codes = state.pgCodesChecked?.entries
+        .where((entry) => entry.value)
+        .map((entry) => _nativePaymentKey(entry.key.code))
+        .toList();
+    if (Platform.isIOS && kReleaseMode) {
+      codes?.add("apple-pay");
     }
 
-    return codes;
+    return codes ?? [];
   }
 }
 

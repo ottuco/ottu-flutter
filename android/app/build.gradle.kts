@@ -9,6 +9,7 @@ if (Files.exists(localPropertiesFile)) {
     }
 }
 
+val ABI_FILTERS="armeabi-v7a"
 val flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
 val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
@@ -33,6 +34,11 @@ android {
         targetSdk = 34
         versionCode = flutterVersionCode.toInt()
         versionName = flutterVersionName
+
+        ndk {
+            // Filter for architectures supported by Flutter
+            //abiFilters += listOf("armeabi-v7a", "arm64-v8a")
+        }
     }
 
     signingConfigs {

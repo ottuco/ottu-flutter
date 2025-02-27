@@ -26,6 +26,8 @@ class CreateTransactionRequest {
   @JsonKey(name: "include_sdk_setup_preload")
   final bool includeSdkSetupPreload;
   final String language;
+  @JsonKey(name: "card_acceptance_criteria", includeIfNull: false)
+  final CardAcceptanceCriteria? cardAcceptanceCriteria;
 
   CreateTransactionRequest(
       {required this.amount,
@@ -38,6 +40,7 @@ class CreateTransactionRequest {
       this.customerLastName,
       this.customerEmail,
       this.billingAddress,
+      this.cardAcceptanceCriteria,
       required this.includeSdkSetupPreload,
       required this.language});
 
@@ -45,4 +48,17 @@ class CreateTransactionRequest {
       _$CreateTransactionRequestFromJson(json);
 
   Map<String, dynamic> toJson() => _$CreateTransactionRequestToJson(this);
+}
+
+@JsonSerializable()
+class CardAcceptanceCriteria {
+  @JsonKey(name: "min_expiry_time")
+  final int minExpiryTime;
+
+  CardAcceptanceCriteria({required this.minExpiryTime});
+
+  factory CardAcceptanceCriteria.fromJson(Map<String, dynamic> json) =>
+      _$CardAcceptanceCriteriaFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CardAcceptanceCriteriaToJson(this);
 }

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:ottu_flutter_checkout_sample/PGCodes.dart';
 
 final class HomeScreenState extends Equatable {
   final String merchantId;
@@ -8,11 +9,13 @@ final class HomeScreenState extends Equatable {
   final String? currencyCode;
   final String? phoneNumber;
   final String? customerId;
+  final String? cardExpiryTime;
   final bool showPaymentDetails;
   final bool? noForms;
   final bool? preloadPayload;
   final bool hasSessionLoaded;
   final Map<String, bool>? formsOfPaymentChecked;
+  final Map<PGCode, bool>? pgCodesChecked;
 
   const HomeScreenState({
     required this.merchantId,
@@ -22,11 +25,13 @@ final class HomeScreenState extends Equatable {
     this.currencyCode,
     this.phoneNumber,
     this.customerId,
+    this.cardExpiryTime,
     this.showPaymentDetails = true,
     this.preloadPayload,
     this.noForms,
     this.hasSessionLoaded = false,
     this.formsOfPaymentChecked,
+    this.pgCodesChecked,
   });
 
   HomeScreenState copyWith({
@@ -37,11 +42,13 @@ final class HomeScreenState extends Equatable {
     String? currencyCode,
     String? phoneNumber,
     String? customerId,
+    String? cardExpiryTime,
     bool? showPaymentDetails,
     bool? noForms,
     bool? preloadPayload,
     bool? hasSessionLoaded,
     Map<String, bool>? formsOfPaymentChecked,
+    Map<PGCode, bool>? pgCodesChecked,
   }) {
     return HomeScreenState(
         merchantId: merchantId ?? this.merchantId,
@@ -51,11 +58,13 @@ final class HomeScreenState extends Equatable {
         currencyCode: currencyCode ?? this.currencyCode,
         phoneNumber: phoneNumber ?? this.phoneNumber,
         customerId: customerId ?? this.customerId,
+        cardExpiryTime: cardExpiryTime ?? this.cardExpiryTime,
         showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
         noForms: noForms ?? this.noForms,
         preloadPayload: preloadPayload ?? this.preloadPayload,
         hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
-        formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked);
+        formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
+        pgCodesChecked: pgCodesChecked ?? this.pgCodesChecked);
   }
 
   @override
@@ -65,10 +74,12 @@ final class HomeScreenState extends Equatable {
         currencyCode,
         noForms,
         customerId,
+        cardExpiryTime,
         sessionId,
         preloadPayload,
         phoneNumber,
         hasSessionLoaded,
         formsOfPaymentChecked.hashCode,
+        pgCodesChecked.hashCode
       ];
 }

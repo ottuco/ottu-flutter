@@ -23,32 +23,41 @@ CreateTransactionRequest _$CreateTransactionRequestFromJson(
           ? null
           : BillingAddress.fromJson(
               json['billing_address'] as Map<String, dynamic>),
+      cardAcceptanceCriteria: json['card_acceptance_criteria'] == null
+          ? null
+          : CardAcceptanceCriteria.fromJson(
+              json['card_acceptance_criteria'] as Map<String, dynamic>),
       includeSdkSetupPreload: json['include_sdk_setup_preload'] as bool,
       language: json['language'] as String,
     );
 
 Map<String, dynamic> _$CreateTransactionRequestToJson(
-    CreateTransactionRequest instance) {
-  final val = <String, dynamic>{
-    'amount': instance.amount,
-    'currency_code': instance.currencyCode,
-    'pg_codes': instance.pgCodes,
-    'type': instance.type,
-  };
+        CreateTransactionRequest instance) =>
+    <String, dynamic>{
+      'amount': instance.amount,
+      'currency_code': instance.currencyCode,
+      'pg_codes': instance.pgCodes,
+      'type': instance.type,
+      if (instance.customerId case final value?) 'customer_id': value,
+      'customer_phone': instance.customerPhone,
+      'customer_first_name': instance.customerFirstName,
+      'customer_last_name': instance.customerLastName,
+      'customer_email': instance.customerEmail,
+      'billing_address': instance.billingAddress,
+      'include_sdk_setup_preload': instance.includeSdkSetupPreload,
+      'language': instance.language,
+      if (instance.cardAcceptanceCriteria case final value?)
+        'card_acceptance_criteria': value,
+    };
 
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
+CardAcceptanceCriteria _$CardAcceptanceCriteriaFromJson(
+        Map<String, dynamic> json) =>
+    CardAcceptanceCriteria(
+      minExpiryTime: (json['min_expiry_time'] as num).toInt(),
+    );
 
-  writeNotNull('customer_id', instance.customerId);
-  val['customer_phone'] = instance.customerPhone;
-  val['customer_first_name'] = instance.customerFirstName;
-  val['customer_last_name'] = instance.customerLastName;
-  val['customer_email'] = instance.customerEmail;
-  val['billing_address'] = instance.billingAddress;
-  val['include_sdk_setup_preload'] = instance.includeSdkSetupPreload;
-  val['language'] = instance.language;
-  return val;
-}
+Map<String, dynamic> _$CardAcceptanceCriteriaToJson(
+        CardAcceptanceCriteria instance) =>
+    <String, dynamic>{
+      'min_expiry_time': instance.minExpiryTime,
+    };
