@@ -70,8 +70,3 @@ android {
         viewBinding = true
     }
 }
-
-dependencies {
-    //implementation(project(":ottu-flutter-checkout"))
-    //implementation("com.ottu.flutter.checkout:ottu-flutter-checkout:1.0.6")
-}

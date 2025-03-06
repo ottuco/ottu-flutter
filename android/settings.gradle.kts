@@ -46,21 +46,14 @@ if (localPropertiesFile.exists()) {
     throw FileNotFoundException("local.properties file not found at ${localPropertiesFile.absolutePath}")
 }
 // Check if :ottu-android-checkout is included as a dependency
-//val appBuildGradleFile = File(rootProject.projectDir, "app/build.gradle.kts")
 val flutterOttuSdkPath: String? = localProperties.getProperty("flutterOttuSdk")
 val flutterOttuSdkFile = flutterOttuSdkPath?.let { File(flutterOttuSdkPath, "build.gradle.kts") }
-//println("Gradle build file: $appBuildGradleFile")
 println("Flutter Ottu sdk build file: $flutterOttuSdkFile")
 
 if (flutterOttuSdkFile != null) {
-    //println("Gradle build file: $appBuildGradleFile")
-    //val buildGradleContent = appBuildGradleFile.readLines()
     val gradleBuildContent = flutterOttuSdkFile.readLines()
-    //val isDependencyExist = buildGradleContent.any { line ->
     val isDependencyExist = gradleBuildContent.any { line ->
-        /*line.contains("""implementation(project(":ottu-flutter-checkout"))""") && !line.trim()
-            .startsWith("//")*/
-        line.contains("""implementation("com.ottu.checkout:ottu-android-checkout:1.0.6")""") && !line.trim()
+        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.6")""") && !line.trim()
             .startsWith("//")
     }
     if (isDependencyExist) {
