@@ -10,7 +10,7 @@ Ottu Flutter SDK containing repo
 4. Run `flutter pub get` command
 
 ## Sample
-`dependencies:
+dependencies:
     flutter:
     sdk: flutter
 
@@ -20,4 +20,4 @@ Ottu Flutter SDK containing repo
     git:
         url: git@github.com:ottuco/ottu-flutter.git
         ref: main
-`
+
