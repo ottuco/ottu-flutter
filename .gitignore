@@ -2,3 +2,7 @@
 /.idea/
 /build/
 /ios/ottu_flutter_checkout/.swiftpm/
+/Sample/build/
+/Sample/pubspec.lock
+/Sample/ottu_flutter_checkout_sample.iml
+/Sample/ottu_sample.iml
