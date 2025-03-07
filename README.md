@@ -18,6 +18,6 @@ dependencies:
     #to use ottu_flutter_checkout sdk from the local source uncomment line below and comment 3 lines with git specification
     #path: ../ottu_flutter_checkout
     git:
-        url: git@github.com:ottuco/ottu-flutter.git
+        url: https://github.com/ottuco/ottu-flutter.git
         ref: main
 
