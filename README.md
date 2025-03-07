@@ -4,12 +4,15 @@ Ottu Flutter SDK containing repo
 
 ## Downloading the Plugin
 
-1. In the merchant application go to the **pubspec.yaml** file and find the dependencies: tag.
-2. Below that tag add dependency tag with **ottu_flutter_checkout:** name.
-3. Below that dependency name add git dependency to the Flutter Ottu SDK with this url: **git@github.com:ottuco/ottu-flutter.git**
+1. In the merchant application go to the `pubspec.yaml` file and find the dependencies: tag.
+2. Below that tag add dependency tag with `ottu_flutter_checkout:` name.
+3. Below that dependency name add git dependency to the Flutter Ottu SDK with this url: `https://github.com/ottuco/ottu-flutter.git`
 4. Run `flutter pub get` command
 
 ## Sample
+
+Please add the section below to your `pubspec.yaml` file
+```
 dependencies:
     flutter:
     sdk: flutter
@@ -20,4 +23,6 @@ dependencies:
     git:
         url: https://github.com/ottuco/ottu-flutter.git
         ref: main
+```
 
+For source samples please refer to `Sample` folder.
