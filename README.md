@@ -26,3 +26,24 @@ dependencies:
 ```
 
 For source samples please refer to `Sample` folder.
+
+## Implementation
+
+All steps those you will find bellow have already been implemented in the `Sample` app.
+
+Here are steps to implement Ottu checkout widget from scratch:
+1. You have successfully setup the plugin that mentioned above.
+2. In your screen-widget override this method
+    ```
+    @override
+    void didChangeDependencies()
+   ```
+3. Then in that method implement ```MethodChannel.setMethodCallHandler()``` with ```METHOD_CHECKOUT_HEIGHT``` method name.
+   See ```chackout_screen.dart``` for instance in the `Sample` app.
+4. Next, define ```ValueNotifier<int>``` property in a State class of a Widget. 
+   It is essential to handle the height change of the native view.
+5. Now, in the ```MethodCallHandler``` handle callback of a native method and assign ```int``` argument to the ```ValueNotifier```
+6. This step is to add ```OttuCheckoutWidget```, so next decide a place on your screen where you want to show the checkout widget.
+7. Wrap the ```OttuCheckoutWidget``` with ```SizedBox``` other container widget, is just for checkout view constraint.
+8. After, wrap the ```SizedBox``` with ```ValueListenableBuilder<int>``` and pass ```int``` argument of the handler to the ```SizedBox``` as a height parameter.
+9. Last, is to define arguments for ```OttuCheckoutWidget``` which described in the next chapter.
