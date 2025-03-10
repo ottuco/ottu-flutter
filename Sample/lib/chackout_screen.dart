@@ -53,30 +53,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           textAlign: TextAlign.center,
           style: ts.TextStyle(fontSize: 24),
         ),
+        //Start of Merchant content
         const Padding(
             padding: EdgeInsets.all(12.0),
             child: Text(
                 "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements")),
+        //End of Merchant content
         Padding(
           padding: const EdgeInsets.all(12.0),
           child: ValueListenableBuilder<int>(
             builder: (BuildContext context, int height, Widget? child) {
-              //return OttuCheckoutWidget(arguments: widget.checkoutArguments);
               return SizedBox(
-                  height: height.toDouble(),
-                  child: OttuCheckoutWidget(arguments: widget.checkoutArguments),
+                height: height.toDouble(),
+                child: OttuCheckoutWidget(arguments: widget.checkoutArguments),
               );
             },
             valueListenable: _checkoutHeight,
           ),
         ),
         const SizedBox(height: 20),
+        //Start of Merchant content
         const Padding(
             padding: EdgeInsets.all(12.0),
             child: Text(
                 "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements,"
-                    " Some users UI elements, Some users UI elements, Some users UI elements,"
-                    " Some users UI elements, Some users UI elements, Some users UI elements")),
+                " Some users UI elements, Some users UI elements, Some users UI elements,"
+                " Some users UI elements, Some users UI elements, Some users UI elements")),
+        //End of Merchant content
       ])), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
