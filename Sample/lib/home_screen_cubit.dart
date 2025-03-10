@@ -64,8 +64,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               PGCode.stc_pay: true,
               PGCode.nbk_mpgs: true,
               PGCode.urpay: true,
-             // PGCode.tamara: true,
-             // PGCode.tabby: true,
+              // PGCode.tamara: true,
+              // PGCode.tabby: true,
             })));
 
   void getSessionId({required String merchantId, required String apiKey}) async {
@@ -112,13 +112,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       }
     } on DioException catch (e) {
       if (e.response != null) {
-        _logger.e("getSessionId ${e.response?.data}");
-        print("getSessionId ${e.response?.headers}");
-        print("getSessionId ${e.response?.requestOptions}");
+        _logger.e("getSessionId, error ${e.response?.data}", error: e);
+        print(
+            "getSessionId, error ${e.response?.headers}\nData:${e.response?.data}\noptions: ${e.response?.requestOptions}");
       } else {
         // Something happened in setting up or sending the request that triggered an Error
-        print("getSessionId ${e.requestOptions}");
-        print("getSessionId ${e.message}");
+        _logger.e("getSessionId, logger error ${e.message}", error: e);
+        print("getSessionId, error no response ${e.requestOptions}\nmessage: ${e.message}");
       }
     }
   }
@@ -228,10 +228,9 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         .where((entry) => entry.value)
         .map((entry) => _nativePaymentKey(entry.key.code))
         .toList();
-    if (Platform.isIOS && kReleaseMode) {
-      codes?.add("apple-pay");
-    }
 
+    _logger.d("pgCodesNative, pg_codes: $codes");
+    print("pgCodesNative pg_codes: $codes");
     return codes ?? [];
   }
 }

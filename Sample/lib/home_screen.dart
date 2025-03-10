@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -214,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         const Text('Pg Codes:'),
                         Divider(height: 2, thickness: 3),
                         Wrap(spacing: 8.0, runSpacing: 4.0, children: [
-                          for (PGCode code in PGCode.values)
+                          for (PGCode code in pgPlatformCodes())
                             pgCodeCheckbox(state.pgCodesChecked, code, context),
                         ]),
                         const SizedBox(height: 26),
@@ -303,4 +304,12 @@ class _HomeScreenState extends State<HomeScreen> {
       return 'Native pay';
     }
   }
+}
+
+List<PGCode> pgPlatformCodes() {
+  final List<PGCode> codes = List.from(PGCode.values);
+  if (!(Platform.isIOS && kReleaseMode)) {
+    codes.remove(PGCode.apple_pay);
+  }
+  return codes;
 }
