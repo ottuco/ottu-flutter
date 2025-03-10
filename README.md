@@ -95,7 +95,7 @@ Scaffold(
     );
 ```
 
-##Checkout arguments initialisation
+## Checkout arguments initialisation
 Below you may find sample of ```CheckoutArguments``` initialisation that requires  ```OttuCheckoutWidget```. 
 You may find this sample in the ```home_screen_cubit.dart``` at ```onPay``` method.
 
