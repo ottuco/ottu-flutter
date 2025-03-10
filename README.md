@@ -94,3 +94,19 @@ Scaffold(
       ])), // This trailing comma makes auto-formatting nicer for build methods.
     );
 ```
+
+##Checkout arguments initialisation
+Below you may find sample of ```dart CheckoutArguments``` initialisation that requires  ```dart OttuCheckoutWidget```.
+You may find this sample in the ```home_screen_cubit.dart``` at ```onPay``` method.
+
+```dart
+    final checkoutArguments = CheckoutArguments(
+        merchantId: state.merchantId,
+        apiKey: state.apiKey,
+        sessionId: state.sessionId ?? "",
+        amount: amount,
+        showPaymentDetails: state.showPaymentDetails,
+        apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
+        formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
+        theme: _theme);
+```
