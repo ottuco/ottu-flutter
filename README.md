@@ -110,3 +110,8 @@ You may find this sample in the ```home_screen_cubit.dart``` at ```onPay``` meth
         formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
         theme: _theme);
 ```
+
+## Callbacks
+Please note that the callbacks are native (Android/iOS). They can be found in the following files:
+* Android: `https://github.com/ottuco/ottu-flutter/blob/main/android/src/main/kotlin/com/ottu/flutter/checkout/CheckoutView.kt`
+* iOS: `https://github.com/ottuco/ottu-flutter/blob/main/ios/ottu_flutter_checkout/Sources/ottu_flutter_checkout/CheckoutPlatformView.swift`
