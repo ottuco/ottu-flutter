@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ottu_flutter_checkout_sample/router.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 const tag = "MyApp";
 
@@ -32,6 +33,15 @@ class _MyAppState extends State<MyApp> {
               return MaterialApp.router(
                 routerConfig: router,
                 themeMode: themeMode,
+                supportedLocales: [
+                  Locale('ar'),
+                  Locale('en'),
+                ],
+                localizationsDelegates: const [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                ],
                 theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
                   useMaterial3: true,

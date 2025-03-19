@@ -349,7 +349,10 @@ private class CheckoutContainerView: UIView {
         
         paymentSuccessfullLabel.center = self.center
         paymentSuccessfullLabel.textAlignment = .center
-        paymentSuccessfullLabel.text = "Your Payment is done successfully!"
+        paymentSuccessfullLabel.text = NSLocalizedString("payment_done",
+                                                         tableName: "Localizable",
+                                                         bundle: Bundle(for: Self.self),
+                                                         comment: "")
         paymentSuccessfullLabel.font = paymentSuccessfullLabel.font.withSize(17)
         paymentSuccessfullLabel.isHidden = true
         paymentSuccessfullLabel.translatesAutoresizingMaskIntoConstraints =
