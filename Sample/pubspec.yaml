@@ -31,6 +31,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  flutter_localizations:
+    sdk: flutter
+
   ottu_flutter_checkout:
     #to use ottu_flutter_checkout sdk from the local source uncomment line below and comment 3 lines with git specification
     #path: ../ottu_flutter_checkout
