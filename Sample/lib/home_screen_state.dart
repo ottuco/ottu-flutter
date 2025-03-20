@@ -27,7 +27,7 @@ final class HomeScreenState extends Equatable {
     this.customerId,
     this.cardExpiryTime,
     this.showPaymentDetails = true,
-    this.preloadPayload,
+    this.preloadPayload = true,
     this.noForms,
     this.hasSessionLoaded = false,
     this.formsOfPaymentChecked,
