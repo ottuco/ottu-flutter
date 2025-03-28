@@ -199,6 +199,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text('Redirect')
                         ]),
                         Row(children: [
+                          paymentMethodCheckbox(state.formsOfPaymentChecked, 'flex_methods', context),
+                          const Text('Flex')
+                        ]),
+                        Row(children: [
                           paymentMethodCheckbox(state.formsOfPaymentChecked, 'stc_pay', context),
                           const Text('Stc Pay')
                         ]),

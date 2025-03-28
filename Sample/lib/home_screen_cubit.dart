@@ -63,9 +63,9 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               PGCode.benefitpay: true,
               PGCode.stc_pay: true,
               PGCode.nbk_mpgs: true,
-              PGCode.urpay: true,
-              // PGCode.tamara: true,
-              // PGCode.tabby: true,
+              //PGCode.urpay: true,
+              PGCode.tamara: true,
+              PGCode.tabby: true,
             })));
 
   void getSessionId({required String merchantId, required String apiKey}) async {
