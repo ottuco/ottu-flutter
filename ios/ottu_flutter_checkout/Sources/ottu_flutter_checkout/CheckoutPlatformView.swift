@@ -104,12 +104,25 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 delegate: self
             )
             self.paymentViewController = checkout.paymentViewController()
-            
-            if let pvc = self.paymentViewController {
-                _view.addCheckoutView(pvc.view)
-            }
+            tryAttachController()
         } catch {
             debugPrint(error)
+        }
+    }
+    
+    func tryAttachController() {
+        guard let pvc = self.paymentViewController else { return }
+        
+        if let parentVC = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController {
+            parentVC.addChild(pvc)
+            _view.addCheckoutView(pvc.view)
+            pvc.didMove(toParent: parentVC)
+            print("Added to parent!")
+        } else {
+            print("Waiting for parent...")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                self.tryAttachController()
+            }
         }
     }
     
