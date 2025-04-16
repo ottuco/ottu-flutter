@@ -325,7 +325,6 @@ extension CheckoutPlatformView: OttuDelegate {
         debugPrint("successCallback\n")
         DispatchQueue.main.async {
             self.paymentViewController?.view.isHidden = true
-            self._view.paymentSuccessfullLabel.isHidden = false
             self.paymentViewController?.view.setNeedsLayout()
             self.paymentViewController?.view.layoutIfNeeded()
             self._view.heightHandlerView.setNeedsLayout()
@@ -352,24 +351,12 @@ extension CheckoutPlatformView: OttuDelegate {
 }
 
 private class CheckoutContainerView: UIView {
-    let paymentSuccessfullLabel: UILabel
     let heightHandlerView: CheckoutHeightHandlerView
     
     override init(frame: CGRect) {
-        paymentSuccessfullLabel = UILabel()
+
         heightHandlerView = CheckoutHeightHandlerView()
         super.init(frame: frame)
-        
-        paymentSuccessfullLabel.center = self.center
-        paymentSuccessfullLabel.textAlignment = .center
-        paymentSuccessfullLabel.text = NSLocalizedString("payment_done",
-                                                         tableName: "Localizable",
-                                                         bundle: Bundle(for: Self.self),
-                                                         comment: "")
-        paymentSuccessfullLabel.font = paymentSuccessfullLabel.font.withSize(17)
-        paymentSuccessfullLabel.isHidden = true
-        paymentSuccessfullLabel.translatesAutoresizingMaskIntoConstraints =
-        false
     }
     
     required init?(coder: NSCoder) {
@@ -385,12 +372,8 @@ private class CheckoutContainerView: UIView {
         checkoutView.accessibilityIdentifier = "CheckoutView"
         
         addSubview(heightHandlerView)
+        addSubview(checkoutView)
         heightHandlerView.addSubview(checkoutView)
-        heightHandlerView.addSubview(paymentSuccessfullLabel)
-        
-        paymentSuccessfullLabel.centerXAnchor.constraint(
-            equalTo: self.centerXAnchor
-        ).isActive = true
         
         NSLayoutConstraint.activate([
             heightHandlerView.leftAnchor.constraint(
