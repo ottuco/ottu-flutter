@@ -29,7 +29,7 @@ pluginManagement {
     }
 
     val flutterSdkPath = flutterSdkPathFun()
-    println("Flutter SDK: $flutterSdkPath")
+    println("ottu-flutter - Flutter SDK: $flutterSdkPath")
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
     repositories {
         google()
@@ -49,13 +49,16 @@ plugins {
 val appBuildGradleFile = File("${rootProject.projectDir}", "build.gradle.kts")
 val ottuSdkPath: String? = localProperties.getProperty("ottuSdk")
 
-println("Gradle build file: $appBuildGradleFile")
-println("Ottu sdk: $ottuSdkPath")
+println("ottu-flutter - Gradle build file: $appBuildGradleFile")
+println("ottu-flutter - Ottu sdk: $ottuSdkPath")
 
 if (appBuildGradleFile.exists()) {
     val buildGradleContent = appBuildGradleFile.readLines()
     val isDependencyExist = buildGradleContent.any { line ->
-        line.contains("""implementation("com.github.ottuco:ottu-flutter-android:1.0.1")""") && !line.trim()
+        //uncomment this line for remote usage
+        /*line.contains("""implementation("com.github.ottuco:ottu-flutter-android:1.0.1")""") && !line.trim()
+            .startsWith("//")*/
+        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.7")""") && !line.trim()
             .startsWith("//")
     }
     if (isDependencyExist) {
@@ -65,13 +68,13 @@ if (appBuildGradleFile.exists()) {
                 "Property 'ottuSdk' not found in local.properties. " + "Use this: \"ottuSdk=/path/to/your/ottu-android-checkout/app\" with the actual path to your module."
             )
         }
-        println("Has ottu local project dependency, include build sdk: $ottuSdkPath")
+        println("ottu-flutter - Has ottu local project dependency, include build sdk: $ottuSdkPath")
         includeBuild("$ottuSdkPath")
     } else {
-        println("Has no ottu local project dependency")
+        println("ottu-flutter - Has no ottu local project dependency")
     }
 } else {
-    println("gradle file has not found at $appBuildGradleFile")
+    println("ottu-flutter - gradle file has not found at $appBuildGradleFile")
 }
 
 rootProject.name = "ottu-flutter-checkout"

@@ -48,45 +48,27 @@ if (localPropertiesFile.exists()) {
 // Check if :ottu-android-checkout is included as a dependency
 val flutterOttuSdkPath: String? = localProperties.getProperty("flutterOttuSdk")
 val flutterOttuSdkFile = flutterOttuSdkPath?.let { File(flutterOttuSdkPath, "build.gradle.kts") }
-println("Flutter Ottu sdk build file: $flutterOttuSdkFile")
+println("Sample App - Flutter Ottu sdk build file: $flutterOttuSdkFile, exist: ${flutterOttuSdkFile?.exists()}")
 
-if (flutterOttuSdkFile != null) {
+if (flutterOttuSdkFile?.exists() == true) {
     val gradleBuildContent = flutterOttuSdkFile.readLines()
     val isDependencyExist = gradleBuildContent.any { line ->
-        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.6")""") && !line.trim()
+
+        //uncomment this line for remote usage
+        /*line.contains("""implementation("com.github.ottuco:ottu-flutter-android:1.0.1")""") && !line.trim()
+            .startsWith("//")*/
+
+        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.7")""") && !line.trim()
             .startsWith("//")
     }
     if (isDependencyExist) {
-        println("Has flutter ottu local project dependency, includeBuild: $flutterOttuSdkPath")
+        println("Sample App - Has flutter ottu local project dependency, includeBuild: ${flutterOttuSdkPath}")
         includeBuild(flutterOttuSdkPath!!)
     } else {
-        println("Has no ottu local project dependency")
+        println("Sample App - Has no ottu local project dependency")
     }
 } else {
-    println("otu sdk file has not found at $flutterOttuSdkFile")
+    println("Sample App - otu sdk file has not found at $flutterOttuSdkFile")
 }
 
 include(":app")
-
-/*
-val flutterProjectRoot = rootProject.projectDir.parentFile.toPath()
-
-val pluginsProperties = Properties()
-val pluginsFile = File(flutterProjectRoot.toFile(), ".flutter-plugins").toPath()
-
-if (Files.exists(pluginsFile)) {
-    Files.newBufferedReader(pluginsFile).use { reader ->
-        pluginsProperties.load(reader)
-    }
-}
-
-pluginsProperties.forEach{ name, path ->
-    val pluginDirectory = flutterProjectRoot.resolve(path as String).resolve("android").toFile()
-    val settings = flutterProjectRoot.resolve(path).resolve("android/settings.gradle.kts").toFile()
-    include(":$name")
-    project(":$name").projectDir = pluginDirectory
-
-    if (settings.exists()) {
-        apply(settings)
-    }
-}*/
