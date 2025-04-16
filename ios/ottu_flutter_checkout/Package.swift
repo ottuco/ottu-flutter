@@ -11,10 +11,9 @@ let package = Package(
         .library(name: "ottu-flutter-checkout", targets: ["ottu_flutter_checkout"])
     ],
     dependencies: [
-        .package(name: "ottu_checkout_sdk", url: "https://github.com/ottuco/ottu-flutter-ios", from: "2.1.2")
-
         //for the local usage please uncomment this line and comment line above
-        //.package(name: "ottu_checkout_sdk", path: "../../../ottu-ios")
+        .package(name: "ottu_checkout_sdk", path: "../../../ottu-flutter-ios"),
+        .package(url: "https://github.com/scenee/FloatingPanel", from: "2.8.6")
     ],
     targets: [
         .target(

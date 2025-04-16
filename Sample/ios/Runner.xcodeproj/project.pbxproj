@@ -8,10 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		140A71B42D8AE8B000EBA941 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 140A71B32D8AE8B000EBA941 /* Localizable.xcstrings */; };
-		1429EFFF2CD4F19A00DD80DA /* ottu-flutter-checkout in Frameworks */ = {isa = PBXBuildFile; productRef = 1429EFFE2CD4F19A00DD80DA /* ottu-flutter-checkout */; };
 		146CCB6B2D86EDBF0099E785 /* ottu_checkout_sdk in Frameworks */ = {isa = PBXBuildFile; productRef = 146CCB6A2D86EDBF0099E785 /* ottu_checkout_sdk */; };
-		1483E0552D8C9A8400AE48B6 /* ottu_checkout_sdk in Frameworks */ = {isa = PBXBuildFile; productRef = 1483E0542D8C9A8400AE48B6 /* ottu_checkout_sdk */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		14B3564E2D944211005D52A8 /* ottu_checkout_sdk in Frameworks */ = {isa = PBXBuildFile; productRef = 14B3564D2D944211005D52A8 /* ottu_checkout_sdk */; };
+		14B356522D94486C005D52A8 /* ottu_checkout_sdk in Frameworks */ = {isa = PBXBuildFile; productRef = 14B356512D94486C005D52A8 /* ottu_checkout_sdk */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
@@ -47,9 +47,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
-				1429EFFF2CD4F19A00DD80DA /* ottu-flutter-checkout in Frameworks */,
 				146CCB6B2D86EDBF0099E785 /* ottu_checkout_sdk in Frameworks */,
-				1483E0552D8C9A8400AE48B6 /* ottu_checkout_sdk in Frameworks */,
+				14B3564E2D944211005D52A8 /* ottu_checkout_sdk in Frameworks */,
+				14B356522D94486C005D52A8 /* ottu_checkout_sdk in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -122,9 +122,9 @@
 			name = Runner;
 			packageProductDependencies = (
 				78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */,
-				1429EFFE2CD4F19A00DD80DA /* ottu-flutter-checkout */,
 				146CCB6A2D86EDBF0099E785 /* ottu_checkout_sdk */,
-				1483E0542D8C9A8400AE48B6 /* ottu_checkout_sdk */,
+				14B3564D2D944211005D52A8 /* ottu_checkout_sdk */,
+				14B356512D94486C005D52A8 /* ottu_checkout_sdk */,
 			);
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
@@ -158,7 +158,7 @@
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
 				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
-				1483E0532D8C9A8400AE48B6 /* XCRemoteSwiftPackageReference "ottu-flutter-ios" */,
+				14B356502D94486C005D52A8 /* XCLocalSwiftPackageReference "../../../ottu-flutter-ios" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -550,6 +550,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		14B356502D94486C005D52A8 /* XCLocalSwiftPackageReference "../../../ottu-flutter-ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../ottu-flutter-ios";
+		};
 		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
@@ -557,17 +561,16 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1429EFFE2CD4F19A00DD80DA /* ottu-flutter-checkout */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "ottu-flutter-checkout";
-		};
 		146CCB6A2D86EDBF0099E785 /* ottu_checkout_sdk */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ottu_checkout_sdk;
 		};
-		1483E0542D8C9A8400AE48B6 /* ottu_checkout_sdk */ = {
+		14B3564D2D944211005D52A8 /* ottu_checkout_sdk */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1483E0532D8C9A8400AE48B6 /* XCRemoteSwiftPackageReference "ottu-flutter-ios" */;
+			productName = ottu_checkout_sdk;
+		};
+		14B356512D94486C005D52A8 /* ottu_checkout_sdk */ = {
+			isa = XCSwiftPackageProductDependency;
 			productName = ottu_checkout_sdk;
 		};
 		78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */ = {
