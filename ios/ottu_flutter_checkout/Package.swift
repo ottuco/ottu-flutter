@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "ottu-flutter-checkout", targets: ["ottu_flutter_checkout"])
     ],
     dependencies: [
-        .package(name: "ottu_checkout_sdk", url: "git@github.com:ottuco/ottu-flutter-ios.git", branch: "main")
+        .package(name: "ottu_checkout_sdk", url: "https://github.com/ottuco/ottu-flutter-ios", branch: "main")
 
         //for the local usage please uncomment this line and comment line above
         //.package(name: "ottu_checkout_sdk", path: "../../../ottu-ios")
