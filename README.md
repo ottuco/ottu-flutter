@@ -27,6 +27,16 @@ dependencies:
 
 For source samples please refer to `Sample` folder.
 
+### iOS Sample App
+
+In order to install the Flutter iOS plugin and run the demo app, it is required to perform the following initial steps:
+1. Open `ottu-flutter/Sample` in the terminal.
+2. Run `flutter config --enable-swift-package-manager` command.
+3. Run `flutter run` command, which actually compiles the app and opens it in the Xcode.
+
+Please note, it is needed only for the very first launch, in order to install all needed Swift packages.
+Per each next launch, the iOS app is simply opened in Xcode.
+
 ## Implementation
 
 All steps those you will find bellow have already been implemented in the `Sample` app.
