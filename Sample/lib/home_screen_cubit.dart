@@ -169,6 +169,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     emit(state.copyWith(cardExpiryTime: time));
   }
 
+  void onDefaultSelectedPaymentChanged(String payment) async {
+    emit(state.copyWith(defaultSelectedPayment: payment));
+  }
+
   void onCustomerIdChanged(String customerId) async {
     emit(state.copyWith(customerId: customerId));
   }
@@ -177,9 +181,18 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     emit(state.copyWith(merchantId: merchantId));
   }
 
+  void onPaymentsListItemCountChange(String count) {
+    emit(state.copyWith(paymentsListItemCount: count));
+  }
+
+  void onShowPaymentOptionsListChange(bool? isChecked) {
+    emit(state.copyWith(showPaymentOptionsList: isChecked));
+  }
+
   void onPay() async {
     _logger.d("onPay");
     final amount = state.amount != null ? double.tryParse(state.amount!) ?? 0.1 : 0.1;
+    final paymentsListItemCount = int.tryParse(state.paymentsListItemCount) ?? 0;
     final formOfPayments = state.formsOfPaymentChecked?.entries
         .where((entry) => entry.value)
         .map((entry) => _nativePaymentKey(entry.key))
@@ -190,6 +203,9 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         sessionId: state.sessionId ?? "",
         amount: amount,
         showPaymentDetails: state.showPaymentDetails,
+        showPaymentOptionsList: state.showPaymentOptionsList ?? false,
+        defaultSelectedPgCode: state.defaultSelectedPayment,
+        paymentOptionsListCount: paymentsListItemCount,
         apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
         formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
         theme: _theme);

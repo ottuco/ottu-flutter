@@ -10,8 +10,8 @@ enum PGCode {
   tabby(code: "tabby", name: "Tabby"),
 
   apple_pay(code: "apple-pay", name: "Apple Pay"),
-  tap_pg(code: "tap_pg", name: "Tag PG", inverselyRelated: "ottu_sdk"),
-  ottu_sdk(code: "ottu_sdk", name: "Ottu Sdk", inverselyRelated: "tap_pg");
+  tap_pg(code: "tap_pg", name: "Tag PG"),
+  ottu_sdk(code: "ottu_sdk", name: "Ottu Sdk");
 
   const PGCode({required this.code, required this.name, this.inverselyRelated});
 

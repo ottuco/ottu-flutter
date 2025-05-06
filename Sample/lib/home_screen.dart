@@ -27,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late TextEditingController customerIdEditingController;
   late TextEditingController phoneNumberEditingController;
   late TextEditingController cardExpiryTimeController;
+  late TextEditingController paymentsListItemCountController;
+  late TextEditingController defaultSelectedPaymentController;
 
   @override
   void initState() {
@@ -39,6 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
     customerIdEditingController = TextEditingController(text: state.customerId);
     phoneNumberEditingController = TextEditingController(text: state.phoneNumber);
     cardExpiryTimeController = TextEditingController(text: state.cardExpiryTime);
+    paymentsListItemCountController = TextEditingController(text: state.paymentsListItemCount);
+    defaultSelectedPaymentController = TextEditingController(text: state.defaultSelectedPayment);
   }
 
   @override
@@ -157,8 +161,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             labelText: 'Card Expiry Time (day(s))',
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: defaultSelectedPaymentController,
+                          onChanged: (text) {
+                            context.read<HomeScreenCubit>().onDefaultSelectedPaymentChanged(text);
+                          },
+                          maxLength: 96,
+                          keyboardType: TextInputType.text,
+                          decoration: const InputDecoration(
+                            border: UnderlineInputBorder(),
+                            labelText: 'Default selected payment',
+                          ),
+                        ),
                         const SizedBox(height: 24),
-                        const Text('Payment methods:'),
                         Divider(height: 2, thickness: 3),
                         Row(children: [
                           Checkbox(
@@ -183,6 +199,46 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text('Preload payload')
                         ]),
                         Row(children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 18.0),
+                            child: Checkbox(
+                              checkColor: Colors.white,
+                              value: state.showPaymentOptionsList ?? false,
+                              onChanged: (bool? value) {
+                                context
+                                    .read<HomeScreenCubit>()
+                                    .onShowPaymentOptionsListChange(value);
+                              },
+                            ),
+                          ),
+                          Expanded(
+                              child: Padding(
+                            padding: const EdgeInsets.only(top: 18.0),
+                            child: const Text('Show payment options list'),
+                          )),
+                          SizedBox(
+                            width: 120,
+                            child: TextFormField(
+                              controller: paymentsListItemCountController,
+                              maxLength: 2,
+                              enabled: state.showPaymentOptionsList ?? false,
+                              onChanged: (text) {
+                                context.read<HomeScreenCubit>().onPaymentsListItemCountChange(text);
+                              },
+                              decoration: const InputDecoration(
+                                counterText: "",
+                                border: UnderlineInputBorder(),
+                                labelText: 'Payment count',
+                              ),
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                            ),
+                          ),
+                        ]),
+                        const SizedBox(height: 24),
+                        Divider(height: 2, thickness: 3),
+                        const Text('Payment methods:'),
+                        Row(children: [
                           Checkbox(
                             checkColor: Colors.white,
                             value: state.noForms ?? false,
@@ -199,7 +255,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text('Redirect')
                         ]),
                         Row(children: [
-                          paymentMethodCheckbox(state.formsOfPaymentChecked, 'flex_methods', context),
+                          paymentMethodCheckbox(
+                              state.formsOfPaymentChecked, 'flex_methods', context),
                           const Text('Flex')
                         ]),
                         Row(children: [

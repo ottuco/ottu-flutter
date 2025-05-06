@@ -3,6 +3,6 @@
 /workspace.xml
 /.idea/vcs.xml
 /.idea/
-/.dart_tool/
+.dart_tool
 /.flutter-plugins
 /.flutter-plugins-dependencies

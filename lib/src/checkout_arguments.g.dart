@@ -13,9 +13,12 @@ CheckoutArguments _$CheckoutArgumentsFromJson(Map<String, dynamic> json) =>
       sessionId: json['sessionId'] as String,
       amount: (json['amount'] as num).toDouble(),
       showPaymentDetails: json['showPaymentDetails'] as bool,
+      showPaymentOptionsList: json['showPaymentOptionsList'] as bool,
+      paymentOptionsListCount: (json['paymentOptionsListCount'] as num).toInt(),
+      defaultSelectedPgCode: json['defaultSelectedPgCode'] as String?,
       apiTransactionDetails: json['apiTransactionDetails'] as String?,
-      formsOfPayment: (json['formsOfPayment'] as List<dynamic>)
-          .map((e) => e as String)
+      formsOfPayment: (json['formsOfPayment'] as List<dynamic>?)
+          ?.map((e) => e as String)
           .toList(),
       theme: json['theme'] == null
           ? null
@@ -27,8 +30,11 @@ Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
       'merchantId': instance.merchantId,
       'apiKey': instance.apiKey,
       'sessionId': instance.sessionId,
+      'paymentOptionsListCount': instance.paymentOptionsListCount,
       'amount': instance.amount,
       'showPaymentDetails': instance.showPaymentDetails,
+      'showPaymentOptionsList': instance.showPaymentOptionsList,
+      'defaultSelectedPgCode': instance.defaultSelectedPgCode,
       'apiTransactionDetails': instance.apiTransactionDetails,
       'formsOfPayment': instance.formsOfPayment,
       'theme': instance.theme,

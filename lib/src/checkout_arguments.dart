@@ -8,8 +8,11 @@ final class CheckoutArguments {
   final String merchantId;
   final String apiKey;
   final String sessionId;
+  final int paymentOptionsListCount;
   final double amount;
   final bool showPaymentDetails;
+  final bool showPaymentOptionsList;
+  String? defaultSelectedPgCode;
   String? apiTransactionDetails;
   final List<String>? formsOfPayment;
   final CheckoutTheme? theme;
@@ -19,8 +22,11 @@ final class CheckoutArguments {
     required this.sessionId,
     required this.amount,
     required this.showPaymentDetails,
-    required this.apiTransactionDetails,
-    required this.formsOfPayment,
+    required this.showPaymentOptionsList,
+    required this.paymentOptionsListCount,
+    required this.defaultSelectedPgCode,
+    this.apiTransactionDetails,
+    this.formsOfPayment,
     this.theme});
 
   factory CheckoutArguments.fromJson(Map<String, dynamic> json) =>
