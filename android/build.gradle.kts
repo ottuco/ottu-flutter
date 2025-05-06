@@ -53,8 +53,6 @@ android {
 }
 
 dependencies {
-    //uncomment this line to use SDK remotely
-    //implementation("com.github.ottuco:ottu-flutter-android:1.0.1")
     implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.7")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
     implementation("com.squareup.moshi:moshi-adapters:1.15.1")
