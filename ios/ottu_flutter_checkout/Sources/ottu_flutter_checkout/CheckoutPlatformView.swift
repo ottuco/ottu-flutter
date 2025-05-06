@@ -84,6 +84,14 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         
         debugPrint("formsOfPayment: \(formsOfPayment)")
         
+        let paymentOptionsDisplaySettings:PaymentOptionsDisplaySettings =
+        if arguments.showPaymentOptionsList {
+            PaymentOptionsDisplaySettings(mode: .list, visibleItemsCount: arguments.paymentOptionsListCount, defaultSelectedPgCode: arguments.defaultSelectedPgCode)
+        } else {
+            PaymentOptionsDisplaySettings(mode: .bottomSheet, defaultSelectedPgCode: arguments.defaultSelectedPgCode)
+        }
+        
+        
         var apiTransactionDetails: RemoteTransactionDetails?
         if let transactionDetails: String? = arguments.apiTransactionDetails {
             if let td = transactionDetails {
@@ -97,10 +105,12 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             let checkout = Checkout(
                 formsOfPayments: formsOfPayment,
                 theme: theme,
+                displaySettings:paymentOptionsDisplaySettings,
                 sessionId: arguments.sessionId,
                 merchantId: arguments.merchantId,
                 apiKey: arguments.apiKey,
                 setupPreload: transactionDetails,
+                
                 delegate: self
             )
             self.paymentViewController = checkout.paymentViewController()
@@ -354,7 +364,7 @@ private class CheckoutContainerView: UIView {
     let heightHandlerView: CheckoutHeightHandlerView
     
     override init(frame: CGRect) {
-
+        
         heightHandlerView = CheckoutHeightHandlerView()
         super.init(frame: frame)
     }
