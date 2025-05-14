@@ -108,10 +108,13 @@ internal class CheckoutView(
     private fun initCheckoutFragment(onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit) {
         val builder = arguments.run {
             val paymentOptionsDisplayMode =
-                if (showPaymentOptionsList) Checkout.PaymentOptionsDisplayMode.List(
+                if (showPaymentOptionsList) Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
                     visiblePaymentItemsCount = paymentOptionsListCount
-                ) else Checkout.PaymentOptionsDisplayMode.BottomSheet
-            val theme = getCheckoutTheme(arguments).copy(paymentOptionsDisplayMode = paymentOptionsDisplayMode)
+                ) else Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
+            val paymentOptionsDisplaySettings =
+                Checkout.PaymentOptionsDisplaySettings(mode = paymentOptionsDisplayMode)
+
+            val theme = getCheckoutTheme(arguments)
             val payments = formsOfPayment?.map { key ->
                 Checkout.FormsOfPayment.of(key)
             }?.filterNotNull()
@@ -125,7 +128,7 @@ internal class CheckoutView(
                 )
                 .formsOfPayments(payments)
                 .theme(theme)
-                .defaultSelectedPgCode(pgCode = defaultSelectedPgCode)
+                .paymentOptionsDisplaySettings(settings = paymentOptionsDisplaySettings)
                 .logger(Checkout.Logger.INFO)
                 .build()
         }
