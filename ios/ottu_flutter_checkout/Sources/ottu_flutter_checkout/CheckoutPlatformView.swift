@@ -84,6 +84,14 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         
         debugPrint("formsOfPayment: \(formsOfPayment)")
         
+        let paymentOptionsDisplaySettings:PaymentOptionsDisplaySettings =
+        if arguments.showPaymentOptionsList {
+            PaymentOptionsDisplaySettings(mode: .list, visibleItemsCount: UInt(arguments.paymentOptionsListCount), defaultSelectedPgCode: arguments.defaultSelectedPgCode)
+        } else {
+            PaymentOptionsDisplaySettings(mode: .bottomSheet, defaultSelectedPgCode: arguments.defaultSelectedPgCode)
+        }
+
+
         var apiTransactionDetails: RemoteTransactionDetails?
         if let transactionDetails: String? = arguments.apiTransactionDetails {
             if let td = transactionDetails {
@@ -94,25 +102,27 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             let transactionDetails: TransactionDetails? = try
             apiTransactionDetails?.transactionDetails
             debugPrint("setupPreload: \(transactionDetails)")
-            let checkout = Checkout(
+            let checkout = try? Checkout(
                 formsOfPayments: formsOfPayment,
                 theme: theme,
+                displaySettings:paymentOptionsDisplaySettings,
                 sessionId: arguments.sessionId,
                 merchantId: arguments.merchantId,
                 apiKey: arguments.apiKey,
                 setupPreload: transactionDetails,
+
                 delegate: self
             )
-            self.paymentViewController = checkout.paymentViewController()
+            self.paymentViewController = checkout?.paymentViewController()
             tryAttachController()
         } catch {
             debugPrint(error)
         }
     }
-    
+
     func tryAttachController() {
         guard let pvc = self.paymentViewController else { return }
-        
+
         if let parentVC = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController {
             parentVC.addChild(pvc)
             _view.addCheckoutView(pvc.view)
@@ -125,7 +135,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             }
         }
     }
-    
+
     private func getApiTransactionDetails(_ transactionDetails: String) throws
     -> RemoteTransactionDetails?
     {
@@ -155,21 +165,21 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 )
                 debugPrint("Coding path: \(context.codingPath)")
             }
-            
+
             return nil
         }
-        
+
         return nil
     }
-    
+
     private func getCheckoutTheme(_ theme: CustomerTheme?, showPaymentDetails: Bool) -> CheckoutTheme {
         let cht = CheckoutTheme()
         cht.showPaymentDetails = showPaymentDetails
-        
+
         if theme == nil {
             return cht
         }
-        
+
         if let color = theme?.sdkBackgroundColor?.toUIColors() {
             if let cc = color.color {
                 cht.backgroundColor = cc
@@ -180,14 +190,14 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 cht.backgroundColorModal = cc
             }
         }
-        
+
         if let comp = theme?.mainTitleText?.toLabelComponent() {
             cht.mainTitle = comp
         }
         if let comp = theme?.titleText?.toLabelComponent() {
             cht.title = comp
         }
-        
+
         if let comp = theme?.subtitleText?.toLabelComponent() {
             cht.subtitle = comp
         }
@@ -197,7 +207,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         if let comp = theme?.feesSubtitleText?.toLabelComponent() {
             cht.feesSubtitle = comp
         }
-        
+
         if let comp = theme?.dataLabelText?.toLabelComponent() {
             cht.dataLabel = comp
         }
@@ -217,35 +227,35 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 //cht.selectorIconColor = cc
             }
         }
-        
+
         if let color = theme?.paymentItemBackgroundColor?.toUIColors() {
             if let cc = color.color {
                 //cht.paymentItemBackgroundColor = cc
             }
         }
-        
+
         if let switchColor = theme?.switchControl?.toCheckoutSwitch() {
             cht.switchOnTintColor = switchColor
         }
-        
+
         if let button = theme?.button?.toCheckoutButton() {
             cht.button = button
         }
-        
+
         if let selectorButton = theme?.selectorButton?.toCheckoutButton() {
             cht.selectorButton = selectorButton
         }
-        
+
         if let iMargins = theme?.margins?.toMargins() {
             cht.margins = iMargins
         }
-        
+
         if let iconColor = theme?.selectorIconColor?.toUIColors() {
             if let cc = iconColor.color {
                 cht.iconColor = cc
             }
         }
-        
+
         return cht
     }
 }
@@ -262,7 +272,7 @@ extension CheckoutPlatformView: OttuDelegate {
                 self._view.heightHandlerView.layoutIfNeeded()
                 self._view.setNeedsLayout()
                 self._view.layoutIfNeeded()
-                
+
                 let alert = UIAlertController(
                     title: "Error",
                     message: data?.debugDescription ?? "",
@@ -279,13 +289,13 @@ extension CheckoutPlatformView: OttuDelegate {
                 self.paymentViewController?.present(alert, animated: true)
             }
     }
-    
+
     public func cancelCallback(_ data: [String: Any]?) {
         debugPrint("cancelCallback\n")
         DispatchQueue.main
             .async {
                 var message = ""
-                
+
                 if let paymentGatewayInfo = data?["payment_gateway_info"]
                     as? [String: Any],
                    let pgName = paymentGatewayInfo["pg_name"] as? String,
@@ -295,7 +305,7 @@ extension CheckoutPlatformView: OttuDelegate {
                 } else {
                     message = data?.debugDescription ?? ""
                 }
-                
+
                 self.paymentViewController?.view.isHidden = true
                 self.paymentViewController?.view.setNeedsLayout()
                 self.paymentViewController?.view.layoutIfNeeded()
@@ -303,7 +313,7 @@ extension CheckoutPlatformView: OttuDelegate {
                 self._view.heightHandlerView.layoutIfNeeded()
                 self._view.setNeedsLayout()
                 self._view.layoutIfNeeded()
-                
+
                 let alert = UIAlertController(
                     title: "Canсel",
                     message: message,
@@ -320,12 +330,11 @@ extension CheckoutPlatformView: OttuDelegate {
                 self.paymentViewController?.present(alert, animated: true)
             }
     }
-    
+
     public func successCallback(_ data: [String: Any]?) {
         debugPrint("successCallback\n")
         DispatchQueue.main.async {
             self.paymentViewController?.view.isHidden = true
-            self._view.paymentSuccessfullLabel.isHidden = false
             self.paymentViewController?.view.setNeedsLayout()
             self.paymentViewController?.view.layoutIfNeeded()
             self._view.heightHandlerView.setNeedsLayout()
@@ -345,52 +354,36 @@ extension CheckoutPlatformView: OttuDelegate {
                     )
                 )
             debugPrint("successCallback, showing alert\n")
-            
+
             self.paymentViewController?.present(alert, animated: true)
         }
     }
 }
 
 private class CheckoutContainerView: UIView {
-    let paymentSuccessfullLabel: UILabel
     let heightHandlerView: CheckoutHeightHandlerView
-    
+
     override init(frame: CGRect) {
-        paymentSuccessfullLabel = UILabel()
+
         heightHandlerView = CheckoutHeightHandlerView()
         super.init(frame: frame)
-        
-        paymentSuccessfullLabel.center = self.center
-        paymentSuccessfullLabel.textAlignment = .center
-        paymentSuccessfullLabel.text = NSLocalizedString("payment_done",
-                                                         tableName: "Localizable",
-                                                         bundle: Bundle(for: Self.self),
-                                                         comment: "")
-        paymentSuccessfullLabel.font = paymentSuccessfullLabel.font.withSize(17)
-        paymentSuccessfullLabel.isHidden = true
-        paymentSuccessfullLabel.translatesAutoresizingMaskIntoConstraints =
-        false
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     public var onHeightChanged: ((Int) -> Void)?
-    
+
     func addCheckoutView(_ checkoutView: UIView) {
         self.heightHandlerView.onHeightChanged = self.onHeightChanged
         self.heightHandlerView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.accessibilityIdentifier = "CheckoutView"
-        
+
         addSubview(heightHandlerView)
+        addSubview(checkoutView)
         heightHandlerView.addSubview(checkoutView)
-        heightHandlerView.addSubview(paymentSuccessfullLabel)
-        
-        paymentSuccessfullLabel.centerXAnchor.constraint(
-            equalTo: self.centerXAnchor
-        ).isActive = true
         
         NSLayoutConstraint.activate([
             heightHandlerView.leftAnchor.constraint(
