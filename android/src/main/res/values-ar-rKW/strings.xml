@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ok">موافق</string>
+    <string name="configuration_error">خطأ في اعدادت بدء عملية الدفع</string>
+    <string name="failed">Failed</string>
+    <string name="failed_start_payment">فشل في بدء عملية الدفع</string>
+</resources>

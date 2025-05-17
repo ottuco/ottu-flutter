@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.snackbar.Snackbar
 import com.ottu.checkout.Checkout
 import com.ottu.checkout.network.model.payment.ApiTransactionDetails
 import com.ottu.checkout.network.moshi.MoshiFactory
@@ -112,7 +113,10 @@ internal class CheckoutView(
                     visiblePaymentItemsCount = paymentOptionsListCount
                 ) else Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
             val paymentOptionsDisplaySettings =
-                Checkout.PaymentOptionsDisplaySettings(mode = paymentOptionsDisplayMode)
+                Checkout.PaymentOptionsDisplaySettings(
+                    mode = paymentOptionsDisplayMode,
+                    defaultSelectedPgCode = defaultSelectedPgCode
+                )
 
             val theme = getCheckoutTheme(arguments)
             val payments = formsOfPayment?.map { key ->
@@ -142,25 +146,42 @@ internal class CheckoutView(
 
         Log.d(TAG, "initCheckoutFragment, with apiTransactionDetails: $apiTransactionDetails")
         coroutineScope.launch {
-            val sdkFragment = Checkout.init(
-                context = checkoutView.context,
-                builder = builder,
-                setupPreload = apiTransactionDetails,
-                successCallback = {
-                    Log.e("TAG", "successCallback: $it")
-                    showResultDialog(checkoutView.context, it)
-                },
-                cancelCallback = {
-                    Log.e("TAG", "cancelCallback: $it")
-                    showResultDialog(checkoutView.context, it)
-                },
-                errorCallback = { errorData, throwable ->
-                    Log.e("TAG", "errorCallback: $errorData")
-                    showResultDialog(checkoutView.context, errorData, throwable)
-                },
-            )
 
-            onInitialized(sdkFragment)
+            try {
+                val sdkFragment = Checkout.init(
+                    context = checkoutView.context,
+                    builder = builder,
+                    setupPreload = apiTransactionDetails,
+                    successCallback = {
+                        Log.e("TAG", "successCallback: $it")
+                        showResultDialog(checkoutView.context, it)
+                    },
+                    cancelCallback = {
+                        Log.e("TAG", "cancelCallback: $it")
+                        showResultDialog(checkoutView.context, it)
+                    },
+                    errorCallback = { errorData, throwable ->
+                        Log.e("TAG", "errorCallback: $errorData")
+                        showResultDialog(checkoutView.context, errorData, throwable)
+                    },
+                )
+
+                onInitialized(sdkFragment)
+            } catch (e: Exception) {
+                Log.w(TAG, "initCheckoutFragment", e)
+                Log.i(TAG, "initCheckoutFragment, show SnackBar")
+                val fa = checkoutView.context as FragmentActivity
+                fa.runOnUiThread {
+                    val message = checkoutView.context.getString(R.string.failed_start_payment)
+                    val ok = checkoutView.context.getString(R.string.ok)
+                    val snackBar =
+                        Snackbar.make(checkoutView, message, Snackbar.LENGTH_LONG)
+                            .setAction(ok) {
+
+                            }
+                    snackBar.show()
+                }
+            }
         }
     }
 
