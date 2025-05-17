@@ -1,0 +1,4 @@
+configuration_error = "Configuration Error";
+failed = "Failed";
+failed_start_payment = "Failed in initializing of the payment process";
+ok ="OK";

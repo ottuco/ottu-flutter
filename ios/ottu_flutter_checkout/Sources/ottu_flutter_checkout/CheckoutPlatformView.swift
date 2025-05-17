@@ -72,6 +72,31 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         return _view
     }
     
+    fileprivate func showSdkError() {
+        if let parentVC = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController {
+            let title = NSLocalizedString("configuration_error", bundle: Bundle.module, comment: "title of the dialog")
+            let message = NSLocalizedString("failed_start_payment", bundle: Bundle.module, comment: "messafe of the dialog")
+            let ok = NSLocalizedString("ok", bundle: Bundle.module, comment: "button label")
+            
+            
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: ok, style: .default, handler: { action in
+                switch action.style{
+                case .default:
+                    print("default")
+                    
+                case .cancel:
+                    print("cancel")
+                    
+                case .destructive:
+                    print("destructive")
+                    
+                }
+            }))
+            parentVC.present(alert, animated: true, completion: nil)
+        }
+    }
+    
     @MainActor
     func createNativeView(arguments: CheckoutArguments) {
         debugPrint("createNativeView, checkout args: \(arguments)")
@@ -102,7 +127,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             let transactionDetails: TransactionDetails? = try
             apiTransactionDetails?.transactionDetails
             debugPrint("setupPreload: \(transactionDetails)")
-            let checkout = try? Checkout(
+            let checkout = try Checkout(
                 formsOfPayments: formsOfPayment,
                 theme: theme,
                 displaySettings:paymentOptionsDisplaySettings,
@@ -113,10 +138,11 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
 
                 delegate: self
             )
-            self.paymentViewController = checkout?.paymentViewController()
+            self.paymentViewController = checkout.paymentViewController()
             tryAttachController()
         } catch {
             debugPrint(error)
+            showSdkError()
         }
     }
 

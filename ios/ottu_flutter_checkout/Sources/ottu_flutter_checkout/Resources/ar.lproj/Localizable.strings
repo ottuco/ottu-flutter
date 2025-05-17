@@ -1,0 +1,4 @@
+configuration_error = "خطأ في اعدادت بدء عملية الدفع";
+failed = "Failed";
+failed_start_payment = "فشل في بدء عملية الدفع";
+ok = "موافق";
