@@ -287,11 +287,11 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
 }
 
 extension CheckoutPlatformView: OttuDelegate {
+    
     public func errorCallback(_ data: [String: Any]?) {
         debugPrint("errorCallback\n")
         DispatchQueue.main
             .async {
-                self.paymentViewController?.view.isHidden = true
                 self.paymentViewController?.view.setNeedsLayout()
                 self.paymentViewController?.view.layoutIfNeeded()
                 self._view.heightHandlerView.setNeedsLayout()
@@ -332,7 +332,6 @@ extension CheckoutPlatformView: OttuDelegate {
                     message = data?.debugDescription ?? ""
                 }
 
-                self.paymentViewController?.view.isHidden = true
                 self.paymentViewController?.view.setNeedsLayout()
                 self.paymentViewController?.view.layoutIfNeeded()
                 self._view.heightHandlerView.setNeedsLayout()
@@ -360,7 +359,6 @@ extension CheckoutPlatformView: OttuDelegate {
     public func successCallback(_ data: [String: Any]?) {
         debugPrint("successCallback\n")
         DispatchQueue.main.async {
-            self.paymentViewController?.view.isHidden = true
             self.paymentViewController?.view.setNeedsLayout()
             self.paymentViewController?.view.layoutIfNeeded()
             self._view.heightHandlerView.setNeedsLayout()
