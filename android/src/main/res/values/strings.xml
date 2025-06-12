@@ -2,5 +2,5 @@
     <string name="ok">OK</string>
     <string name="configuration_error">Configuration Error</string>
     <string name="failed">Failed</string>
-    <string name="failed_start_payment">Failed in initializing of the payment process</string>
+    <string name="failed_start_payment">The specified number of visible payment options is invalid. Please ensure it falls within the supported range.</string>
 </resources>

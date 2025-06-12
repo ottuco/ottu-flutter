@@ -74,7 +74,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     
     fileprivate func showSdkError() {
         if let parentVC = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController {
-            let title = NSLocalizedString("configuration_error", bundle: Bundle.module, comment: "title of the dialog")
+            let title = NSLocalizedString("failed", bundle: Bundle.module, comment: "title of the dialog")
             let message = NSLocalizedString("failed_start_payment", bundle: Bundle.module, comment: "messafe of the dialog")
             let ok = NSLocalizedString("ok", bundle: Bundle.module, comment: "button label")
             

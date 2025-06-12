@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.fragment.app.FragmentActivity
-import com.google.android.material.snackbar.Snackbar
 import com.ottu.checkout.Checkout
 import com.ottu.checkout.network.model.payment.ApiTransactionDetails
 import com.ottu.checkout.network.moshi.MoshiFactory
@@ -31,6 +30,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import kotlin.math.abs
 
@@ -44,25 +44,22 @@ private val sessionCoroutineExceptionHandler = CoroutineExceptionHandler { _, t 
 
 private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 
-private val coroutineScope =
-    CoroutineScope(
-        CoroutineName(TAG) +
-                dispatcher +
-                sessionCoroutineExceptionHandler,
-    )
+private val coroutineScope = CoroutineScope(
+    CoroutineName(TAG) + dispatcher + sessionCoroutineExceptionHandler,
+)
 
 internal class CheckoutView(
-    context: Context,
-    id: Int,
-    val arguments: CheckoutArguments,
     messenger: BinaryMessenger,
-) :
-    PlatformView {
+    id: Int,
+    private val context: Context,
+    private val arguments: CheckoutArguments,
+) : PlatformView {
     private val methodChannel: MethodChannel
 
-    private val checkoutView: FrameLayout =
-        LayoutInflater.from(context)
-            .inflate(R.layout.fragment_checkout_wrapper_view, null) as FrameLayout
+    private val checkoutView: FrameLayout = LayoutInflater.from(context)
+        .inflate(R.layout.fragment_checkout_wrapper_view, null) as FrameLayout
+
+    private var initializerErrorDialog: AlertDialog? = null
 
     init {
         val vParams: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
@@ -84,57 +81,46 @@ internal class CheckoutView(
         val fa = checkoutView.context as FragmentActivity
         val fm = fa.supportFragmentManager
         initCheckoutFragment { fragment ->
-            fm.beginTransaction()
-                .replace(R.id.checkout_fragment_container, fragment)
+            fm.beginTransaction().replace(R.id.checkout_fragment_container, fragment)
                 .commitAllowingStateLoss()
         }
 
 
         checkoutView.findViewById<FrameLayout>(R.id.checkout_fragment_container)
-            ?.addOnLayoutChangeListener(
-                CheckoutLayoutChangeListener { height ->
-                    val scroll =
-                        checkoutView.findViewById<ScrollView>(R.id.checkout_fragment_container_scroll)
-                    val maxScroll = scroll.maxScrollAmount
-                    val density = checkoutView.context.resources.displayMetrics.density
-                    val px = ((height + 40) / density).toInt()
-                    Log.d(
-                        TAG,
-                        "addOnLayoutChangeListener, height in px: $px, max scroll: $maxScroll"
-                    )
-                    methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, px)
-                })
+            ?.addOnLayoutChangeListener(CheckoutLayoutChangeListener { height ->
+                val scroll =
+                    checkoutView.findViewById<ScrollView>(R.id.checkout_fragment_container_scroll)
+                val maxScroll = scroll.maxScrollAmount
+                val density = checkoutView.context.resources.displayMetrics.density
+                val px = ((height + 40) / density).toInt()
+                Log.d(
+                    TAG, "addOnLayoutChangeListener, height in px: $px, max scroll: $maxScroll"
+                )
+                methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, px)
+            })
     }
 
     private fun initCheckoutFragment(onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit) {
+        Log.i(TAG, "initCheckoutFragment")
         val builder = arguments.run {
             val paymentOptionsDisplayMode =
                 if (showPaymentOptionsList) Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
                     visiblePaymentItemsCount = paymentOptionsListCount
                 ) else Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
-            val paymentOptionsDisplaySettings =
-                Checkout.PaymentOptionsDisplaySettings(
-                    mode = paymentOptionsDisplayMode,
-                    defaultSelectedPgCode = defaultSelectedPgCode
-                )
+            val paymentOptionsDisplaySettings = Checkout.PaymentOptionsDisplaySettings(
+                mode = paymentOptionsDisplayMode, defaultSelectedPgCode = defaultSelectedPgCode
+            )
 
             val theme = getCheckoutTheme(arguments)
             val payments = formsOfPayment?.map { key ->
                 Checkout.FormsOfPayment.of(key)
             }?.filterNotNull()
 
-            Checkout
-                .Builder(
-                    merchantId = merchantId,
-                    sessionId = sessionId,
-                    apiKey = apiKey,
-                    amount = amount
-                )
-                .formsOfPayments(payments)
-                .theme(theme)
+            Checkout.Builder(
+                merchantId = merchantId, sessionId = sessionId, apiKey = apiKey, amount = amount
+            ).formsOfPayments(payments).theme(theme)
                 .paymentOptionsDisplaySettings(settings = paymentOptionsDisplaySettings)
-                .logger(Checkout.Logger.INFO)
-                .build()
+                .logger(Checkout.Logger.INFO).build()
         }
 
         if (Checkout.isInitialized) {
@@ -169,20 +155,34 @@ internal class CheckoutView(
                 onInitialized(sdkFragment)
             } catch (e: Exception) {
                 Log.w(TAG, "initCheckoutFragment", e)
-                Log.i(TAG, "initCheckoutFragment, show SnackBar")
-                val fa = checkoutView.context as FragmentActivity
-                fa.runOnUiThread {
-                    val message = checkoutView.context.getString(R.string.failed_start_payment)
-                    val ok = checkoutView.context.getString(R.string.ok)
-                    val snackBar =
-                        Snackbar.make(checkoutView, message, Snackbar.LENGTH_LONG)
-                            .setAction(ok) {
-
-                            }
-                    snackBar.show()
+                withContext(Dispatchers.Main) {
+                    showErrorAlert()
                 }
             }
         }
+    }
+
+    private fun showErrorAlert() {
+        Log.i(TAG, "showErrorAlert")
+
+        if (initializerErrorDialog?.isShowing == true) {
+            Log.i(TAG, "showErrorAlert, dismiss the old one")
+            initializerErrorDialog?.dismiss();
+        }
+
+        val message = context.getString(R.string.failed_start_payment)
+        val title = context.getString(R.string.failed)
+        val ok = context.getString(R.string.ok)
+
+        initializerErrorDialog =
+            AlertDialog.Builder(context)
+                .setMessage(message)
+                .setTitle(title)
+                .setPositiveButton(ok) { intfc, _ ->
+                    intfc.dismiss()
+                }.create()
+        initializerErrorDialog?.show()
+
     }
 
     private fun getApiTransactionDetails(apiTransactionDetails: String): ApiTransactionDetails? {
@@ -199,10 +199,8 @@ internal class CheckoutView(
     }
 
     private fun getCheckoutTheme(checkoutArguments: CheckoutArguments): CheckoutTheme {
-        return CheckoutTheme(
-            uiMode = CheckoutTheme.UiMode.entries
-                .find { mode -> mode.name.lowercase() == checkoutArguments.theme?.uiMode }
-                ?: CheckoutTheme.UiMode.AUTO,
+        return CheckoutTheme(uiMode = CheckoutTheme.UiMode.entries.find { mode -> mode.name.lowercase() == checkoutArguments.theme?.uiMode }
+            ?: CheckoutTheme.UiMode.AUTO,
             showPaymentDetails = checkoutArguments.showPaymentDetails,
             appearanceLight = checkoutArguments.theme?.run {
                 CheckoutTheme.Appearance(
@@ -247,8 +245,7 @@ internal class CheckoutView(
                     selectorButton = selectorButton?.toCheckoutButton(),
                     switch = switchControl?.toCheckoutSwitch()
                 )
-            }
-        )
+            })
     }
 
     private fun showResultDialog(
@@ -272,15 +269,11 @@ internal class CheckoutView(
             sb.append(throwable?.message ?: "Unknown Error")
         }
 
-        AlertDialog.Builder(context)
-            .setTitle("Order Information")
-            .setMessage(sb)
-            .setPositiveButton(
-                android.R.string.ok
-            ) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+        AlertDialog.Builder(context).setTitle("Order Information").setMessage(sb).setPositiveButton(
+            android.R.string.ok
+        ) { dialog, _ ->
+            dialog.dismiss()
+        }.show()
     }
 
 
