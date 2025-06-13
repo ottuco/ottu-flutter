@@ -22,8 +22,14 @@ final router = GoRouter(
             )),
     GoRoute(
       path: '/checkout',
-      builder: (context, state) =>
-          CheckoutScreen(title: "Checkout", checkoutArguments: state.extra as CheckoutArguments),
+      builder: (context, state) => WillPopScope(
+        //canPop: _canPop(context),
+        //onPopInvokedWithResult: (bool didPop, dynamic result) =>
+        //   _onPopInvoked(context, didPop, result),
+        onWillPop: () async => _canPop(context),
+        child:
+            CheckoutScreen(title: "Checkout", checkoutArguments: state.extra as CheckoutArguments),
+      ),
     ),
     GoRoute(
         path: '/theme_customization',
@@ -34,3 +40,13 @@ final router = GoRouter(
             ))
   ],
 );
+
+_onPopInvoked(BuildContext context, bool didPop, dynamic result) {
+  print("_onPopInvoked: $didPop, result: $result");
+}
+
+Future<bool> _canPop(BuildContext context) async {
+  final canPopSwipe = !(Navigator.of(context).userGestureInProgress);
+  print("canPop: $canPopSwipe");
+  return canPopSwipe;
+}

@@ -223,7 +223,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               maxLength: 2,
                               enabled: state.showPaymentOptionsList ?? false,
                               onChanged: (text) {
-                                context.read<HomeScreenCubit>().onPaymentsListItemCountChange(text);
+                                context
+                                    .read<HomeScreenCubit>()
+                                    .onPaymentsListItemCountChange(text);
                               },
                               decoration: const InputDecoration(
                                 counterText: "",
@@ -264,7 +266,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text('Stc Pay')
                         ]),
                         Row(children: [
-                          paymentMethodCheckbox(state.formsOfPaymentChecked, 'token_pay', context),
+                          paymentMethodCheckbox(
+                              state.formsOfPaymentChecked, 'token_pay', context),
                           const Text('Token Pay')
                         ]),
                         Row(children: [
