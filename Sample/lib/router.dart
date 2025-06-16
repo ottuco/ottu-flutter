@@ -23,9 +23,6 @@ final router = GoRouter(
     GoRoute(
       path: '/checkout',
       builder: (context, state) => WillPopScope(
-        //canPop: _canPop(context),
-        //onPopInvokedWithResult: (bool didPop, dynamic result) =>
-        //   _onPopInvoked(context, didPop, result),
         onWillPop: () async => _canPop(context),
         child:
             CheckoutScreen(title: "Checkout", checkoutArguments: state.extra as CheckoutArguments),

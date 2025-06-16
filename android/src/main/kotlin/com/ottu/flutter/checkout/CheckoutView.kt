@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.fragment.app.FragmentActivity
+import com.google.android.material.snackbar.Snackbar
 import com.ottu.checkout.Checkout
 import com.ottu.checkout.network.model.payment.ApiTransactionDetails
 import com.ottu.checkout.network.moshi.MoshiFactory
@@ -156,14 +157,37 @@ internal class CheckoutView(
             } catch (e: Exception) {
                 Log.w(TAG, "initCheckoutFragment", e)
                 withContext(Dispatchers.Main) {
-                    showErrorAlert()
+                    handleInitException(e)
                 }
             }
         }
     }
 
-    private fun showErrorAlert() {
-        Log.i(TAG, "showErrorAlert")
+    private fun handleInitException(e: Exception) {
+        val message = e.message
+        Log.w(TAG, "handleInitException, ")
+        when (message) {
+            "The specified number of visible payment options is invalid. Please ensure it falls within the supported range." -> showPaimentCountZeroErrorAlert()
+            else -> {
+                if (message != null) {
+                    showCommonErrorSnackbar(message)
+                }
+            }
+        }
+    }
+
+    private fun showCommonErrorSnackbar(message: String) {
+        val ok = checkoutView.context.getString(R.string.ok)
+        val snackBar =
+            Snackbar.make(checkoutView, message, Snackbar.LENGTH_LONG)
+                .setAction(ok) {
+
+                }
+        snackBar.show()
+    }
+
+    private fun showPaimentCountZeroErrorAlert() {
+        Log.i(TAG, "showPaimentCountZeroErrorAlert")
 
         if (initializerErrorDialog?.isShowing == true) {
             Log.i(TAG, "showErrorAlert, dismiss the old one")
@@ -174,13 +198,10 @@ internal class CheckoutView(
         val title = context.getString(R.string.failed)
         val ok = context.getString(R.string.ok)
 
-        initializerErrorDialog =
-            AlertDialog.Builder(context)
-                .setMessage(message)
-                .setTitle(title)
-                .setPositiveButton(ok) { intfc, _ ->
-                    intfc.dismiss()
-                }.create()
+        initializerErrorDialog = AlertDialog.Builder(context).setMessage(message).setTitle(title)
+            .setPositiveButton(ok) { intfc, _ ->
+                intfc.dismiss()
+            }.create()
         initializerErrorDialog?.show()
 
     }
