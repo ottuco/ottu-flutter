@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.fragment.app.FragmentActivity
-import com.google.android.material.snackbar.Snackbar
 import com.ottu.checkout.Checkout
 import com.ottu.checkout.network.model.payment.ApiTransactionDetails
 import com.ottu.checkout.network.moshi.MoshiFactory
@@ -31,8 +30,9 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 import kotlin.math.abs
 
 private const val METHOD_CHECKOUT_HEIGHT = "METHOD_CHECKOUT_HEIGHT"
@@ -43,11 +43,13 @@ private val sessionCoroutineExceptionHandler = CoroutineExceptionHandler { _, t 
     Log.w(TAG, "CoroutineExceptionHandler", t)
 }
 
-private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 
 private val coroutineScope = CoroutineScope(
     CoroutineName(TAG) + dispatcher + sessionCoroutineExceptionHandler,
 )
+
+private val checkoutInitLock = ReentrantLock()
 
 internal class CheckoutView(
     messenger: BinaryMessenger,
@@ -103,60 +105,69 @@ internal class CheckoutView(
 
     private fun initCheckoutFragment(onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit) {
         Log.i(TAG, "initCheckoutFragment")
-        val builder = arguments.run {
-            val paymentOptionsDisplayMode =
-                if (showPaymentOptionsList) Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
-                    visiblePaymentItemsCount = paymentOptionsListCount
-                ) else Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
-            val paymentOptionsDisplaySettings = Checkout.PaymentOptionsDisplaySettings(
-                mode = paymentOptionsDisplayMode, defaultSelectedPgCode = defaultSelectedPgCode
-            )
 
-            val theme = getCheckoutTheme(arguments)
-            val payments = formsOfPayment?.map { key ->
-                Checkout.FormsOfPayment.of(key)
-            }?.filterNotNull()
+        checkoutInitLock.withLock {
+            coroutineScope.launch {
+                val builder = arguments.run {
+                    val paymentOptionsDisplayMode =
+                        if (showPaymentOptionsList) Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
+                            visiblePaymentItemsCount = paymentOptionsListCount
+                        ) else Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
+                    val paymentOptionsDisplaySettings = Checkout.PaymentOptionsDisplaySettings(
+                        mode = paymentOptionsDisplayMode,
+                        defaultSelectedPgCode = defaultSelectedPgCode
+                    )
 
-            Checkout.Builder(
-                merchantId = merchantId, sessionId = sessionId, apiKey = apiKey, amount = amount
-            ).formsOfPayments(payments).theme(theme)
-                .paymentOptionsDisplaySettings(settings = paymentOptionsDisplaySettings)
-                .logger(Checkout.Logger.INFO).build()
-        }
+                    val theme = getCheckoutTheme(arguments)
+                    val payments = formsOfPayment?.map { key ->
+                        Checkout.FormsOfPayment.of(key)
+                    }?.filterNotNull()
 
-        if (Checkout.isInitialized) {
-            Checkout.release()
-        }
+                    Checkout.Builder(
+                        merchantId = merchantId,
+                        sessionId = sessionId,
+                        apiKey = apiKey,
+                        amount = amount
+                    ).formsOfPayments(payments).theme(theme)
+                        .paymentOptionsDisplaySettings(settings = paymentOptionsDisplaySettings)
+                        .logger(Checkout.Logger.INFO).build()
+                }
 
-        val apiTransactionDetails =
-            arguments.apiTransactionDetails?.let { getApiTransactionDetails(arguments.apiTransactionDetails) }
+                if (Checkout.isInitialized) {
+                    Log.d(TAG, "initCheckoutFragment, release")
+                    Checkout.release()
+                }
 
-        Log.d(TAG, "initCheckoutFragment, with apiTransactionDetails: $apiTransactionDetails")
-        coroutineScope.launch {
+                val apiTransactionDetails =
+                    arguments.apiTransactionDetails?.let { getApiTransactionDetails(arguments.apiTransactionDetails) }
 
-            try {
-                val sdkFragment = Checkout.init(
-                    context = checkoutView.context,
-                    builder = builder,
-                    setupPreload = apiTransactionDetails,
-                    successCallback = {
-                        Log.e("TAG", "successCallback: $it")
-                        showResultDialog(checkoutView.context, it)
-                    },
-                    cancelCallback = {
-                        Log.e("TAG", "cancelCallback: $it")
-                        showResultDialog(checkoutView.context, it)
-                    },
-                    errorCallback = { errorData, throwable ->
-                        Log.e("TAG", "errorCallback: $errorData")
-                        showResultDialog(checkoutView.context, errorData, throwable)
-                    },
+                Log.d(
+                    TAG,
+                    "initCheckoutFragment, with apiTransactionDetails: $apiTransactionDetails"
                 )
 
-                onInitialized(sdkFragment)
-            } catch (e: Exception) {
-                Log.w(TAG, "initCheckoutFragment", e)
-                withContext(Dispatchers.Main) {
+                try {
+                    val sdkFragment = Checkout.init(
+                        context = checkoutView.context,
+                        builder = builder,
+                        setupPreload = apiTransactionDetails,
+                        successCallback = {
+                            Log.e("TAG", "successCallback: $it")
+                            showResultDialog(checkoutView.context, it)
+                        },
+                        cancelCallback = {
+                            Log.e("TAG", "cancelCallback: $it")
+                            showResultDialog(checkoutView.context, it)
+                        },
+                        errorCallback = { errorData, throwable ->
+                            Log.e("TAG", "errorCallback: $errorData")
+                            showResultDialog(checkoutView.context, errorData, throwable)
+                        },
+                    )
+
+                    onInitialized(sdkFragment)
+                } catch (e: Exception) {
+                    Log.e(TAG, "initCheckoutFragment", e)
                     handleInitException(e)
                 }
             }
@@ -166,27 +177,10 @@ internal class CheckoutView(
     private fun handleInitException(e: Exception) {
         val message = e.message
         Log.w(TAG, "handleInitException, ")
-        when (message) {
-            "The specified number of visible payment options is invalid. Please ensure it falls within the supported range." -> showPaimentCountZeroErrorAlert()
-            else -> {
-                if (message != null) {
-                    showCommonErrorSnackbar(message)
-                }
-            }
-        }
+        message?.let { showAlert(it) }
     }
 
-    private fun showCommonErrorSnackbar(message: String) {
-        val ok = checkoutView.context.getString(R.string.ok)
-        val snackBar =
-            Snackbar.make(checkoutView, message, Snackbar.LENGTH_LONG)
-                .setAction(ok) {
-
-                }
-        snackBar.show()
-    }
-
-    private fun showPaimentCountZeroErrorAlert() {
+    private fun showAlert(message: String) {
         Log.i(TAG, "showPaimentCountZeroErrorAlert")
 
         if (initializerErrorDialog?.isShowing == true) {
@@ -194,7 +188,7 @@ internal class CheckoutView(
             initializerErrorDialog?.dismiss();
         }
 
-        val message = context.getString(R.string.failed_start_payment)
+        //val message = context.getString(R.string.failed_start_payment)
         val title = context.getString(R.string.failed)
         val ok = context.getString(R.string.ok)
 
