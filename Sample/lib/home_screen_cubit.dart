@@ -186,7 +186,9 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   }
 
   void onShowPaymentOptionsListChange(bool? isChecked) {
-    emit(state.copyWith(showPaymentOptionsList: isChecked));
+    emit(state.copyWith(
+        paymentOptionsDisplayMode:
+            isChecked == true ? PaymentOptionsListMode.LIST : PaymentOptionsListMode.BOTTOM_SHEET));
   }
 
   void onPay() async {
@@ -203,7 +205,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         sessionId: state.sessionId ?? "",
         amount: amount,
         showPaymentDetails: state.showPaymentDetails,
-        showPaymentOptionsList: state.showPaymentOptionsList ?? false,
+        paymentOptionsListMode: state.paymentOptionsDisplayMode ?? PaymentOptionsListMode.BOTTOM_SHEET,
         defaultSelectedPgCode: state.defaultSelectedPayment,
         paymentOptionsListCount: paymentsListItemCount,
         apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,

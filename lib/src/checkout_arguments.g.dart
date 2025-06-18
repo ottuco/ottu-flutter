@@ -13,7 +13,8 @@ CheckoutArguments _$CheckoutArgumentsFromJson(Map<String, dynamic> json) =>
       sessionId: json['sessionId'] as String,
       amount: (json['amount'] as num).toDouble(),
       showPaymentDetails: json['showPaymentDetails'] as bool,
-      showPaymentOptionsList: json['showPaymentOptionsList'] as bool,
+      paymentOptionsListMode: $enumDecode(
+          _$PaymentOptionsListModeEnumMap, json['paymentOptionsListMode']),
       paymentOptionsListCount: (json['paymentOptionsListCount'] as num).toInt(),
       defaultSelectedPgCode: json['defaultSelectedPgCode'] as String?,
       apiTransactionDetails: json['apiTransactionDetails'] as String?,
@@ -33,9 +34,15 @@ Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
       'paymentOptionsListCount': instance.paymentOptionsListCount,
       'amount': instance.amount,
       'showPaymentDetails': instance.showPaymentDetails,
-      'showPaymentOptionsList': instance.showPaymentOptionsList,
+      'paymentOptionsListMode':
+          _$PaymentOptionsListModeEnumMap[instance.paymentOptionsListMode]!,
       'defaultSelectedPgCode': instance.defaultSelectedPgCode,
       'apiTransactionDetails': instance.apiTransactionDetails,
       'formsOfPayment': instance.formsOfPayment,
       'theme': instance.theme,
     };
+
+const _$PaymentOptionsListModeEnumMap = {
+  PaymentOptionsListMode.LIST: 'list',
+  PaymentOptionsListMode.BOTTOM_SHEET: 'list',
+};

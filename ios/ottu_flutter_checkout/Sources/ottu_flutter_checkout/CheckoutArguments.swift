@@ -11,6 +11,9 @@ struct CheckoutArguments: Decodable {
     let sessionId: String
     let amount: Double
     let showPaymentDetails: Bool
+    let paymentOptionsListMode: String
+    let paymentOptionsListCount: Int
+    let defaultSelectedPgCode: String?
     let apiTransactionDetails: String?
     let formsOfPayment: [String]?
     let theme: CustomerTheme?

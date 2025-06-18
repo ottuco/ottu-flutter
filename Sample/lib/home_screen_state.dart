@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/PGCodes.dart';
 
 const _default_payments_list__item_count = 5;
@@ -18,7 +19,7 @@ final class HomeScreenState extends Equatable {
   final bool? noForms;
   final bool? preloadPayload;
   final bool hasSessionLoaded;
-  final bool? showPaymentOptionsList;
+  final PaymentOptionsListMode? paymentOptionsDisplayMode;
   final Map<String, bool>? formsOfPaymentChecked;
   final Map<PGCode, bool>? pgCodesChecked;
 
@@ -37,7 +38,7 @@ final class HomeScreenState extends Equatable {
     this.preloadPayload = true,
     this.noForms,
     this.hasSessionLoaded = false,
-    this.showPaymentOptionsList,
+    this.paymentOptionsDisplayMode,
     this.formsOfPaymentChecked,
     this.pgCodesChecked,
   });
@@ -57,7 +58,7 @@ final class HomeScreenState extends Equatable {
     bool? noForms,
     bool? preloadPayload,
     bool? hasSessionLoaded,
-    bool? showPaymentOptionsList,
+    PaymentOptionsListMode? paymentOptionsDisplayMode,
     Map<String, bool>? formsOfPaymentChecked,
     Map<PGCode, bool>? pgCodesChecked,
   }) {
@@ -76,7 +77,7 @@ final class HomeScreenState extends Equatable {
         noForms: noForms ?? this.noForms,
         preloadPayload: preloadPayload ?? this.preloadPayload,
         hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
-        showPaymentOptionsList: showPaymentOptionsList ?? this.showPaymentOptionsList,
+        paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
         formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
         pgCodesChecked: pgCodesChecked ?? this.pgCodesChecked);
   }
@@ -95,7 +96,7 @@ final class HomeScreenState extends Equatable {
         preloadPayload,
         phoneNumber,
         hasSessionLoaded,
-        showPaymentOptionsList,
+        paymentOptionsDisplayMode?.name,
         formsOfPaymentChecked.hashCode,
         pgCodesChecked.hashCode
       ];

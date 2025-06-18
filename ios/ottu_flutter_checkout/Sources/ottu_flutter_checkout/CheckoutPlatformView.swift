@@ -110,7 +110,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         debugPrint("formsOfPayment: \(formsOfPayment)")
         
         let paymentOptionsDisplaySettings:PaymentOptionsDisplaySettings =
-        if arguments.showPaymentOptionsList {
+        if arguments.paymentOptionsListMode == "list" {
             PaymentOptionsDisplaySettings(mode: .list, visibleItemsCount: UInt(arguments.paymentOptionsListCount), defaultSelectedPgCode: arguments.defaultSelectedPgCode)
         } else {
             PaymentOptionsDisplaySettings(mode: .bottomSheet, defaultSelectedPgCode: arguments.defaultSelectedPgCode)
@@ -332,7 +332,6 @@ extension CheckoutPlatformView: OttuDelegate {
                     message = data?.debugDescription ?? ""
                 }
 
-                self.paymentViewController?.view.isHidden = true
                 self.paymentViewController?.view.setNeedsLayout()
                 self.paymentViewController?.view.layoutIfNeeded()
                 self._view.heightHandlerView.setNeedsLayout()
