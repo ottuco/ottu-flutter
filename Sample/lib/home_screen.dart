@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/PGCodes.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen_cubit.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen_state.dart';
@@ -203,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.only(top: 18.0),
                             child: Checkbox(
                               checkColor: Colors.white,
-                              value: state.showPaymentOptionsList ?? false,
+                              value: state.paymentOptionsDisplayMode == PaymentOptionsListMode.LIST,
                               onChanged: (bool? value) {
                                 context
                                     .read<HomeScreenCubit>()
@@ -221,11 +222,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: TextFormField(
                               controller: paymentsListItemCountController,
                               maxLength: 2,
-                              enabled: state.showPaymentOptionsList ?? false,
+                              enabled:
+                                  state.paymentOptionsDisplayMode == PaymentOptionsListMode.LIST,
                               onChanged: (text) {
-                                context
-                                    .read<HomeScreenCubit>()
-                                    .onPaymentsListItemCountChange(text);
+                                context.read<HomeScreenCubit>().onPaymentsListItemCountChange(text);
                               },
                               decoration: const InputDecoration(
                                 counterText: "",
@@ -266,8 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text('Stc Pay')
                         ]),
                         Row(children: [
-                          paymentMethodCheckbox(
-                              state.formsOfPaymentChecked, 'token_pay', context),
+                          paymentMethodCheckbox(state.formsOfPaymentChecked, 'token_pay', context),
                           const Text('Token Pay')
                         ]),
                         Row(children: [

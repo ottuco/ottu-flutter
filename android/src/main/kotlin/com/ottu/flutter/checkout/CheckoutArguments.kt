@@ -10,7 +10,7 @@ data class CheckoutArguments(
     val amount: Double,
     val paymentOptionsListCount: Int,
     val showPaymentDetails: Boolean,
-    val showPaymentOptionsList: Boolean,
+    val paymentOptionsListMode: String,
     val defaultSelectedPgCode: String?,
     val apiTransactionDetails: String?,
     val formsOfPayment: List<String>?,

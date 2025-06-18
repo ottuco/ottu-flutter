@@ -110,9 +110,13 @@ internal class CheckoutView(
             coroutineScope.launch {
                 val builder = arguments.run {
                     val paymentOptionsDisplayMode =
-                        if (showPaymentOptionsList) Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
-                            visiblePaymentItemsCount = paymentOptionsListCount
-                        ) else Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
+                        when (paymentOptionsListMode) {
+                            "list" -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
+                                visiblePaymentItemsCount = paymentOptionsListCount
+                            )
+
+                            else -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
+                        }
                     val paymentOptionsDisplaySettings = Checkout.PaymentOptionsDisplaySettings(
                         mode = paymentOptionsDisplayMode,
                         defaultSelectedPgCode = defaultSelectedPgCode
@@ -188,7 +192,6 @@ internal class CheckoutView(
             initializerErrorDialog?.dismiss();
         }
 
-        //val message = context.getString(R.string.failed_start_payment)
         val title = context.getString(R.string.failed)
         val ok = context.getString(R.string.ok)
 
