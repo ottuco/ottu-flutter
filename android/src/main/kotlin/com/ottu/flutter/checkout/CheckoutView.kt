@@ -137,7 +137,7 @@ internal class CheckoutView(
                         .logger(Checkout.Logger.INFO).build()
                 }
 
-                if (Checkout.isInitialized) {
+                if (Checkout.isInitialized()) {
                     Log.d(TAG, "initCheckoutFragment, release")
                     Checkout.release()
                 }
