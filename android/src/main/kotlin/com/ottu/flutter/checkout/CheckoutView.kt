@@ -137,13 +137,13 @@ internal class CheckoutView(
                         .logger(Checkout.Logger.INFO).build()
                 }
 
-                if (Checkout.isInitialized()) {
+                val apiTransactionDetails =
+                    arguments.apiTransactionDetails?.let { getApiTransactionDetails(arguments.apiTransactionDetails) }
+
+                if (Checkout.isInitialized.get()) {
                     Log.d(TAG, "initCheckoutFragment, release")
                     Checkout.release()
                 }
-
-                val apiTransactionDetails =
-                    arguments.apiTransactionDetails?.let { getApiTransactionDetails(arguments.apiTransactionDetails) }
 
                 Log.d(
                     TAG,

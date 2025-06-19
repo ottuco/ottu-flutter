@@ -53,7 +53,7 @@ android {
 }
 
 dependencies {
-    implementation("com.github.ottuco:ottu-flutter-android:2.1.0")
+    implementation("com.github.ottuco:ottu-flutter-android:2.1.1")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
     implementation("com.squareup.moshi:moshi-adapters:1.15.1")
     implementation("com.squareup.moshi:moshi-kotlin-codegen:1.15.1")

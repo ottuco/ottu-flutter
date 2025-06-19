@@ -35,6 +35,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
@@ -61,8 +62,7 @@ if (appBuildGradleFile.exists()) {
         println("isDependencyExist: $isDependencyExist")
         if (ottuSdkPath == null) {
             throw GradleException(
-                "Property 'ottuSdk' not found in local.properties. " +
-                        "Use this: \"ottuSdk=/path/to/your/ottu-android-checkout/app\" with the actual path to your module."
+                "Property 'ottuSdk' not found in local.properties. " + "Use this: \"ottuSdk=/path/to/your/ottu-android-checkout/app\" with the actual path to your module."
             )
         }
         println("Has ottu local project dependency, include build sdk: $ottuSdkPath")
