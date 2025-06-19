@@ -30,9 +30,9 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import org.json.JSONObject
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 
 private const val METHOD_CHECKOUT_HEIGHT = "METHOD_CHECKOUT_HEIGHT"
@@ -49,7 +49,7 @@ private val coroutineScope = CoroutineScope(
     CoroutineName(TAG) + dispatcher + sessionCoroutineExceptionHandler,
 )
 
-private val checkoutInitLock = ReentrantLock()
+private val isCheckoutInitializing = AtomicBoolean(false)
 
 internal class CheckoutView(
     messenger: BinaryMessenger,
@@ -76,16 +76,26 @@ internal class CheckoutView(
 
     override fun dispose() {}
 
+    override fun onFlutterViewDetached() {
+        super.onFlutterViewDetached()
+        Log.i(TAG, "onFlutterViewDetached")
+    }
+
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
 
-        Log.d(TAG, "onFlutterViewAttached")
-
-        val fa = checkoutView.context as FragmentActivity
-        val fm = fa.supportFragmentManager
-        initCheckoutFragment { fragment ->
-            fm.beginTransaction().replace(R.id.checkout_fragment_container, fragment)
-                .commitAllowingStateLoss()
+        Log.i(TAG, "onFlutterViewAttached")
+        if (isCheckoutInitializing.getAndSet(true).not()) {
+            val fa = checkoutView.context as FragmentActivity
+            val fm = fa.supportFragmentManager
+            Log.i(TAG, "onFlutterViewAttached, start init")
+            coroutineScope.launch {
+                initCheckoutFragment { fragment ->
+                    Log.d(TAG, "onFlutterViewAttached, Checkout initialized")
+                    fm.beginTransaction().replace(R.id.checkout_fragment_container, fragment)
+                        .commitAllowingStateLoss()
+                }
+            }
         }
 
 
@@ -103,77 +113,76 @@ internal class CheckoutView(
             })
     }
 
-    private fun initCheckoutFragment(onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit) {
-        Log.i(TAG, "initCheckoutFragment")
+    private suspend fun initCheckoutFragment(onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit) {
+        Log.d(TAG, "initCheckoutFragment, initialized: ${Checkout.isInitialized.get()}")
 
-        checkoutInitLock.withLock {
-            coroutineScope.launch {
-                val builder = arguments.run {
-                    val paymentOptionsDisplayMode =
-                        when (paymentOptionsListMode) {
-                            "list" -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
-                                visiblePaymentItemsCount = paymentOptionsListCount
-                            )
-
-                            else -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
-                        }
-                    val paymentOptionsDisplaySettings = Checkout.PaymentOptionsDisplaySettings(
-                        mode = paymentOptionsDisplayMode,
-                        defaultSelectedPgCode = defaultSelectedPgCode
+        val builder = arguments.run {
+            val paymentOptionsDisplayMode =
+                when (paymentOptionsListMode) {
+                    "list" -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
+                        visiblePaymentItemsCount = paymentOptionsListCount
                     )
 
-                    val theme = getCheckoutTheme(arguments)
-                    val payments = formsOfPayment?.map { key ->
-                        Checkout.FormsOfPayment.of(key)
-                    }?.filterNotNull()
-
-                    Checkout.Builder(
-                        merchantId = merchantId,
-                        sessionId = sessionId,
-                        apiKey = apiKey,
-                        amount = amount
-                    ).formsOfPayments(payments).theme(theme)
-                        .paymentOptionsDisplaySettings(settings = paymentOptionsDisplaySettings)
-                        .logger(Checkout.Logger.INFO).build()
+                    else -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
                 }
+            val paymentOptionsDisplaySettings = Checkout.PaymentOptionsDisplaySettings(
+                mode = paymentOptionsDisplayMode,
+                defaultSelectedPgCode = defaultSelectedPgCode
+            )
 
-                val apiTransactionDetails =
-                    arguments.apiTransactionDetails?.let { getApiTransactionDetails(arguments.apiTransactionDetails) }
+            val theme = getCheckoutTheme(arguments)
+            val payments = formsOfPayment?.map { key ->
+                Checkout.FormsOfPayment.of(key)
+            }?.filterNotNull()
 
-                if (Checkout.isInitialized.get()) {
-                    Log.d(TAG, "initCheckoutFragment, release")
-                    Checkout.release()
-                }
+            Checkout.Builder(
+                merchantId = merchantId,
+                sessionId = sessionId,
+                apiKey = apiKey,
+                amount = amount
+            ).formsOfPayments(payments).theme(theme)
+                .paymentOptionsDisplaySettings(settings = paymentOptionsDisplaySettings)
+                .logger(Checkout.Logger.INFO).build()
+        }
 
-                Log.d(
-                    TAG,
-                    "initCheckoutFragment, with apiTransactionDetails: $apiTransactionDetails"
+        val apiTransactionDetails =
+            arguments.apiTransactionDetails?.let { getApiTransactionDetails(arguments.apiTransactionDetails) }
+
+        if (Checkout.isInitialized.get()) {
+            Log.d(TAG, "initCheckoutFragment, release")
+            Checkout.release()
+        }
+
+        Log.d(
+            TAG,
+            "initCheckoutFragment, with apiTransactionDetails: $apiTransactionDetails"
+        )
+        coroutineScope.launch {
+            try {
+                val sdkFragment = Checkout.init(
+                    context = checkoutView.context,
+                    builder = builder,
+                    setupPreload = apiTransactionDetails,
+                    successCallback = {
+                        Log.e("TAG", "successCallback: $it")
+                        showResultDialog(checkoutView.context, it)
+                    },
+                    cancelCallback = {
+                        Log.e("TAG", "cancelCallback: $it")
+                        showResultDialog(checkoutView.context, it)
+                    },
+                    errorCallback = { errorData, throwable ->
+                        Log.e("TAG", "errorCallback: $errorData")
+                        showResultDialog(checkoutView.context, errorData, throwable)
+                    },
                 )
 
-                try {
-                    val sdkFragment = Checkout.init(
-                        context = checkoutView.context,
-                        builder = builder,
-                        setupPreload = apiTransactionDetails,
-                        successCallback = {
-                            Log.e("TAG", "successCallback: $it")
-                            showResultDialog(checkoutView.context, it)
-                        },
-                        cancelCallback = {
-                            Log.e("TAG", "cancelCallback: $it")
-                            showResultDialog(checkoutView.context, it)
-                        },
-                        errorCallback = { errorData, throwable ->
-                            Log.e("TAG", "errorCallback: $errorData")
-                            showResultDialog(checkoutView.context, errorData, throwable)
-                        },
-                    )
-
-                    onInitialized(sdkFragment)
-                } catch (e: Exception) {
-                    Log.e(TAG, "initCheckoutFragment", e)
-                    handleInitException(e)
-                }
+                onInitialized(sdkFragment)
+            } catch (e: Exception) {
+                Log.e(TAG, "initCheckoutFragment, error", e)
+                handleInitException(e)
+            } finally {
+                isCheckoutInitializing.set(false)
             }
         }
     }
