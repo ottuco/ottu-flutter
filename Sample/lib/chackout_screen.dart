@@ -6,6 +6,9 @@ import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 
 const _defaultCheckoutViewHeight = 200;
 const _methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT";
+const _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT";
+const _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT";
+const _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT";
 const _methodChannel = MethodChannel('com.ottu.sample/checkout');
 
 class CheckoutScreen extends StatefulWidget {
@@ -20,8 +23,22 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final ValueNotifier<int> _checkoutHeight = ValueNotifier<int>(_defaultCheckoutViewHeight);
+  final ValueNotifier<(String, String)> _checkoutMessage =
+      ValueNotifier<(String, String)>(("", ""));
 
   final logger = Logger();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkoutMessage.addListener(_showMessageDialog);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _checkoutMessage.removeListener(_showMessageDialog);
+  }
 
   @override
   void didChangeDependencies() {
@@ -33,6 +50,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             int height = call.arguments as int;
             logger.d("didChangeDependencies, height: $height");
             _checkoutHeight.value = height;
+          }
+        case _methodPaymentSuccessResult:
+          {
+            String message = call.arguments as String;
+            logger.d("didChangeDependencies, success: $message");
+            _checkoutMessage.value = ("Success", message);
+          }
+
+        case _methodPaymentCancelResult:
+          {
+            String message = call.arguments as String;
+            logger.d("didChangeDependencies, cancel: $message");
+            _checkoutMessage.value = ("Cancel", message);
+          }
+
+        case _methodPaymentErrorResult:
+          {
+            String message = call.arguments as String;
+            logger.d("didChangeDependencies, error: $message");
+            _checkoutMessage.value = ("Error", message);
           }
       }
     });
@@ -82,5 +119,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         //End of Merchant content
       ])), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> _showMessageDialog() async {
+    if (_checkoutMessage.value.$1.isNotEmpty) {
+      showDialog<void>(
+          context: context,
+          barrierDismissible: false, // user must tap button!
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(_checkoutMessage.value.$1),
+              content: SingleChildScrollView(child: Text(_checkoutMessage.value.$2)),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+    }
   }
 }

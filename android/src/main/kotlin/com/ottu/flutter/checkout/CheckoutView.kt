@@ -36,6 +36,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 
 private const val METHOD_CHECKOUT_HEIGHT = "METHOD_CHECKOUT_HEIGHT"
+private const val METHOD_PAYMENT_SUCCESS_RESULT = "METHOD_PAYMENT_SUCCESS_RESULT"
+private const val METHOD_PAYMENT_ERROR_RESULT = "METHOD_PAYMENT_ERROR_RESULT"
+private const val METHOD_PAYMENT_CANCEL_RESULT = "METHOD_PAYMENT_CANCEL_RESULT"
 const val CHANNEL = "com.ottu.sample/checkout"
 private const val TAG = "CheckoutView"
 
@@ -164,16 +167,19 @@ internal class CheckoutView(
                     builder = builder,
                     setupPreload = apiTransactionDetails,
                     successCallback = {
-                        Log.e("TAG", "successCallback: $it")
-                        showResultDialog(checkoutView.context, it)
+                        Log.d(TAG, "successCallback: $it")
+                        methodChannel.invokeMethod(METHOD_PAYMENT_SUCCESS_RESULT, it.toString())
                     },
                     cancelCallback = {
-                        Log.e("TAG", "cancelCallback: $it")
-                        showResultDialog(checkoutView.context, it)
+                        Log.i(TAG, "cancelCallback: $it")
+                        methodChannel.invokeMethod(METHOD_PAYMENT_CANCEL_RESULT, it.toString())
                     },
                     errorCallback = { errorData, throwable ->
-                        Log.e("TAG", "errorCallback: $errorData")
-                        showResultDialog(checkoutView.context, errorData, throwable)
+                        Log.e(TAG, "errorCallback: $errorData", throwable)
+                        methodChannel.invokeMethod(
+                            METHOD_PAYMENT_ERROR_RESULT,
+                            errorData.toString()
+                        )
                     },
                 )
 
@@ -273,34 +279,6 @@ internal class CheckoutView(
                     switch = switchControl?.toCheckoutSwitch()
                 )
             })
-    }
-
-    private fun showResultDialog(
-        context: Context,
-        result: JSONObject?,
-        throwable: Throwable? = null,
-    ) {
-        val sb = StringBuilder()
-
-        result?.let {
-            sb.apply {
-                append(("Status : " + result.opt("status")) + "\n")
-                append(("Message : " + result.opt("message")) + "\n")
-                append(("Session id : " + result.opt("session_id")) + "\n")
-                append(("operation : " + result.opt("operation")) + "\n")
-                append(("Reference number : " + result.opt("reference_number")) + "\n")
-                append(("Challenge Occurred : " + result.opt("challenge_occurred")) + "\n")
-                append(("Form of payment: " + result.opt("form_of_payment")) + "\n")
-            }
-        } ?: run {
-            sb.append(throwable?.message ?: "Unknown Error")
-        }
-
-        AlertDialog.Builder(context).setTitle("Order Information").setMessage(sb).setPositiveButton(
-            android.R.string.ok
-        ) { dialog, _ ->
-            dialog.dismiss()
-        }.show()
     }
 
 
