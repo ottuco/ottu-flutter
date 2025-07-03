@@ -35,7 +35,6 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
-        maven { url = uri("https://jitpack.io") }
     }
 }
 
@@ -55,10 +54,7 @@ println("ottu-flutter - Ottu sdk: $ottuSdkPath")
 if (appBuildGradleFile.exists()) {
     val buildGradleContent = appBuildGradleFile.readLines()
     val isDependencyExist = buildGradleContent.any { line ->
-        //uncomment this line for remote usage
-        /*line.contains("""implementation("com.github.ottuco:ottu-flutter-android:1.0.1")""") && !line.trim()
-            .startsWith("//")*/
-        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.7")""") && !line.trim()
+        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.1")""") && !line.trim()
             .startsWith("//")
     }
     if (isDependencyExist) {
