@@ -54,11 +54,7 @@ if (flutterOttuSdkFile?.exists() == true) {
     val gradleBuildContent = flutterOttuSdkFile.readLines()
     val isDependencyExist = gradleBuildContent.any { line ->
 
-        //uncomment this line for remote usage
-        /*line.contains("""implementation("com.github.ottuco:ottu-flutter-android:1.0.1")""") && !line.trim()
-            .startsWith("//")*/
-
-        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.7")""") && !line.trim()
+        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.1")""") && !line.trim()
             .startsWith("//")
     }
     if (isDependencyExist) {
