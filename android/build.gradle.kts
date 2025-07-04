@@ -21,7 +21,7 @@ val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "
 plugins {
     id("com.android.library")
     kotlin("android")
-    kotlin("plugin.serialization") version "2.0.20"
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 group = "com.ottu.flutter.checkout"
@@ -54,11 +54,5 @@ android {
 
 dependencies {
     implementation("com.github.ottuco:ottu-flutter-android:2.1.2")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
-    implementation("com.squareup.moshi:moshi-adapters:1.15.1")
-    implementation("com.squareup.moshi:moshi-kotlin-codegen:1.15.1")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
-    implementation ("com.google.android.material:material:1.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+
 }
