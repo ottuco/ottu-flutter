@@ -294,7 +294,7 @@ extension CheckoutPlatformView: OttuDelegate {
         debugPrint("errorCallback\n")
         DispatchQueue.main
             .async {
-                if let messsage = data?.description {
+                if let message = data?.description {
                     self.channel.invokeMethod(_methodPaymentErrorResult, arguments: message)
                 }
                 
@@ -312,7 +312,7 @@ extension CheckoutPlatformView: OttuDelegate {
         debugPrint("cancelCallback\n")
         DispatchQueue.main
             .async {
-                if let messsage = data?.description {
+                if let message = data?.description {
                     self.channel.invokeMethod(_methodPaymentCancelResult, arguments: message)
                 }
                 
@@ -328,7 +328,7 @@ extension CheckoutPlatformView: OttuDelegate {
     public func successCallback(_ data: [String: Any]?) {
         debugPrint("successCallback\n")
         DispatchQueue.main.async {
-            if let messsage = data?.description {
+            if let message = data?.description {
                 self.channel.invokeMethod(_methodPaymentSuccessResult, arguments: message)
             }
             
