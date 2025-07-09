@@ -57,8 +57,6 @@ flutter:
       android:
         package: com.ottu.flutter.checkout
         pluginClass: CheckoutViewPlugin
-      ios:
-        pluginClass: CheckoutViewPlugin
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
