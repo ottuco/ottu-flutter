@@ -44,5 +44,5 @@ Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
 
 const _$PaymentOptionsListModeEnumMap = {
   PaymentOptionsListMode.LIST: 'list',
-  PaymentOptionsListMode.BOTTOM_SHEET: 'list',
+  PaymentOptionsListMode.BOTTOM_SHEET: 'bottom_sheet',
 };
