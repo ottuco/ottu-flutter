@@ -120,7 +120,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         }
         
         
-        var apiTransactionDetails: RemoteTransactionDetails?
+        var apiTransactionDetails: TransactionDetailsResponse?
         if let transactionDetails: String? = arguments.apiTransactionDetails {
             if let td = transactionDetails {
                 apiTransactionDetails = try! getApiTransactionDetails(td)
@@ -166,13 +166,13 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     }
     
     private func getApiTransactionDetails(_ transactionDetails: String) throws
-    -> RemoteTransactionDetails?
+    -> TransactionDetailsResponse?
     {
         if let jsonData = transactionDetails.data(using: .utf8) {
             let decoder = JSONDecoder()
             do {
                 return try decoder.decode(
-                    RemoteTransactionDetails.self, from: jsonData)
+                    TransactionDetailsResponse.self, from: jsonData)
             } catch let DecodingError.keyNotFound(key, context) {
                 debugPrint(
                     "Decoding error (keyNotFound): \(key) not found in \(context.debugDescription)"
