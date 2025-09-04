@@ -69,7 +69,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
             })));
 
   void getSessionId({required String merchantId, required String apiKey}) async {
-    _logger.d("getSessionId");
+    _logger.d("getSessionId, merchantId: $merchantId, apiKey: $apiKey");
     emit(state.copyWith(hasSessionLoaded: false));
     final language = Platform.localeName.split("_")[0];
     final cardExpiryTime =
@@ -181,6 +181,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     emit(state.copyWith(merchantId: merchantId));
   }
 
+  void onApiKeyChanged(String apiKey) {
+    emit(state.copyWith(apiKey: apiKey));
+  }
+
   void onPaymentsListItemCountChange(String count) {
     emit(state.copyWith(paymentsListItemCount: count));
   }
@@ -205,7 +209,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         sessionId: state.sessionId ?? "",
         amount: amount,
         showPaymentDetails: state.showPaymentDetails,
-        paymentOptionsListMode: state.paymentOptionsDisplayMode ?? PaymentOptionsListMode.BOTTOM_SHEET,
+        paymentOptionsListMode:
+            state.paymentOptionsDisplayMode ?? PaymentOptionsListMode.BOTTOM_SHEET,
         defaultSelectedPgCode: state.defaultSelectedPayment,
         paymentOptionsListCount: paymentsListItemCount,
         apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,

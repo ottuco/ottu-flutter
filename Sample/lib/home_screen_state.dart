@@ -85,6 +85,8 @@ final class HomeScreenState extends Equatable {
   @override
   List<Object?> get props => [
         showPaymentDetails,
+        merchantId,
+        apiKey,
         amount,
         currencyCode,
         noForms,

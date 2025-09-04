@@ -113,6 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: apiKeyEditingController,
+                          onChanged: (text) {
+                            context.read<HomeScreenCubit>().onApiKeyChanged(text);
+                          },
                           decoration: const InputDecoration(
                             border: UnderlineInputBorder(),
                             labelText: 'Api key',
