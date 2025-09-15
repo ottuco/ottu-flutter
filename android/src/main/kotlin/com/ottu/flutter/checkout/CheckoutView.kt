@@ -117,7 +117,7 @@ internal class CheckoutView(
     }
 
     private suspend fun initCheckoutFragment(onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit) {
-        Log.d(TAG, "initCheckoutFragment, initialized: ${Checkout.isInitialized.get()}")
+        Log.d(TAG, "initCheckoutFragment, initialized: ${Checkout.isInitialized}")
 
         val builder = arguments.run {
             val paymentOptionsDisplayMode =
@@ -151,7 +151,7 @@ internal class CheckoutView(
         val apiTransactionDetails =
             arguments.apiTransactionDetails?.let { getApiTransactionDetails(arguments.apiTransactionDetails) }
 
-        if (Checkout.isInitialized.get()) {
+        if (Checkout.isInitialized) {
             Log.d(TAG, "initCheckoutFragment, release")
             Checkout.release()
         }

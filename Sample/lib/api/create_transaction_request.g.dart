@@ -14,6 +14,8 @@ CreateTransactionRequest _$CreateTransactionRequestFromJson(
       pgCodes:
           (json['pg_codes'] as List<dynamic>).map((e) => e as String).toList(),
       type: json['type'] as String,
+      includeSdkSetupPreload: json['include_sdk_setup_preload'] as bool,
+      language: json['language'] as String,
       customerId: json['customer_id'] as String?,
       customerPhone: json['customer_phone'] as String?,
       customerFirstName: json['customer_first_name'] as String?,
@@ -27,8 +29,12 @@ CreateTransactionRequest _$CreateTransactionRequestFromJson(
           ? null
           : CardAcceptanceCriteria.fromJson(
               json['card_acceptance_criteria'] as Map<String, dynamic>),
-      includeSdkSetupPreload: json['include_sdk_setup_preload'] as bool,
-      language: json['language'] as String,
+      paymentType: $enumDecodeNullable(
+          _$TransactionPaymentTypeEnumMap, json['payment_type']),
+      agreement: json['agreement'] == null
+          ? null
+          : TransactionAgreement.fromJson(
+              json['agreement'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$CreateTransactionRequestToJson(
@@ -46,9 +52,19 @@ Map<String, dynamic> _$CreateTransactionRequestToJson(
       'billing_address': instance.billingAddress,
       'include_sdk_setup_preload': instance.includeSdkSetupPreload,
       'language': instance.language,
+      if (_$TransactionPaymentTypeEnumMap[instance.paymentType]
+          case final value?)
+        'payment_type': value,
+      if (instance.agreement case final value?) 'agreement': value,
       if (instance.cardAcceptanceCriteria case final value?)
         'card_acceptance_criteria': value,
     };
+
+const _$TransactionPaymentTypeEnumMap = {
+  TransactionPaymentType.oneOff: 'one_off',
+  TransactionPaymentType.autoDebit: 'auto_debit',
+  TransactionPaymentType.saveCard: 'save_card',
+};
 
 CardAcceptanceCriteria _$CardAcceptanceCriteriaFromJson(
         Map<String, dynamic> json) =>

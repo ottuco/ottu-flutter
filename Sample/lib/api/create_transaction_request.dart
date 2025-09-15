@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:ottu_flutter_checkout_sample/api/billing_address.dart';
+import 'package:ottu_flutter_checkout_sample/api/transaction_agreement.dart';
+import 'package:ottu_flutter_checkout_sample/api/transaction_payment_type.dart';
 
 part 'create_transaction_request.g.dart';
 
@@ -26,23 +28,31 @@ class CreateTransactionRequest {
   @JsonKey(name: "include_sdk_setup_preload")
   final bool includeSdkSetupPreload;
   final String language;
+  @JsonKey(name: "payment_type", includeIfNull: false)
+  final TransactionPaymentType? paymentType;
+  @JsonKey(includeIfNull: false)
+  final TransactionAgreement? agreement;
+
+  CreateTransactionRequest({
+    required this.amount,
+    required this.currencyCode,
+    required this.pgCodes,
+    required this.type,
+    required this.includeSdkSetupPreload,
+    required this.language,
+    this.customerId,
+    this.customerPhone,
+    this.customerFirstName,
+    this.customerLastName,
+    this.customerEmail,
+    this.billingAddress,
+    this.cardAcceptanceCriteria,
+    this.paymentType,
+    this.agreement,
+  });
+
   @JsonKey(name: "card_acceptance_criteria", includeIfNull: false)
   final CardAcceptanceCriteria? cardAcceptanceCriteria;
-
-  CreateTransactionRequest(
-      {required this.amount,
-      required this.currencyCode,
-      required this.pgCodes,
-      required this.type,
-      this.customerId,
-      this.customerPhone,
-      this.customerFirstName,
-      this.customerLastName,
-      this.customerEmail,
-      this.billingAddress,
-      this.cardAcceptanceCriteria,
-      required this.includeSdkSetupPreload,
-      required this.language});
 
   factory CreateTransactionRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateTransactionRequestFromJson(json);

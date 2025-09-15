@@ -11,6 +11,8 @@ import 'package:ottu_flutter_checkout_sample/PGCodes.dart';
 import 'package:ottu_flutter_checkout_sample/api/billing_address.dart';
 import 'package:ottu_flutter_checkout_sample/api/create_transaction_request.dart';
 import 'package:ottu_flutter_checkout_sample/api/session_response.dart';
+import 'package:ottu_flutter_checkout_sample/api/transaction_agreement.dart';
+import 'package:ottu_flutter_checkout_sample/api/transaction_payment_type.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen_state.dart';
 import 'package:ottu_flutter_checkout_sample/main.dart';
 
@@ -70,7 +72,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
   void getSessionId({required String merchantId, required String apiKey}) async {
     _logger.d("getSessionId, merchantId: $merchantId, apiKey: $apiKey");
-    emit(state.copyWith(hasSessionLoaded: false));
+    emit(state.copyWith(sessionId: null, hasSessionLoaded: false));
     final language = Platform.localeName.split("_")[0];
     final cardExpiryTime =
         state.cardExpiryTime?.isNotEmpty == true ? int.tryParse(state.cardExpiryTime!) : null;
@@ -89,7 +91,9 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         billingAddress:
             BillingAddress(country: billingCountry, city: billingCity, line1: "something"),
         cardAcceptanceCriteria:
-            cardExpiryTime != null ? CardAcceptanceCriteria(minExpiryTime: cardExpiryTime) : null);
+            cardExpiryTime != null ? CardAcceptanceCriteria(minExpiryTime: cardExpiryTime) : null,
+        paymentType: state.isAutoDebit == true ? TransactionPaymentType.autoDebit : null,
+        agreement: state.isAutoDebit == true ? TransactionAgreement.defaultAgreement() : null);
 
     _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     try {
@@ -151,6 +155,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
   void onPreloadPayloadChecked(bool? isChecked) async {
     emit(state.copyWith(preloadPayload: isChecked));
+  }
+
+  void onAutoDebitChecked(bool? isChecked) {
+    emit(state.copyWith(isAutoDebit: isChecked));
   }
 
   void onAmountChanged(String amount) async {

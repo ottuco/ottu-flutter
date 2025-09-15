@@ -240,6 +240,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ]),
+                        Row(children: [
+                          Checkbox(
+                            checkColor: Colors.white,
+                            value: state.isAutoDebit ?? false,
+                            onChanged: (bool? value) {
+                              context.read<HomeScreenCubit>().onAutoDebitChecked(value);
+                            },
+                          ),
+                          const Text('Auto debit')
+                        ]),
                         const SizedBox(height: 24),
                         Divider(height: 2, thickness: 3),
                         const Text('Payment methods:'),

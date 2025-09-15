@@ -18,6 +18,7 @@ final class HomeScreenState extends Equatable {
   final bool showPaymentDetails;
   final bool? noForms;
   final bool? preloadPayload;
+  final bool? isAutoDebit;
   final bool hasSessionLoaded;
   final PaymentOptionsListMode? paymentOptionsDisplayMode;
   final Map<String, bool>? formsOfPaymentChecked;
@@ -36,6 +37,7 @@ final class HomeScreenState extends Equatable {
     this.defaultSelectedPayment,
     this.showPaymentDetails = true,
     this.preloadPayload = true,
+    this.isAutoDebit = false,
     this.noForms,
     this.hasSessionLoaded = false,
     this.paymentOptionsDisplayMode,
@@ -57,6 +59,7 @@ final class HomeScreenState extends Equatable {
     bool? showPaymentDetails,
     bool? noForms,
     bool? preloadPayload,
+    bool? isAutoDebit,
     bool? hasSessionLoaded,
     PaymentOptionsListMode? paymentOptionsDisplayMode,
     Map<String, bool>? formsOfPaymentChecked,
@@ -76,6 +79,7 @@ final class HomeScreenState extends Equatable {
         showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
         noForms: noForms ?? this.noForms,
         preloadPayload: preloadPayload ?? this.preloadPayload,
+        isAutoDebit: isAutoDebit ?? this.isAutoDebit,
         hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
         paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
         formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
@@ -96,6 +100,7 @@ final class HomeScreenState extends Equatable {
         defaultSelectedPayment,
         sessionId,
         preloadPayload,
+        isAutoDebit,
         phoneNumber,
         hasSessionLoaded,
         paymentOptionsDisplayMode?.name,
