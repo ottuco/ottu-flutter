@@ -58,6 +58,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               "stc_pay": true,
               "token_pay": true,
               "card_onsite": true,
+              "auto_debit": false,
             }),
             pgCodesChecked: Map.from({
               PGCode.mpgs: true,
