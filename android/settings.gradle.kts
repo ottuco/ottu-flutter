@@ -54,18 +54,19 @@ println("ottu-flutter - Ottu sdk: $ottuSdkPath")
 if (appBuildGradleFile.exists()) {
     val buildGradleContent = appBuildGradleFile.readLines()
     val isDependencyExist = buildGradleContent.any { line ->
-        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.1")""") && !line.trim()
+        line.contains("""com.github.ottuco:ottu-android-checkout""") && !line.trim()
             .startsWith("//")
     }
-    if (isDependencyExist) {
-        println("isDependencyExist: $isDependencyExist")
-        if (ottuSdkPath == null) {
-            throw GradleException(
-                "Property 'ottuSdk' not found in local.properties. " + "Use this: \"ottuSdk=/path/to/your/ottu-android-checkout/app\" with the actual path to your module."
-            )
-        }
+
+    println("ottu-flutter - isDependencyExist: $isDependencyExist")
+    if (isDependencyExist && ottuSdkPath != null) {
         println("ottu-flutter - Has ottu local project dependency, include build sdk: $ottuSdkPath")
-        includeBuild("$ottuSdkPath")
+        includeBuild("$ottuSdkPath") {
+            dependencySubstitution {
+                substitute(module("com.github.ottuco:ottu-android-checkout:"))
+                    .using(project(":"))
+            }
+        }
     } else {
         println("ottu-flutter - Has no ottu local project dependency")
     }

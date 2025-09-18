@@ -54,10 +54,11 @@ if (flutterOttuSdkFile?.exists() == true) {
     val gradleBuildContent = flutterOttuSdkFile.readLines()
     val isDependencyExist = gradleBuildContent.any { line ->
 
-        line.contains("""implementation("com.ottu.checkout:ottu-flutter-checkout:1.0.1")""") && !line.trim()
+        line.contains("""com.github.ottuco:ottu-android-checkout""") && !line.trim()
             .startsWith("//")
     }
-    if (isDependencyExist) {
+
+    if (isDependencyExist && flutterOttuSdkPath != null) {
         println("Sample App - Has flutter ottu local project dependency, includeBuild: ${flutterOttuSdkPath}")
         includeBuild(flutterOttuSdkPath!!)
     } else {
