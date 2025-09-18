@@ -214,15 +214,27 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 cht.backgroundColor = cc
             }
         }
+        
         if let color = theme?.modalBackgroundColor?.toUIColors() {
             if let cc = color.color {
                 cht.backgroundColorModal = cc
             }
         }
         
+        if let color = theme?.selectPaymentMethodHeaderBackgroundColor?.toUIColors() {
+            if let cc = color.color {
+                cht.selectPaymentMethodTitleBackgroundColor = cc
+            }
+        }
+        
         if let comp = theme?.mainTitleText?.toLabelComponent() {
             cht.mainTitle = comp
         }
+        
+        if let comp = theme?.selectPaymentMethodHeaderText?.toLabelComponent() {
+            cht.selectPaymentMethodTitleLabel = comp
+        }
+        
         if let comp = theme?.titleText?.toLabelComponent() {
             cht.title = comp
         }
@@ -230,9 +242,11 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         if let comp = theme?.subtitleText?.toLabelComponent() {
             cht.subtitle = comp
         }
+        
         if let comp = theme?.feesTitleText?.toLabelComponent() {
             cht.feesTitle = comp
         }
+        
         if let comp = theme?.feesSubtitleText?.toLabelComponent() {
             cht.feesSubtitle = comp
         }
@@ -240,17 +254,21 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         if let comp = theme?.dataLabelText?.toLabelComponent() {
             cht.dataLabel = comp
         }
+        
         if let comp = theme?.dataValueText?.toLabelComponent() {
             cht.dataValue = comp
         }
+        
         if let comp = theme?.errorMessageText?.toLabelComponent() {
             cht.errorMessage = comp
         }
+        
         if let color = theme?.savePhoneNumberIconColor?.toUIColors() {
             if let cc = color.color {
                 //cht.savePhoneNumberIconColor = cc
             }
         }
+        
         if let color = theme?.selectorIconColor?.toUIColors() {
             if let cc = color.color {
                 //cht.selectorIconColor = cc

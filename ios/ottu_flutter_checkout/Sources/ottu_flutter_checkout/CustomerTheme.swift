@@ -8,6 +8,7 @@
 struct CustomerTheme: Decodable {
     let uiMode: String?
     let mainTitleText: TextStyle?
+    let selectPaymentMethodHeaderText: TextStyle?
     let titleText: TextStyle?
     let subtitleText: TextStyle?
     let feesTitleText: TextStyle?
@@ -18,6 +19,7 @@ struct CustomerTheme: Decodable {
     let inputTextField: TextFieldStyle?
     let sdkBackgroundColor: ColorState?
     let modalBackgroundColor: ColorState?
+    let selectPaymentMethodHeaderBackgroundColor: ColorState?
     let paymentItemBackgroundColor: ColorState?
     let selectorIconColor: ColorState?
     let savePhoneNumberIconColor: ColorState?

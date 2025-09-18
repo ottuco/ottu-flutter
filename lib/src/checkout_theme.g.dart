@@ -17,6 +17,11 @@ CheckoutTheme _$CheckoutThemeFromJson(Map<String, dynamic> json) =>
       mainTitleText: json['mainTitleText'] == null
           ? null
           : TextStyle.fromJson(json['mainTitleText'] as Map<String, dynamic>),
+      selectPaymentMethodHeaderText: json['selectPaymentMethodHeaderText'] ==
+              null
+          ? null
+          : TextStyle.fromJson(
+              json['selectPaymentMethodHeaderText'] as Map<String, dynamic>),
       subtitleText: json['subtitleText'] == null
           ? null
           : TextStyle.fromJson(json['subtitleText'] as Map<String, dynamic>),
@@ -66,6 +71,12 @@ CheckoutTheme _$CheckoutThemeFromJson(Map<String, dynamic> json) =>
           ? null
           : ColorState.fromJson(
               json['modalBackgroundColor'] as Map<String, dynamic>),
+      selectPaymentMethodHeaderBackgroundColor:
+          json['selectPaymentMethodHeaderBackgroundColor'] == null
+              ? null
+              : ColorState.fromJson(
+                  json['selectPaymentMethodHeaderBackgroundColor']
+                      as Map<String, dynamic>),
       paymentItemBackgroundColor: json['paymentItemBackgroundColor'] == null
           ? null
           : ColorState.fromJson(
@@ -84,6 +95,7 @@ Map<String, dynamic> _$CheckoutThemeToJson(CheckoutTheme instance) =>
     <String, dynamic>{
       'uiMode': const _UiModeJsonConverter().toJson(instance.uiMode),
       'mainTitleText': instance.mainTitleText,
+      'selectPaymentMethodHeaderText': instance.selectPaymentMethodHeaderText,
       'titleText': instance.titleText,
       'subtitleText': instance.subtitleText,
       'feesTitleText': instance.feesTitleText,
@@ -99,6 +111,8 @@ Map<String, dynamic> _$CheckoutThemeToJson(CheckoutTheme instance) =>
       'margins': instance.margins,
       'sdkBackgroundColor': instance.sdkBackgroundColor,
       'modalBackgroundColor': instance.modalBackgroundColor,
+      'selectPaymentMethodHeaderBackgroundColor':
+          instance.selectPaymentMethodHeaderBackgroundColor,
       'paymentItemBackgroundColor': instance.paymentItemBackgroundColor,
       'selectorIconColor': instance.selectorIconColor,
       'savePhoneNumberIconColor': instance.savePhoneNumberIconColor,

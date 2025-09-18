@@ -239,6 +239,7 @@ internal class CheckoutView(
                 CheckoutTheme.Appearance(
                     mainTitleText = mainTitleText?.toCheckoutText(),
                     titleText = titleText?.toCheckoutText(),
+                    selectPaymentMethodHeaderText = selectPaymentMethodHeaderText?.toCheckoutText(),
                     subtitleText = subtitleText?.toCheckoutText(),
                     feesTitleText = feesTitleText?.toCheckoutText(),
                     feesSubtitleText = feesSubtitleText?.toCheckoutText(),
@@ -247,6 +248,7 @@ internal class CheckoutView(
                     errorMessageText = errorMessageText?.toCheckoutText(),
                     inputTextField = inputTextField?.toCheckoutTextField(),
                     sdkBackgroundColor = sdkBackgroundColor?.toCheckoutColor(),
+                    selectPaymentMethodHeaderBackgroundColor = selectPaymentMethodHeaderBackgroundColor?.toCheckoutColor(),
                     modalBackgroundColor = modalBackgroundColor?.toCheckoutColor(),
                     paymentItemBackgroundColor = paymentItemBackgroundColor?.toCheckoutColor(),
                     selectorIconColor = selectorIconColor?.toCheckoutColor(),

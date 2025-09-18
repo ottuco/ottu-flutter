@@ -20,7 +20,7 @@ plugins {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 36
     namespace = "com.ottu.sample"
     lint {
         abortOnError = false
@@ -31,7 +31,7 @@ android {
     defaultConfig {
         applicationId = "com.ottu.sample"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = flutterVersionCode.toInt()
         versionName = flutterVersionName
 

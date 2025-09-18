@@ -87,6 +87,16 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                           }),
                           const SizedBox(height: dividerPadding),
                           divider(),
+                          const SizedBox(height: dividerPadding),
+                          _colorOptionItem(
+                              state.theme?.selectPaymentMethodHeaderBackgroundColor?.color, "Select payment method header background",
+                              (color) {
+                            final newTheme = (state.theme ?? ch.CheckoutTheme())
+                                .copyWith(selectPaymentMethodHeaderBackgroundColor: ch.ColorState(color: color));
+                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                          }),
+                          const SizedBox(height: dividerPadding),
+                          divider(),
                           const SizedBox(height: 8),
                           _colorOptionItem(
                               state.theme?.mainTitleText?.textColor?.color, "Main title", (color) {
@@ -102,6 +112,15 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                               (color) {
                             final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                                 titleText: ch.TextStyle(textColor: ch.ColorState(color: color)));
+                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                          }),
+                          const SizedBox(height: dividerPadding),
+                          divider(),
+                          const SizedBox(height: dividerPadding),
+                          _colorOptionItem(state.theme?.selectPaymentMethodHeaderText?.textColor?.color, "Select payment method header text",
+                              (color) {
+                            final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                                selectPaymentMethodHeaderText: ch.TextStyle(textColor: ch.ColorState(color: color)));
                             context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
                           }),
                           const SizedBox(height: dividerPadding),

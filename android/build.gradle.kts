@@ -28,7 +28,7 @@ group = "com.ottu.flutter.checkout"
 version = "1.0.3"
 
 android {
-    compileSdk = 34
+    compileSdk = 36
     namespace = "com.ottu.flutter.checkout"
 
     defaultConfig {

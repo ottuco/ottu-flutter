@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class CustomerTheme(
     val uiMode: String?,
     val mainTitleText: TextStyle?,
+    val selectPaymentMethodHeaderText: TextStyle?,
     val titleText: TextStyle?,
     val subtitleText: TextStyle?,
     val feesTitleText: TextStyle?,
@@ -16,6 +17,7 @@ data class CustomerTheme(
     val inputTextField: TextFieldStyle?,
     val sdkBackgroundColor: ColorState?,
     val modalBackgroundColor: ColorState?,
+    val selectPaymentMethodHeaderBackgroundColor: ColorState?,
     val paymentItemBackgroundColor: ColorState?,
     val selectorIconColor: ColorState?,
     val savePhoneNumberIconColor: ColorState?,
