@@ -287,11 +287,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               state.formsOfPaymentChecked, 'card_onsite', context),
                           const Text('CardOnsite')
                         ]),
-                        Row(children: [
-                          paymentMethodCheckbox(
-                              state.formsOfPaymentChecked, 'auto_debit', context),
-                          const Text('Auto debit')
-                        ]),
                         const SizedBox(height: 24),
                         const Text('Pg Codes:'),
                         Divider(height: 2, thickness: 3),
