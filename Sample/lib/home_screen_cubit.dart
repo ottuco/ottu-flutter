@@ -16,10 +16,10 @@ import 'package:ottu_flutter_checkout_sample/api/transaction_payment_type.dart';
 import 'package:ottu_flutter_checkout_sample/home_screen_state.dart';
 import 'package:ottu_flutter_checkout_sample/main.dart';
 
-//const merchantId = "alpha.ottu.net";
-//const apiKey = "cHSLW0bE.56PLGcUYEhRvzhHVVO9CbF68hmDiXcPI";
-const merchantId = "staging4.ottu.dev";
-const apiKey = "kZia0dfY.vEWS0cUV5gWV1JDzIvzDfSxKLUh4qAa3"; //staging
+const merchantId = "alpha.ottu.net";
+const apiKey = "cHSLW0bE.56PLGcUYEhRvzhHVVO9CbF68hmDiXcPI";
+//const merchantId = "staging4.ottu.dev";
+//const apiKey = "kZia0dfY.vEWS0cUV5gWV1JDzIvzDfSxKLUh4qAa3"; //staging
 const customerId = "john2";
 const currencyCode = "KWD";
 const transactionType = "e_commerce";

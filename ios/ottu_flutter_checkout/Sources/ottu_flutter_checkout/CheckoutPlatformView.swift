@@ -232,6 +232,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         }
         
         if let comp = theme?.selectPaymentMethodHeaderText?.toLabelComponent() {
+            comp.font = UIFont.boldSystemFont(ofSize: 20)
             cht.selectPaymentMethodTitleLabel = comp
         }
         
