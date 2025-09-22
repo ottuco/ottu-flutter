@@ -1,5 +1,5 @@
-import java.util.Properties
 import java.nio.file.Files
+import java.util.Properties
 
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties").toPath()
@@ -9,7 +9,7 @@ if (Files.exists(localPropertiesFile)) {
     }
 }
 
-val ABI_FILTERS="armeabi-v7a"
+val ABI_FILTERS = "armeabi-v7a"
 val flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
 val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
@@ -53,10 +53,13 @@ android {
     buildTypes {
         getByName("release") {
             // Signing with the debug keys for now, so `flutter run --release` works.
-            //signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = true // Enable code shrinking and obfuscation
             isShrinkResources = true // Enable resource shrinking
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -71,5 +74,11 @@ android {
 
     buildFeatures {
         viewBinding = true
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url = uri("https://www.jitpack.io") }
     }
 }

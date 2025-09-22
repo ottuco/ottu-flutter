@@ -6,3 +6,4 @@
 .dart_tool
 /.flutter-plugins
 /.flutter-plugins-dependencies
+/android/build
