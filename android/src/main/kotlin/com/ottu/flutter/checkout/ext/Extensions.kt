@@ -1,5 +1,6 @@
 package com.ottu.flutter.checkout.ext
 
+import android.content.res.Resources
 import android.graphics.Color
 import android.util.Log
 import com.ottu.checkout.ui.theme.CheckoutTheme
@@ -10,6 +11,7 @@ import com.ottu.flutter.checkout.RippleColor
 import com.ottu.flutter.checkout.SwitchComponent
 import com.ottu.flutter.checkout.TextFieldStyle
 import com.ottu.flutter.checkout.TextStyle
+import java.lang.Exception
 import com.ottu.checkout.ui.theme.style.Margins as CheckoutMargins
 
 fun String.toColor() = this.let {
@@ -25,16 +27,25 @@ fun ColorState.toCheckoutColor() = CheckoutTheme.Color(
     colorDisabled = colorDisabled?.toColor()
 )
 
-fun TextStyle.toCheckoutText() =
-    CheckoutTheme.Text(textColor = this.textColor?.toCheckoutColor(), fontType = this.fontType)
+fun TextStyle.toCheckoutText(resources: Resources, packageName: String): CheckoutTheme.Text {
+    var fontResId: Int? = null;
+    try {
+        fontResId = resources.getIdentifier(this.fontFamily, "font", packageName)
+    } catch (e: Exception) {
+        Log.e("Extensions", "toCheckoutText", e)
+    }
 
-fun TextFieldStyle.toCheckoutTextField() = CheckoutTheme.TextField(
-    background = this.background?.toCheckoutColor(),
-    primaryColor = this.primaryColor?.toCheckoutColor(),
-    focusedColor = this.focusedColor?.toCheckoutColor(),
-    text = this.text?.toCheckoutText(),
-    error = this.error?.toCheckoutText()
-)
+    return CheckoutTheme.Text(textColor = this.textColor?.toCheckoutColor(), fontType = fontResId)
+}
+
+fun TextFieldStyle.toCheckoutTextField(resources: Resources, packageName: String) =
+    CheckoutTheme.TextField(
+        background = this.background?.toCheckoutColor(),
+        primaryColor = this.primaryColor?.toCheckoutColor(),
+        focusedColor = this.focusedColor?.toCheckoutColor(),
+        text = this.text?.toCheckoutText(resources = resources, packageName = packageName),
+        error = this.error?.toCheckoutText(resources = resources, packageName = packageName)
+    )
 
 fun Margins.toMargins() = CheckoutMargins(
     left = this.left,

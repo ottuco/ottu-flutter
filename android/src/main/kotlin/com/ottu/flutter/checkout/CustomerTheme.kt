@@ -44,7 +44,8 @@ data class RippleColor(
 @Serializable
 data class TextStyle(
     val textColor: ColorState?,
-    val fontType: Int?,
+    val fontFamily: String?,
+    val fontSize: Int?,
 )
 
 @Serializable

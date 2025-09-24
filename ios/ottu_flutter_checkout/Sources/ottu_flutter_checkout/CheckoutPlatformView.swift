@@ -227,40 +227,39 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             }
         }
         
-        if let comp = theme?.mainTitleText?.toLabelComponent() {
+        if let comp = theme?.mainTitleText?.toLabelComponent(ofSize: 20, weight: .semibold) {
             cht.mainTitle = comp
         }
         
-        if let comp = theme?.selectPaymentMethodHeaderText?.toLabelComponent() {
-            comp.font = UIFont.boldSystemFont(ofSize: 20)
+        if let comp = theme?.selectPaymentMethodHeaderText?.toLabelComponent(ofSize: 20, weight: .semibold) {
             cht.selectPaymentMethodTitleLabel = comp
         }
         
-        if let comp = theme?.titleText?.toLabelComponent() {
+        if let comp = theme?.titleText?.toLabelComponent(ofSize: 17, weight: .semibold) {
             cht.title = comp
         }
         
-        if let comp = theme?.subtitleText?.toLabelComponent() {
+        if let comp = theme?.subtitleText?.toLabelComponent(ofSize: 15) {
             cht.subtitle = comp
         }
         
-        if let comp = theme?.feesTitleText?.toLabelComponent() {
+        if let comp = theme?.feesTitleText?.toLabelComponent(ofSize: 17) {
             cht.feesTitle = comp
         }
         
-        if let comp = theme?.feesSubtitleText?.toLabelComponent() {
+        if let comp = theme?.feesSubtitleText?.toLabelComponent(ofSize: 15) {
             cht.feesSubtitle = comp
         }
         
-        if let comp = theme?.dataLabelText?.toLabelComponent() {
+        if let comp = theme?.dataLabelText?.toLabelComponent(ofSize: 14, weight: .semibold) {
             cht.dataLabel = comp
         }
         
-        if let comp = theme?.dataValueText?.toLabelComponent() {
+        if let comp = theme?.dataValueText?.toLabelComponent(ofSize: 16, weight: .semibold) {
             cht.dataValue = comp
         }
         
-        if let comp = theme?.errorMessageText?.toLabelComponent() {
+        if let comp = theme?.errorMessageText?.toLabelComponent(ofSize: 13, weight: .semibold) {
             cht.errorMessage = comp
         }
         

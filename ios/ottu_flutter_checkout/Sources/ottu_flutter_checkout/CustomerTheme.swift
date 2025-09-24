@@ -43,7 +43,8 @@ struct RippleColor: Decodable {
 
 struct TextStyle: Decodable {
     let textColor: ColorState?
-    let fontType: Int?
+    let fontFamily: String?
+    let fontSize: Int?
 }
 
 struct TextFieldStyle: Decodable {

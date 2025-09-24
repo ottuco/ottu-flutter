@@ -2,6 +2,7 @@ package com.ottu.flutter.checkout
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.res.Resources
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,8 +31,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.async
-import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 
@@ -93,7 +92,10 @@ internal class CheckoutView(
             val fm = fa.supportFragmentManager
             Log.i(TAG, "onFlutterViewAttached, start init")
             coroutineScope.launch {
-                initCheckoutFragment { fragment ->
+                initCheckoutFragment(
+                    resources = flutterView.resources,
+                    packageName = flutterView.context.packageName
+                ) { fragment ->
                     Log.d(TAG, "onFlutterViewAttached, Checkout initialized")
                     fm.beginTransaction().replace(R.id.checkout_fragment_container, fragment)
                         .commitAllowingStateLoss()
@@ -116,7 +118,11 @@ internal class CheckoutView(
             })
     }
 
-    private suspend fun initCheckoutFragment(onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit) {
+    private suspend fun initCheckoutFragment(
+        resources: Resources,
+        packageName: String,
+        onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit,
+    ) {
         Log.d(TAG, "initCheckoutFragment, initialized: ${Checkout.isInitialized}")
 
         val builder = arguments.run {
@@ -133,7 +139,7 @@ internal class CheckoutView(
                 defaultSelectedPgCode = defaultSelectedPgCode
             )
 
-            val theme = getCheckoutTheme(arguments)
+            val theme = getCheckoutTheme(arguments, resources, packageName)
             val payments = formsOfPayment?.map { key ->
                 Checkout.FormsOfPayment.of(key)
             }?.filterNotNull()
@@ -231,22 +237,27 @@ internal class CheckoutView(
         }
     }
 
-    private fun getCheckoutTheme(checkoutArguments: CheckoutArguments): CheckoutTheme {
+    private fun getCheckoutTheme(
+        checkoutArguments: CheckoutArguments,
+        resources: Resources,
+        packageName: String,
+    ): CheckoutTheme {
+
         return CheckoutTheme(uiMode = CheckoutTheme.UiMode.entries.find { mode -> mode.name.lowercase() == checkoutArguments.theme?.uiMode }
             ?: CheckoutTheme.UiMode.AUTO,
             showPaymentDetails = checkoutArguments.showPaymentDetails,
             appearanceLight = checkoutArguments.theme?.run {
                 CheckoutTheme.Appearance(
-                    mainTitleText = mainTitleText?.toCheckoutText(),
-                    titleText = titleText?.toCheckoutText(),
-                    selectPaymentMethodHeaderText = selectPaymentMethodHeaderText?.toCheckoutText(),
-                    subtitleText = subtitleText?.toCheckoutText(),
-                    feesTitleText = feesTitleText?.toCheckoutText(),
-                    feesSubtitleText = feesSubtitleText?.toCheckoutText(),
-                    dataLabelText = dataLabelText?.toCheckoutText(),
-                    dataValueText = dataValueText?.toCheckoutText(),
-                    errorMessageText = errorMessageText?.toCheckoutText(),
-                    inputTextField = inputTextField?.toCheckoutTextField(),
+                    mainTitleText = mainTitleText?.toCheckoutText(resources, packageName),
+                    titleText = titleText?.toCheckoutText(resources, packageName),
+                    selectPaymentMethodHeaderText = selectPaymentMethodHeaderText?.toCheckoutText(resources, packageName),
+                    subtitleText = subtitleText?.toCheckoutText(resources, packageName),
+                    feesTitleText = feesTitleText?.toCheckoutText(resources, packageName),
+                    feesSubtitleText = feesSubtitleText?.toCheckoutText(resources, packageName),
+                    dataLabelText = dataLabelText?.toCheckoutText(resources, packageName),
+                    dataValueText = dataValueText?.toCheckoutText(resources, packageName),
+                    errorMessageText = errorMessageText?.toCheckoutText(resources, packageName),
+                    inputTextField = inputTextField?.toCheckoutTextField(resources, packageName),
                     sdkBackgroundColor = sdkBackgroundColor?.toCheckoutColor(),
                     selectPaymentMethodHeaderBackgroundColor = selectPaymentMethodHeaderBackgroundColor?.toCheckoutColor(),
                     modalBackgroundColor = modalBackgroundColor?.toCheckoutColor(),
@@ -261,15 +272,15 @@ internal class CheckoutView(
             },
             appearanceDark = checkoutArguments.theme?.run {
                 CheckoutTheme.Appearance(
-                    mainTitleText = mainTitleText?.toCheckoutText(),
-                    titleText = titleText?.toCheckoutText(),
-                    subtitleText = subtitleText?.toCheckoutText(),
-                    feesTitleText = feesTitleText?.toCheckoutText(),
-                    feesSubtitleText = feesSubtitleText?.toCheckoutText(),
-                    dataLabelText = dataLabelText?.toCheckoutText(),
-                    dataValueText = dataValueText?.toCheckoutText(),
-                    errorMessageText = errorMessageText?.toCheckoutText(),
-                    inputTextField = inputTextField?.toCheckoutTextField(),
+                    mainTitleText = mainTitleText?.toCheckoutText(resources, packageName),
+                    titleText = titleText?.toCheckoutText(resources, packageName),
+                    subtitleText = subtitleText?.toCheckoutText(resources, packageName),
+                    feesTitleText = feesTitleText?.toCheckoutText(resources, packageName),
+                    feesSubtitleText = feesSubtitleText?.toCheckoutText(resources, packageName),
+                    dataLabelText = dataLabelText?.toCheckoutText(resources, packageName),
+                    dataValueText = dataValueText?.toCheckoutText(resources, packageName),
+                    errorMessageText = errorMessageText?.toCheckoutText(resources, packageName),
+                    inputTextField = inputTextField?.toCheckoutTextField(resources, packageName),
                     sdkBackgroundColor = sdkBackgroundColor?.toCheckoutColor(),
                     modalBackgroundColor = modalBackgroundColor?.toCheckoutColor(),
                     paymentItemBackgroundColor = paymentItemBackgroundColor?.toCheckoutColor(),

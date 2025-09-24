@@ -168,12 +168,14 @@ TextStyle _$TextStyleFromJson(Map<String, dynamic> json) => TextStyle(
       textColor: json['textColor'] == null
           ? null
           : ColorState.fromJson(json['textColor'] as Map<String, dynamic>),
-      fontType: (json['fontType'] as num?)?.toInt(),
+      fontFamily: json['fontFamily'] as String?,
+      fontSize: (json['fontSize'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$TextStyleToJson(TextStyle instance) => <String, dynamic>{
       'textColor': instance.textColor,
-      'fontType': instance.fontType,
+      'fontFamily': instance.fontFamily,
+      'fontSize': instance.fontSize,
     };
 
 TextFieldStyle _$TextFieldStyleFromJson(Map<String, dynamic> json) =>

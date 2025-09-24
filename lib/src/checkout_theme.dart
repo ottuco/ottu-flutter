@@ -213,9 +213,10 @@ final class RippleColor {
 @JsonSerializable()
 final class TextStyle {
   final ColorState? textColor;
-  final int? fontType;
+  final String? fontFamily;
+  final int? fontSize;
 
-  TextStyle({this.textColor, this.fontType});
+  TextStyle({this.textColor, this.fontFamily, this.fontSize});
 
   factory TextStyle.fromJson(Map<String, dynamic> json) => _$TextStyleFromJson(json);
 

@@ -1,8 +1,10 @@
 package com.ottu.flutter.checkout
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class CheckoutArguments(
     val merchantId: String,
     val apiKey: String,
