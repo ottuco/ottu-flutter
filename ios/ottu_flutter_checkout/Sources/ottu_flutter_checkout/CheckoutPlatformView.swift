@@ -107,7 +107,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             arguments.theme, showPaymentDetails: arguments.showPaymentDetails)
         let formsOfPayment =
         arguments.formsOfPayment?.map(
-            { code in FormOfPayment.of(code)
+            { code in FormOfPayment(rawValue: code)
             }).compactMap { $0 } ?? []
         
         debugPrint("formsOfPayment: \(formsOfPayment)")
