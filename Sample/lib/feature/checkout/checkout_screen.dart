@@ -10,11 +10,13 @@ class CheckoutScreen extends StatefulWidget {
     required this.title,
     required this.checkoutArguments,
     required this.failPaymentValidation,
+    required this.showMerchantWidget,
   });
 
   final String title;
   final CheckoutArguments checkoutArguments;
   final bool failPaymentValidation;
+  final bool showMerchantWidget;
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();

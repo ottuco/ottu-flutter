@@ -2,6 +2,7 @@ import Flutter
 import Foundation
 import OSLog
 import SwiftUI
+import UIKit
 import ottu_checkout_sdk
 
 //
@@ -18,6 +19,7 @@ private let _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT"
 private let _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT"
 private let _methodOnWidgetDetached = "METHOD_ON_WIDGET_DETACHED"
 private let _methodVerifyPayment = "METHOD_VERIFY_PAYMENT"
+private let nestedWidgetHeight: CGFloat = 56
 
 public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let viewId: Int64
@@ -25,38 +27,58 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let _view: CheckoutContainerView
     private weak var paymentViewController: UIViewController?
     private var checkout: Checkout?
-
+    private var nestedFlutterVC: FlutterViewController?
+    private var nestedEngine: FlutterEngine?
+    
+    deinit {
+        if let nestedFlutterVC, nestedFlutterVC.parent != nil {
+            nestedFlutterVC.willMove(toParent: nil)
+            nestedFlutterVC.view.removeFromSuperview()
+            nestedFlutterVC.removeFromParent()
+        }
+        nestedFlutterVC = nil
+        
+        nestedEngine?.destroyContext()
+        nestedEngine = nil
+        
+        print("CheckoutPlatformView successfully deallocated and memory cleaned up.")
+    }
+    
     private func deinitCheckout() {
         guard let pvc = paymentViewController,
-            let parentVC = findRootViewController() as? FlutterViewController
+              let parentVC = findRootViewController() as? FlutterViewController
         else { return }
-
+        
         if parentVC.children.contains(pvc) {
             pvc.willMove(toParent: nil)
             pvc.view.removeFromSuperview()
             pvc.removeFromParent()
-            Logger.sdk.info("Removed from parent!")
+            Logger.sdk.info("CheckoutPlatformView, Removed from parent!")
         } else {
-            Logger.sdk.debug("No parent relationship found, nothing to remove.")
+            Logger.sdk.debug("CheckoutPlatformView, No parent relationship found, nothing to remove.")
         }
     }
-
+    
     @MainActor
     init(
         messenger: FlutterBinaryMessenger,
         frame: CGRect,
         viewId: Int64,
-        args: Any?
+        args: Any?,
+        nestedEngine: FlutterEngine,
     ) {
-
+        
         self.viewId = viewId
         self.channel = FlutterMethodChannel(
             name: checkoutChannelName,
             binaryMessenger: messenger
         )
         _view = CheckoutContainerView()
+        self.nestedEngine = nestedEngine
         super.init()
-
+        
+        let nestedWidget = setupNestedFlutterWidget(with: nestedEngine)
+        
         self.channel.setMethodCallHandler { [weak self] call, _ in
             guard let self else { return }
             if call.method == _methodOnWidgetDetached {
@@ -64,21 +86,21 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             }
         }
         let jsonData: Data? =
-            if args != nil {
-                if let dictionaryArgs = args as? [String: Any] {
-                    (dictionaryArgs["args"] as? String)?.data(using: .utf8)
-                } else {
-                    nil
-                }
-            } else { nil }
-
+        if args != nil {
+            if let dictionaryArgs = args as? [String: Any] {
+                (dictionaryArgs["args"] as? String)?.data(using: .utf8)
+            } else {
+                nil
+            }
+        } else { nil }
+        
         if jsonData != nil {
             do {
                 let arguments: CheckoutArguments? = try? JSONDecoder().decode(
                     CheckoutArguments.self,
                     from: jsonData!
                 )
-
+                
                 self._view.onHeightChanged = { [weak self] (height: Int) in
                     guard let self else { return }
                     Logger.sdk.debug(
@@ -89,22 +111,41 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                         arguments: height
                     )
                 }
-
+                
                 if arguments != nil {
-                    createNativeView(arguments: arguments!)
+                    createNativeView(arguments: arguments!, nestedWidget: nestedWidget)
                 }
             } catch {
-                Logger.sdk.warning("Unexpected error: \(error).")
+                Logger.sdk.warning("CheckoutPlatformView, Unexpected error: \(error).")
             }
         }
     }
-
+    
     public func view() -> UIView {
         return _view
     }
-
+    
+    private func setupNestedFlutterWidget(with engine: FlutterEngine) -> UIView {
+        Logger.sdk.info("CheckoutPlatformView, setupNestedFlutterWidget")
+        let flutterVC = FlutterViewController(engine: engine, nibName: nil, bundle: nil)
+        self.nestedFlutterVC = flutterVC
+        
+        flutterVC.view.frame = CGRect(
+            x: 0,
+            y: 0,
+            width: _view.bounds.width,
+            height: nestedWidgetHeight
+        )
+        flutterVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        flutterVC.isViewOpaque = false
+        flutterVC.view.backgroundColor = .clear
+        
+        return flutterVC.view
+    }
+    
     fileprivate func showSdkError() {
-        Logger.sdk.info("showSdkError")
+        Logger.sdk.info("CheckoutPlatformView, showSdkError")
         if let parentVC = findRootViewController() as? FlutterViewController {
             let title = NSLocalizedString(
                 "failed",
@@ -121,7 +162,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 bundle: Bundle.module,
                 comment: "button label"
             )
-
+            
             let alert = UIAlertController(
                 title: title,
                 message: message,
@@ -135,72 +176,77 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                         switch action.style {
                         case .default:
                             Logger.sdk.info("default")
-
+                            
                         case .cancel:
                             Logger.sdk.info("cancel")
-
+                            
                         case .destructive:
                             Logger.sdk.info("destructive")
-
+                            
                         }
                     }
                 )
             )
             parentVC.present(alert, animated: true, completion: nil)
         } else {
-            Logger.sdk.info("showSdkError, unable to find parentVC")
+            Logger.sdk.info("CheckoutPlatformView, showSdkError, unable to find parentVC")
         }
     }
-
+    
     @MainActor
-    func createNativeView(arguments: CheckoutArguments) {
-        Logger.sdk.info("createNativeView")
+    func createNativeView(arguments: CheckoutArguments, nestedWidget: UIView?) {
+        Logger.sdk.info("CheckoutPlatformView, createNativeView")
         let theme = getCheckoutTheme(
             arguments.theme,
             showPaymentDetails: arguments.showPaymentDetails
         )
         let formsOfPayment =
-            arguments.formsOfPayment?.map(
-                { code in FormOfPayment(rawValue: code)
-                }).compactMap { $0 } ?? []
-
-        Logger.sdk.info("formsOfPayment")
-
+        arguments.formsOfPayment?.map(
+            { code in FormOfPayment(rawValue: code)
+            }).compactMap { $0 } ?? []
+        
+        Logger.sdk.info("CheckoutPlatformView, formsOfPayment")
+        
         let paymentOptionsDisplaySettings:
-            ottu_checkout_sdk.PaymentOptionsDisplaySettings =
-                if arguments.paymentOptionsDisplaySettings.mode == "list" {
-                    ottu_checkout_sdk.PaymentOptionsDisplaySettings(
-                        mode: .list,
-                        visibleItemsCount: UInt(
-                            arguments.paymentOptionsDisplaySettings
-                                .visibleItemsCount
-                        ),
-                        defaultSelectedPgCode: arguments
-                            .paymentOptionsDisplaySettings
-                            .defaultSelectedPgCode,
-                    )
-                } else {
-                    ottu_checkout_sdk.PaymentOptionsDisplaySettings(
-                        mode: .bottomSheet,
-                        defaultSelectedPgCode: arguments
-                            .paymentOptionsDisplaySettings
-                            .defaultSelectedPgCode,
-                    )
-                }
-
+        ottu_checkout_sdk.PaymentOptionsDisplaySettings =
+        if arguments.paymentOptionsDisplaySettings.mode == "list" {
+            ottu_checkout_sdk.PaymentOptionsDisplaySettings(
+                mode: .list,
+                visibleItemsCount: UInt(
+                    arguments.paymentOptionsDisplaySettings
+                        .visibleItemsCount
+                ),
+                defaultSelectedPgCode: arguments
+                    .paymentOptionsDisplaySettings
+                    .defaultSelectedPgCode,
+            )
+        } else {
+            ottu_checkout_sdk.PaymentOptionsDisplaySettings(
+                mode: .bottomSheet,
+                defaultSelectedPgCode: arguments
+                    .paymentOptionsDisplaySettings
+                    .defaultSelectedPgCode,
+            )
+        }
+        
         var apiTransactionDetails: TransactionDetailsResponse?
         if let transactionDetails: String? = arguments.apiTransactionDetails {
-
+            
             if let td = transactionDetails {
                 apiTransactionDetails = try? getApiTransactionDetails(td)
             }
         }
         do {
-            Logger.sdk.info("Get transactionDetails from apiTransactionDetails")
+            Logger.sdk.info("CheckoutPlatformView, Get transactionDetails from apiTransactionDetails")
             let transactionDetails: TransactionDetails? = try
-                apiTransactionDetails?.transactionDetails
-
-            Logger.sdk.info("setupPreload")
+            apiTransactionDetails?.transactionDetails
+            
+            Logger.sdk.info("CheckoutPlatformView, setupPreload")
+            
+            if(nestedWidget != nil) {
+                Logger.sdk.info("CheckoutPlatformView, embed nested widget")
+            }
+            
             self.checkout = try Checkout(
                 formsOfPayments: formsOfPayment,
                 theme: theme,
@@ -211,7 +257,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 setupPreload: transactionDetails,
                 delegate: self,
                 verifyPayment: verifyPaymentCallback,
-                payButtonText: arguments.payButtonText?.toPayButtonText()
+                payButtonText: arguments.payButtonText?.toPayButtonText(),
+                nestedWidget: nestedWidget,
             )
             if let cht = checkout {
                 self.paymentViewController = cht.paymentViewController()
@@ -222,16 +269,20 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             showSdkError()
         }
     }
-
+    
     func tryAttachController() {
         Logger.sdk.info("tryAttachController")
         guard let pvc = self.paymentViewController else { return }
-
+        
         let rootViewController = findRootViewController()
         Logger.sdk.info(
             "tryAttachController, pvc: \(rootViewController)"
         )
         if let parentVC = rootViewController as? FlutterViewController {
+            // The nested Flutter view is embedded inside the checkout
+            // PaymentViewController, so its controller must have the same
+            // immediate parent as its view hierarchy.
+            attachNestedFlutterController(to: pvc)
             Logger.sdk.debug("tryAttachController, addChild PVC")
             parentVC.addChild(pvc)
             _view.addCheckoutView(pvc.view)
@@ -247,14 +298,24 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         }
     }
 
-    private func findRootViewController() -> UIViewController? {
+    private func attachNestedFlutterController(to parent: UIViewController) {
+        guard let nestedFlutterVC,
+              nestedFlutterVC.parent == nil
+        else { return }
 
+        parent.addChild(nestedFlutterVC)
+        nestedFlutterVC.didMove(toParent: parent)
+        Logger.sdk.debug("Attached nested Flutter view controller")
+    }
+    
+    private func findRootViewController() -> UIViewController? {
+        
         if let scene = UIApplication.shared.connectedScenes.first
             as? UIWindowScene
         {
             if let window = scene.windows.first(where: { $0.isKeyWindow }) {
                 return window.rootViewController
-
+                
             } else {
                 Logger.sdk.error(
                     "findRootViewController, unable to find window in scene"
@@ -266,7 +327,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         return nil
     }
     private func getApiTransactionDetails(_ transactionDetails: String)
-        -> TransactionDetailsResponse?
+    -> TransactionDetailsResponse?
     {
         Logger.sdk.info("getApiTransactionDetails")
         if let jsonData = transactionDetails.data(using: .utf8) {
@@ -301,36 +362,36 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             } catch {
                 Logger.sdk.error("Failed to decode transactionDetails \(error)")
             }
-
+            
             return nil
         }
-
+        
         return nil
     }
-
+    
     private func getCheckoutTheme(
         _ theme: CustomerTheme?,
         showPaymentDetails: Bool
     ) -> CheckoutTheme {
         let cht = CheckoutTheme()
         cht.showPaymentDetails = showPaymentDetails
-
+        
         if theme == nil {
             return cht
         }
-
+        
         if let color = theme?.sdkBackgroundColor?.toUIColors() {
             if let cc = color.color {
                 cht.backgroundColor = cc
             }
         }
-
+        
         if let color = theme?.modalBackgroundColor?.toUIColors() {
             if let cc = color.color {
                 cht.backgroundColorModal = cc
             }
         }
-
+        
         if let color = theme?.selectPaymentMethodHeaderBackgroundColor?
             .toUIColors()
         {
@@ -338,135 +399,135 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 cht.selectPaymentMethodTitleBackgroundColor = cc
             }
         }
-
+        
         if let comp = theme?.mainTitleText?.toLabelComponent(
             ofSize: 20,
             weight: .semibold
         ) {
             cht.mainTitle = comp
         }
-
+        
         if let comp = theme?.selectPaymentMethodHeaderText?.toLabelComponent(
             ofSize: 20,
             weight: .semibold
         ) {
             cht.selectPaymentMethodTitleLabel = comp
         }
-
+        
         if let comp = theme?.titleText?.toLabelComponent(
             ofSize: 17,
             weight: .semibold
         ) {
             cht.title = comp
         }
-
+        
         if let comp = theme?.subtitleText?.toLabelComponent(ofSize: 15) {
             cht.subtitle = comp
         }
-
+        
         if let comp = theme?.feesTitleText?.toLabelComponent(ofSize: 17) {
             cht.feesTitle = comp
         }
-
+        
         if let comp = theme?.feesSubtitleText?.toLabelComponent(ofSize: 15) {
             cht.feesSubtitle = comp
         }
-
+        
         if let comp = theme?.dataLabelText?.toLabelComponent(
             ofSize: 14,
             weight: .semibold
         ) {
             cht.dataLabel = comp
         }
-
+        
         if let comp = theme?.dataValueText?.toLabelComponent(
             ofSize: 16,
             weight: .semibold
         ) {
             cht.dataValue = comp
         }
-
+        
         if let comp = theme?.errorMessageText?.toLabelComponent(
             ofSize: 13,
             weight: .semibold
         ) {
             cht.errorMessage = comp
         }
-
+        
         if let color = theme?.savePhoneNumberIconColor?.toUIColors() {
             if let cc = color.color {
                 //cht.savePhoneNumberIconColor = cc
             }
         }
-
+        
         if let color = theme?.selectorIconColor?.toUIColors() {
             if let cc = color.color {
                 //cht.selectorIconColor = cc
             }
         }
-
+        
         if let color = theme?.paymentItemBackgroundColor?.toUIColors() {
             if let cc = color.color {
                 cht.paymentItemBackgroundColor = cc
             }
         }
-
+        
         if let color = theme?.paymentItemDescriptionTextColor?.toUIColors() {
             if let cc = color.color {
                 cht.selectPaymentMethodDescriptionTextColor = cc
             }
         }
-
+        
         if let color = theme?.paymentItemBorderColor?.toUIColors() {
             if let cc = color.color {
                 cht.selectPaymentMethodBorderColor = cc
             }
         }
-
+        
         if let width = theme?.paymentItemBorderWidth {
             cht.selectPaymentMethodBorderWidth = CGFloat(width)
         }
-
+        
         if let radius = theme?.paymentItemCornerRadius {
             cht.selectPaymentMethodCornerRadius = CGFloat(radius)
         }
-
+        
         if let switchColor = theme?.switchControl?.toCheckoutSwitch() {
             cht.switchOnTintColor = switchColor
         }
-
+        
         if let button = theme?.button?.toCheckoutButton() {
             cht.button = button
         }
-
+        
         if let selectorButton = theme?.selectorButton?.toCheckoutButton() {
             cht.selectorButton = selectorButton
         }
-
+        
         if let iMargins = theme?.margins?.toMargins() {
             cht.margins = iMargins
         }
-
+        
         if let iconColor = theme?.selectorIconColor?.toUIColors() {
             if let cc = iconColor.color {
                 cht.iconColor = cc
             }
         }
-
+        
         if let uiMode = theme?.uiMode {
             cht.uiMode =
-                switch uiMode {
-                case "light": .LIGHT
-                case "dark": .DARK
-                default: .SYSTEM
-                }
+            switch uiMode {
+            case "light": .LIGHT
+            case "dark": .DARK
+            default: .SYSTEM
+            }
         }
-
+        
         return cht
     }
-
+    
     private func verifyPaymentCallback(_ payload: String?) async
-        -> CardVerificationResult<Void>
+    -> CardVerificationResult<Void>
     {
         return await withCheckedContinuation { continuation in
             Logger.sdk.info("CheckoutPlatformView.verifyPaymentCallback")
@@ -537,7 +598,7 @@ extension CheckoutPlatformView: OttuDelegate {
                         arguments: message
                     )
                 }
-
+                
                 self.paymentViewController?.view.isHidden = true
                 self.paymentViewController?.view.setNeedsLayout()
                 self.paymentViewController?.view.layoutIfNeeded()
@@ -547,7 +608,7 @@ extension CheckoutPlatformView: OttuDelegate {
                 self._view.layoutIfNeeded()
             }
     }
-
+    
     public func cancelCallback(_ data: [String: Any]?) {
         Logger.sdk.debug("cancelCallback\n")
         DispatchQueue.main
@@ -558,7 +619,7 @@ extension CheckoutPlatformView: OttuDelegate {
                         arguments: message
                     )
                 }
-
+                
                 self.paymentViewController?.view.setNeedsLayout()
                 self.paymentViewController?.view.layoutIfNeeded()
                 self._view.heightHandlerView.setNeedsLayout()
@@ -567,7 +628,7 @@ extension CheckoutPlatformView: OttuDelegate {
                 self._view.layoutIfNeeded()
             }
     }
-
+    
     public func successCallback(_ data: [String: Any]?) {
         Logger.sdk.debug("successCallback")
         DispatchQueue.main.async {
@@ -577,7 +638,7 @@ extension CheckoutPlatformView: OttuDelegate {
                     arguments: message
                 )
             }
-
+            
             //self.paymentViewController?.view.isHidden = true
             self.paymentViewController?.view.setNeedsLayout()
             self.paymentViewController?.view.layoutIfNeeded()
@@ -591,29 +652,29 @@ extension CheckoutPlatformView: OttuDelegate {
 
 private class CheckoutContainerView: UIView {
     let heightHandlerView: CheckoutHeightHandlerView
-
+    
     override init(frame: CGRect) {
-
+        
         heightHandlerView = CheckoutHeightHandlerView()
         super.init(frame: frame)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     public var onHeightChanged: ((Int) -> Void)?
-
+    
     func addCheckoutView(_ checkoutView: UIView) {
         self.heightHandlerView.onHeightChanged = self.onHeightChanged
         self.heightHandlerView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.translatesAutoresizingMaskIntoConstraints = false
         checkoutView.accessibilityIdentifier = "CheckoutView"
-
+        
         addSubview(heightHandlerView)
         addSubview(checkoutView)
         heightHandlerView.addSubview(checkoutView)
-
+        
         NSLayoutConstraint.activate([
             heightHandlerView.leftAnchor.constraint(
                 equalTo: self.leftAnchor
@@ -623,7 +684,7 @@ private class CheckoutContainerView: UIView {
             ),
             heightHandlerView.topAnchor.constraint(equalTo: self.topAnchor),
             //checkoutHeightHandler.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-
+            
             checkoutView.leftAnchor.constraint(
                 equalTo: heightHandlerView.leftAnchor
             ),
@@ -641,17 +702,17 @@ private class CheckoutContainerView: UIView {
 }
 
 private class CheckoutHeightHandlerView: UIView {
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     public var onHeightChanged: ((Int) -> Void)?
-
+    
     override open func layoutSubviews() {
         super.layoutSubviews()
         self.setNeedsDisplay()
@@ -686,7 +747,7 @@ private class CheckoutHeightHandlerView: UIView {
                 }
             }
         }
-
+        
         Logger.sdk.debug("layoutSubviews, bounds")
         onHeightChanged?(
             Int(self.bounds.height)

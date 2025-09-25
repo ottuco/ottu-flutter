@@ -24,6 +24,9 @@ import com.ottu.flutter.checkout.ext.toCheckoutText
 import com.ottu.flutter.checkout.ext.toCheckoutTextField
 import com.ottu.flutter.checkout.ext.toPayButtonText
 import com.squareup.moshi.JsonAdapter
+import io.flutter.embedding.android.FlutterView
+import io.flutter.embedding.android.RenderMode
+import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
@@ -65,6 +68,7 @@ internal class CheckoutView(
     id: Int,
     private val context: Context,
     private val arguments: CheckoutArguments,
+    private var nestedEngine: FlutterEngine? = null,
 ) : PlatformView {
     private val methodChannel: MethodChannel
     private val checkoutView: FrameLayout = LayoutInflater.from(context)
@@ -72,17 +76,37 @@ internal class CheckoutView(
 
     private var initializerErrorDialog: AlertDialog? = null
 
+    private val nestedContainerLayout = FrameLayout(context)
+    private var nestedFlutterView: FlutterView? = null
+
     init {
         val vParams: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         )
         checkoutView.layoutParams = vParams
         methodChannel = MethodChannel(messenger, CHANNEL)
+
+        nestedEngine?.let { engine ->
+            nestedFlutterView = FlutterView(context, RenderMode.texture).apply {
+                attachToFlutterEngine(engine)
+            }
+
+            val layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                98
+            )
+            nestedContainerLayout.addView(nestedFlutterView, layoutParams)
+        }
     }
 
     override fun getView(): View = checkoutView
 
-    override fun dispose() {}
+    override fun dispose() {
+        nestedFlutterView?.detachFromFlutterEngine()
+        nestedEngine?.destroy()
+        nestedFlutterView = null
+        nestedEngine = null
+    }
 
     override fun onFlutterViewDetached() {
         super.onFlutterViewDetached()
@@ -187,6 +211,12 @@ internal class CheckoutView(
             TAG,
             "initCheckoutFragment, with apiTransactionDetails"
         )
+
+        Log.d(
+            TAG,
+            "initCheckoutFragment, has nested view: ${nestedContainerLayout != null}"
+        )
+
         coroutineScope.launch {
             try {
                 val sdkFragment = Checkout.init(
@@ -210,6 +240,7 @@ internal class CheckoutView(
                     },
                     verifyPayment = ::verifyPayment,
                     payButtonText = arguments.payButtonText?.toPayButtonText(),
+                    nestedWidget = nestedContainerLayout,
                 )
 
                 onInitialized(sdkFragment)

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart' as ch;
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart' show CustomerUiMode;
 import 'package:ottu_flutter_checkout_sample/feature/checkout/checkout_module.dart';
+import 'package:ottu_flutter_checkout_sample/feature/checkout/merchant_nested_widget.dart';
 import 'package:ottu_flutter_checkout_sample/feature/home/home_module.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_module.dart';
 import 'package:ottu_flutter_checkout_sample/util/transformation_notifier.dart';
@@ -34,6 +35,14 @@ final ThemeModeNotifierHolder _themeModeNotifierHolder = ThemeModeNotifierHolder
 void main() {
   runApp(OttuApp(modules: [HomeModule(), ThemeModule(), CheckoutModule()]));
 }
+
+// @pragma('vm:entry-point')
+// void merchantNestedWidgetMain() {
+//   runApp(const MaterialApp(
+//     debugShowCheckedModeBanner: false,
+//     home: MerchantNestedWidget(),
+//   ));
+// }
 
 class OttuApp extends StatelessWidget {
   final List<Module> modules;

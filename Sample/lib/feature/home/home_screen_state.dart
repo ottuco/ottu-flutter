@@ -23,6 +23,7 @@ final class HomeScreenState extends Equatable {
   final bool hasSessionLoaded;
   final bool? failPaymentValidation;
   final bool useCustomText;
+  final bool showMerchantWidget;
   final PaymentOptionsDisplayMode? paymentOptionsDisplayMode;
   final Map<FormsOfPayment, bool>? formsOfPaymentChecked;
   final Map<PGCode, bool>? pgCodesChecked;
@@ -50,6 +51,7 @@ final class HomeScreenState extends Equatable {
     this.formsOfPaymentChecked,
     this.pgCodesChecked,
     this.useCustomText = false,
+    this.showMerchantWidget = false,
     this.apiTransactionDetails,
   });
 
@@ -72,6 +74,7 @@ final class HomeScreenState extends Equatable {
     bool? hasSessionLoaded,
     bool? failPaymentValidation,
     bool? useCustomText,
+    bool? showMerchantWidget,
     PaymentOptionsDisplayMode? paymentOptionsDisplayMode,
     Map<FormsOfPayment, bool>? formsOfPaymentChecked,
     Map<PGCode, bool>? pgCodesChecked,
@@ -95,6 +98,7 @@ final class HomeScreenState extends Equatable {
       isAutoDebit: isAutoDebit ?? this.isAutoDebit,
       failPaymentValidation: failPaymentValidation ?? this.failPaymentValidation,
       useCustomText: useCustomText ?? this.useCustomText,
+      showMerchantWidget: showMerchantWidget ?? this.showMerchantWidget,
       hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
       paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
       formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
@@ -121,6 +125,7 @@ final class HomeScreenState extends Equatable {
     isAutoDebit,
     failPaymentValidation,
     useCustomText,
+    showMerchantWidget,
     phoneNumber,
     hasSessionLoaded,
     paymentOptionsDisplayMode?.name,
