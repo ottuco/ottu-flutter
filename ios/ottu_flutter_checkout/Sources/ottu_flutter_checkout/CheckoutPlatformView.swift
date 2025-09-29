@@ -277,7 +277,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         
         if let color = theme?.paymentItemBackgroundColor?.toUIColors() {
             if let cc = color.color {
-                //cht.paymentItemBackgroundColor = cc
+                cht.paymentItemBackgroundColor = cc
             }
         }
         
