@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
-import 'package:ottu_flutter_checkout_sample/PGCodes.dart';
-import 'package:ottu_flutter_checkout_sample/home_screen_cubit.dart';
-import 'package:ottu_flutter_checkout_sample/home_screen_state.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/pg_codes.dart';
+import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_cubit.dart';
+import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_state.dart';
 
 const oneDotPattern = r'^\d+(\.)?(\d{1,2})?$';
 

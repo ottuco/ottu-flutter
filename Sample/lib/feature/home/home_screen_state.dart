@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
-import 'package:ottu_flutter_checkout_sample/PGCodes.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/pg_codes.dart';
 
 const _default_payments_list__item_count = 5;
 
