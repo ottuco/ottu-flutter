@@ -7,14 +7,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
-import 'package:ottu_flutter_checkout_sample/PGCodes.dart';
-import 'package:ottu_flutter_checkout_sample/api/billing_address.dart';
-import 'package:ottu_flutter_checkout_sample/api/create_transaction_request.dart';
-import 'package:ottu_flutter_checkout_sample/api/session_response.dart';
-import 'package:ottu_flutter_checkout_sample/api/transaction_agreement.dart';
-import 'package:ottu_flutter_checkout_sample/api/transaction_payment_type.dart';
-import 'package:ottu_flutter_checkout_sample/home_screen_state.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/billing_address.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/create_transaction_request.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/pg_codes.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/transaction_agreement.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/transaction_payment_type.dart';
+import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_state.dart';
 import 'package:ottu_flutter_checkout_sample/main.dart';
+
+import '../../api/ottu_api.dart';
 
 const merchantId = "alpha.ottu.net";
 const apiKey = "cHSLW0bE.56PLGcUYEhRvzhHVVO9CbF68hmDiXcPI";
@@ -36,104 +37,102 @@ const nativePayMethodKey = 'native_pay';
 class HomeScreenCubit extends Cubit<HomeScreenState> {
   final GoRouter _navigator;
   final _logger = Logger();
-  final _dio = Dio();
+  final OttuApi _api;
+
   CheckoutTheme? _theme;
   String? _apiTransactionDetails;
   ThemeModeNotifierHolder _themeModeNotifier;
 
-  HomeScreenCubit({required GoRouter navigator, required ThemeModeNotifierHolder themeModeNotifier})
-      : _navigator = navigator,
-        _themeModeNotifier = themeModeNotifier,
-        super(HomeScreenState(
-            amount: "10",
-            merchantId: merchantId,
-            apiKey: apiKey,
-            currencyCode: currencyCode,
-            phoneNumber: _customerPhone,
-            customerId: customerId,
-            formsOfPaymentChecked: Map.from({
-              nativePayMethodKey: _hasNativePaymentAllowed(),
-              "redirect": true,
-              "flex_methods": true,
-              "stc_pay": true,
-              "token_pay": true,
-              "card_onsite": true,
-            }),
-            pgCodesChecked: Map.from({
-              PGCode.mpgs: true,
-              PGCode.tap_pg: true,
-              PGCode.knet: true,
-              PGCode.benefit: true,
-              PGCode.benefitpay: true,
-              PGCode.stc_pay: true,
-              PGCode.nbk_mpgs: true,
-              //PGCode.urpay: true,
-              PGCode.tamara: true,
-              PGCode.tabby: true,
-            })));
+  HomeScreenCubit({
+    required GoRouter navigator,
+    required ThemeModeNotifierHolder themeModeNotifier,
+    required OttuApi api,
+  }) : _navigator = navigator,
+       _themeModeNotifier = themeModeNotifier,
+       _api = api,
+       super(
+         HomeScreenState(
+           amount: "10",
+           merchantId: merchantId,
+           apiKey: apiKey,
+           currencyCode: currencyCode,
+           phoneNumber: _customerPhone,
+           customerId: customerId,
+           formsOfPaymentChecked: Map.from({
+             nativePayMethodKey: _hasNativePaymentAllowed(),
+             "redirect": true,
+             "flex_methods": true,
+             "stc_pay": true,
+             "token_pay": true,
+             "card_onsite": true,
+           }),
+           pgCodesChecked: Map.from({
+             PGCode.mpgs: true,
+             PGCode.tap_pg: true,
+             PGCode.knet: true,
+             PGCode.benefit: true,
+             PGCode.benefitpay: true,
+             PGCode.stc_pay: true,
+             PGCode.nbk_mpgs: true,
+             //PGCode.urpay: true,
+             PGCode.tamara: true,
+             PGCode.tabby: true,
+           }),
+         ),
+       );
 
   void getSessionId({required String merchantId, required String apiKey}) async {
     _logger.d("getSessionId, merchantId: $merchantId, apiKey: $apiKey");
     emit(state.copyWith(sessionId: null, hasSessionLoaded: false));
     final language = Platform.localeName.split("_")[0];
-    final cardExpiryTime =
-        state.cardExpiryTime?.isNotEmpty == true ? int.tryParse(state.cardExpiryTime!) : null;
+    final cardExpiryTime = state.cardExpiryTime?.isNotEmpty == true
+        ? int.tryParse(state.cardExpiryTime!)
+        : null;
     final request = CreateTransactionRequest(
-        amount: state.amount != null ? (double.tryParse(state.amount!).toString() ?? "0.0") : "0.0",
-        currencyCode: state.currencyCode ?? "",
-        pgCodes: pgCodesNative(),
-        type: transactionType,
-        customerId: state.customerId?.isNotEmpty == true ? state.customerId : null,
-        customerPhone: state.phoneNumber,
-        includeSdkSetupPreload: state.preloadPayload ?? false,
-        language: language,
-        customerFirstName: customerFirstName,
-        customerLastName: customerLastName,
-        customerEmail: customerEmail,
-        billingAddress:
-            BillingAddress(country: billingCountry, city: billingCity, line1: "something"),
-        cardAcceptanceCriteria:
-            cardExpiryTime != null ? CardAcceptanceCriteria(minExpiryTime: cardExpiryTime) : null,
-        paymentType: state.isAutoDebit == true ? TransactionPaymentType.autoDebit : null,
-        agreement: state.isAutoDebit == true ? TransactionAgreement.defaultAgreement() : null);
+      amount: state.amount != null ? (double.tryParse(state.amount!).toString() ?? "0.0") : "0.0",
+      currencyCode: state.currencyCode ?? "",
+      pgCodes: pgCodesNative(),
+      type: transactionType,
+      customerId: state.customerId?.isNotEmpty == true ? state.customerId : null,
+      customerPhone: state.phoneNumber,
+      includeSdkSetupPreload: state.preloadPayload ?? false,
+      language: language,
+      customerFirstName: customerFirstName,
+      customerLastName: customerLastName,
+      customerEmail: customerEmail,
+      billingAddress: BillingAddress(
+        country: billingCountry,
+        city: billingCity,
+        line1: "something",
+      ),
+      cardAcceptanceCriteria: cardExpiryTime != null
+          ? CardAcceptanceCriteria(minExpiryTime: cardExpiryTime)
+          : null,
+      paymentType: state.isAutoDebit == true ? TransactionPaymentType.autoDebit : null,
+      agreement: state.isAutoDebit == true ? TransactionAgreement.defaultAgreement() : null,
+    );
 
-    _dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
-    try {
-      final response = await _dio.post(
-        'https://$merchantId/b/checkout/v1/pymt-txn',
-        data: request.toJson(),
-        options: Options(
-          headers: {
-            Headers.contentTypeHeader: Headers.jsonContentType,
-            "Authorization": "Api-Key $apiKey",
-            "Accept-Language": language,
-          },
-        ),
-      );
-
-      if (response.data != null) {
-        final sessionResponse = SessionResponse.fromJson(response.data);
-        _apiTransactionDetails = sessionResponse.transactionDetails;
+    final result = await _api.getSessionId(
+      merchantId: merchantId,
+      request: request,
+      apiKey: apiKey,
+      language: language,
+    );
+    result.onResult(
+      success: (sessionResponse) {
+        final apiTransactionDetails = sessionResponse.transactionDetails;
         emit(state.copyWith(sessionId: sessionResponse.sessionId, hasSessionLoaded: true));
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        _logger.e("getSessionId, error ${e.response?.data}", error: e);
-        print(
-            "getSessionId, error ${e.response?.headers}\nData:${e.response?.data}\noptions: ${e.response?.requestOptions}");
-      } else {
-        // Something happened in setting up or sending the request that triggered an Error
-        _logger.e("getSessionId, logger error ${e.message}", error: e);
-        print("getSessionId, error no response ${e.requestOptions}\nmessage: ${e.message}");
-      }
-    }
+      },
+      error: (_) {},
+    );
   }
 
   void onFormsOfPaymentChecked(String key, bool isChecked) {
     final payments = state.formsOfPaymentChecked ?? Map.from({});
     payments[key] = isChecked;
-    emit(state.copyWith(
-        formsOfPaymentChecked: Map.from(payments), noForms: isChecked ? false : null));
+    emit(
+      state.copyWith(formsOfPaymentChecked: Map.from(payments), noForms: isChecked ? false : null),
+    );
   }
 
   void onPgCodeChecked(PGCode pgCode, bool isChecked) {
@@ -151,8 +150,12 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   }
 
   void onNoFormsChecked(bool? isChecked) async {
-    emit(state.copyWith(
-        noForms: isChecked, formsOfPaymentChecked: isChecked == true ? Map.from({}) : null));
+    emit(
+      state.copyWith(
+        noForms: isChecked,
+        formsOfPaymentChecked: isChecked == true ? Map.from({}) : null,
+      ),
+    );
   }
 
   void onPreloadPayloadChecked(bool? isChecked) async {
@@ -200,9 +203,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   }
 
   void onShowPaymentOptionsListChange(bool? isChecked) {
-    emit(state.copyWith(
-        paymentOptionsDisplayMode:
-            isChecked == true ? PaymentOptionsListMode.LIST : PaymentOptionsListMode.BOTTOM_SHEET));
+    emit(
+      state.copyWith(
+        paymentOptionsDisplayMode: isChecked == true
+            ? PaymentOptionsListMode.LIST
+            : PaymentOptionsListMode.BOTTOM_SHEET,
+      ),
+    );
   }
 
   void onPay() async {
@@ -214,18 +221,19 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         .map((entry) => _nativePaymentKey(entry.key))
         .toList();
     final args = CheckoutArguments(
-        merchantId: state.merchantId,
-        apiKey: state.apiKey,
-        sessionId: state.sessionId ?? "",
-        amount: amount,
-        showPaymentDetails: state.showPaymentDetails,
-        paymentOptionsListMode:
-            state.paymentOptionsDisplayMode ?? PaymentOptionsListMode.BOTTOM_SHEET,
-        defaultSelectedPgCode: state.defaultSelectedPayment,
-        paymentOptionsListCount: paymentsListItemCount,
-        apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
-        formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
-        theme: _theme);
+      merchantId: state.merchantId,
+      apiKey: state.apiKey,
+      sessionId: state.sessionId ?? "",
+      amount: amount,
+      showPaymentDetails: state.showPaymentDetails,
+      paymentOptionsListMode:
+          state.paymentOptionsDisplayMode ?? PaymentOptionsListMode.BOTTOM_SHEET,
+      defaultSelectedPgCode: state.defaultSelectedPayment,
+      paymentOptionsListCount: paymentsListItemCount,
+      apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
+      formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
+      theme: _theme,
+    );
     _navigator.push("/checkout", extra: args);
   }
 

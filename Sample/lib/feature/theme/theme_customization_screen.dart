@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart' as ch;
-import 'package:ottu_flutter_checkout_sample/theme/android_fonts.dart';
-import 'package:ottu_flutter_checkout_sample/theme/ios_fonts.dart';
-import 'package:ottu_flutter_checkout_sample/theme/theme_customization_screen_cubit.dart';
-import 'package:ottu_flutter_checkout_sample/theme/theme_customization_state.dart';
+import 'package:ottu_flutter_checkout_sample/feature/theme/android_fonts.dart';
+import 'package:ottu_flutter_checkout_sample/feature/theme/ios_fonts.dart';
+import 'package:ottu_flutter_checkout_sample/feature/theme/theme_customization_screen_cubit.dart';
+import 'package:ottu_flutter_checkout_sample/feature/theme/theme_customization_state.dart';
 
 class ThemeCustomizationScreen extends StatefulWidget {
   const ThemeCustomizationScreen({super.key});
@@ -51,15 +51,14 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                             );
                             context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
                           },
-                          dropdownMenuEntries:
-                              ch.CustomerUiMode.values.map<DropdownMenuEntry<ch.CustomerUiMode>>((
-                            ch.CustomerUiMode mode,
-                          ) {
-                            return DropdownMenuEntry<ch.CustomerUiMode>(
-                              value: mode,
-                              label: mode.name,
-                            );
-                          }).toList(),
+                          dropdownMenuEntries: ch.CustomerUiMode.values
+                              .map<DropdownMenuEntry<ch.CustomerUiMode>>((ch.CustomerUiMode mode) {
+                                return DropdownMenuEntry<ch.CustomerUiMode>(
+                                  value: mode,
+                                  label: mode.name,
+                                );
+                              })
+                              .toList(),
                         ),
                         const SizedBox(height: 12),
                         _expandableOptionItem(
@@ -110,21 +109,19 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: 8),
-                        _textOptionItem(
-                          "Main title",
-                          state.theme?.mainTitleText,
-                          (style) {
-                            final newTheme =
-                                (state.theme ?? ch.CheckoutTheme()).copyWith(mainTitleText: style);
-                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
-                          },
-                        ),
+                        _textOptionItem("Main title", state.theme?.mainTitleText, (style) {
+                          final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                            mainTitleText: style,
+                          );
+                          context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                        }),
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
                         _textOptionItem("Title", state.theme?.titleText, (style) {
-                          final newTheme =
-                              (state.theme ?? ch.CheckoutTheme()).copyWith(titleText: style);
+                          final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                            titleText: style,
+                          );
                           context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
                         }),
                         const SizedBox(height: dividerPadding),
@@ -134,8 +131,9 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                           "Select payment method header text",
                           state.theme?.selectPaymentMethodHeaderText,
                           (style) {
-                            final newTheme = (state.theme ?? ch.CheckoutTheme())
-                                .copyWith(selectPaymentMethodHeaderText: style);
+                            final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                              selectPaymentMethodHeaderText: style,
+                            );
                             context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
                           },
                         ),
@@ -143,71 +141,56 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         divider(),
                         const SizedBox(height: dividerPadding),
                         _textOptionItem("Subtitle", state.theme?.subtitleText, (style) {
-                          final newTheme =
-                              (state.theme ?? ch.CheckoutTheme()).copyWith(subtitleText: style);
+                          final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                            subtitleText: style,
+                          );
                           context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
                         }),
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem(
-                          "Fees Title",
-                          state.theme?.feesTitleText,
-                          (style) {
-                            final newTheme =
-                                (state.theme ?? ch.CheckoutTheme()).copyWith(feesTitleText: style);
-                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
-                          },
-                        ),
+                        _textOptionItem("Fees Title", state.theme?.feesTitleText, (style) {
+                          final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                            feesTitleText: style,
+                          );
+                          context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                        }),
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem(
-                          "Fees Subtitle",
-                          state.theme?.feesSubtitleText,
-                          (style) {
-                            final newTheme = (state.theme ?? ch.CheckoutTheme())
-                                .copyWith(feesSubtitleText: style);
-                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
-                          },
-                        ),
+                        _textOptionItem("Fees Subtitle", state.theme?.feesSubtitleText, (style) {
+                          final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                            feesSubtitleText: style,
+                          );
+                          context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                        }),
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem(
-                          "Data label",
-                          state.theme?.dataLabelText,
-                          (style) {
-                            final newTheme =
-                                (state.theme ?? ch.CheckoutTheme()).copyWith(dataLabelText: style);
-                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
-                          },
-                        ),
+                        _textOptionItem("Data label", state.theme?.dataLabelText, (style) {
+                          final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                            dataLabelText: style,
+                          );
+                          context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                        }),
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem(
-                          "Data value",
-                          state.theme?.dataValueText,
-                          (style) {
-                            final newTheme =
-                                (state.theme ?? ch.CheckoutTheme()).copyWith(dataValueText: style);
-                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
-                          },
-                        ),
+                        _textOptionItem("Data value", state.theme?.dataValueText, (style) {
+                          final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                            dataValueText: style,
+                          );
+                          context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                        }),
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem(
-                          "Error message",
-                          state.theme?.errorMessageText,
-                          (style) {
-                            final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
-                              errorMessageText: style,
-                            );
-                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
-                          },
-                        ),
+                        _textOptionItem("Error message", state.theme?.errorMessageText, (style) {
+                          final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                            errorMessageText: style,
+                          );
+                          context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                        }),
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
@@ -348,36 +331,40 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title),
-            ValueListenableBuilder(
-              valueListenable: initialFontFamily,
-              builder: (context, font, __) => font != null
-                  ? Text(
-                      "($font)${initialFontSize.value != null ? " - ${initialFontSize.value}sp" : ""}",
-                      style: TextStyle(fontSize: 10),
-                    )
-                  : initialFontSize.value != null
-                      ? Text("${initialFontSize.value}sp")
-                      : SizedBox.shrink(),
-            ),
-          ]),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title),
+              ValueListenableBuilder(
+                valueListenable: initialFontFamily,
+                builder: (context, font, __) => font != null
+                    ? Text(
+                        "($font)${initialFontSize.value != null ? " - ${initialFontSize.value}sp" : ""}",
+                        style: TextStyle(fontSize: 10),
+                      )
+                    : initialFontSize.value != null
+                    ? Text("${initialFontSize.value}sp")
+                    : SizedBox.shrink(),
+              ),
+            ],
+          ),
           ValueListenableBuilder(
-              valueListenable: initialColor,
-              builder: (context, color, __) {
-                final isEmpty = color == null;
-                return Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: color ?? Colors.grey,
-                    borderRadius: const BorderRadius.all(Radius.circular(1.0)),
-                  ),
-                  child: isEmpty
-                      ? CustomPaint(painter: CrossingLinesPainter())
-                      : const SizedBox.shrink(),
-                );
-              }),
+            valueListenable: initialColor,
+            builder: (context, color, __) {
+              final isEmpty = color == null;
+              return Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: color ?? Colors.grey,
+                  borderRadius: const BorderRadius.all(Radius.circular(1.0)),
+                ),
+                child: isEmpty
+                    ? CustomPaint(painter: CrossingLinesPainter())
+                    : const SizedBox.shrink(),
+              );
+            },
+          ),
         ],
       ),
       onTap: () {
@@ -394,9 +381,10 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                 initialFontSize.value = fontSize;
                 onChange(
                   ch.TextStyle(
-                      textColor: ch.ColorState(color: color),
-                      fontFamily: fontFamily,
-                      fontSize: fontSize),
+                    textColor: ch.ColorState(color: color),
+                    fontFamily: fontFamily,
+                    fontSize: fontSize,
+                  ),
                 );
               },
               title: title,
@@ -430,11 +418,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return colorPickerDialog(
-              initialColor: color,
-              onChanged: onChange,
-              title: title,
-            );
+            return colorPickerDialog(initialColor: color, onChanged: onChange, title: title);
           },
         );
       },
@@ -503,11 +487,11 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, btnValue, __) =>
               _colorOptionItem(btnValue?.rippleColor?.color, "Button Color", (color) {
-            final button = (btnValue ?? ch.ButtonComponent());
-            btn.value = button.copyWith(
-              rippleColor: (button.rippleColor ?? ch.RippleColor()).copyWith(color: color),
-            );
-          }),
+                final button = (btnValue ?? ch.ButtonComponent());
+                btn.value = button.copyWith(
+                  rippleColor: (button.rippleColor ?? ch.RippleColor()).copyWith(color: color),
+                );
+              }),
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
@@ -534,25 +518,22 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, btnValue, __) =>
               _colorOptionItem(btnValue?.textColor?.color, "Text Color", (color) {
-            final button = (btnValue ?? ch.ButtonComponent());
-            final c = button.textColor ?? ch.ColorState();
-            btn.value = button.copyWith(textColor: c.copyWith(color: color));
-          }),
+                final button = (btnValue ?? ch.ButtonComponent());
+                final c = button.textColor ?? ch.ColorState();
+                btn.value = button.copyWith(textColor: c.copyWith(color: color));
+              }),
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
         const SizedBox(height: dividerPadding),
         ValueListenableBuilder(
           valueListenable: btn,
-          builder: (context, btnValue, __) => _colorOptionItem(
-            btnValue?.textColor?.colorDisabled,
-            "Text disabled Color",
-            (color) {
-              final button = (btnValue ?? ch.ButtonComponent());
-              final c = button.textColor ?? ch.ColorState();
-              btn.value = button.copyWith(textColor: c.copyWith(colorDisabled: color));
-            },
-          ),
+          builder: (context, btnValue, __) =>
+              _colorOptionItem(btnValue?.textColor?.colorDisabled, "Text disabled Color", (color) {
+                final button = (btnValue ?? ch.ButtonComponent());
+                final c = button.textColor ?? ch.ColorState();
+                btn.value = button.copyWith(textColor: c.copyWith(colorDisabled: color));
+              }),
         ),
         const SizedBox(height: 10),
         ElevatedButton(
@@ -577,8 +558,8 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, btnValue, __) =>
               _colorOptionItem(btnValue?.textColor.color, "Back Button Color", (color) {
-            btn.value = (btnValue ?? ch.RippleColor()).copyWith(color: color);
-          }),
+                btn.value = (btnValue ?? ch.RippleColor()).copyWith(color: color);
+              }),
         ),
         const SizedBox(height: 10),
         ElevatedButton(
@@ -606,10 +587,10 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, value, __) =>
               _colorOptionItem(value?.background?.color, "Background", (color) {
-            btn.value = (value ?? ch.TextFieldStyle()).copyWith(
-              background: ch.ColorState(color: color),
-            );
-          }),
+                btn.value = (value ?? ch.TextFieldStyle()).copyWith(
+                  background: ch.ColorState(color: color),
+                );
+              }),
         ),
         subDivider(),
         const SizedBox(height: dividerPadding),
@@ -617,10 +598,10 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, value, __) =>
               _colorOptionItem(value?.primaryColor?.color, "Primary Color", (color) {
-            btn.value = (value ?? ch.TextFieldStyle()).copyWith(
-              primaryColor: ch.ColorState(color: color),
-            );
-          }),
+                btn.value = (value ?? ch.TextFieldStyle()).copyWith(
+                  primaryColor: ch.ColorState(color: color),
+                );
+              }),
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
@@ -629,10 +610,10 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, value, __) =>
               _colorOptionItem(value?.focusedColor?.color, "Focused Color", (color) {
-            btn.value = (value ?? ch.TextFieldStyle()).copyWith(
-              focusedColor: ch.ColorState(color: color),
-            );
-          }),
+                btn.value = (value ?? ch.TextFieldStyle()).copyWith(
+                  focusedColor: ch.ColorState(color: color),
+                );
+              }),
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
@@ -640,10 +621,10 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, value, __) =>
               _colorOptionItem(value?.text?.textColor?.color, "Text Color", (color) {
-            btn.value = (value ?? ch.TextFieldStyle()).copyWith(
-              text: ch.TextStyle(textColor: ch.ColorState(color: color)),
-            );
-          }),
+                btn.value = (value ?? ch.TextFieldStyle()).copyWith(
+                  text: ch.TextStyle(textColor: ch.ColorState(color: color)),
+                );
+              }),
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
@@ -651,10 +632,10 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, value, __) =>
               _colorOptionItem(value?.error?.textColor?.color, "Error Color", (color) {
-            btn.value = (value ?? ch.TextFieldStyle()).copyWith(
-              error: ch.TextStyle(textColor: ch.ColorState(color: color)),
-            );
-          }),
+                btn.value = (value ?? ch.TextFieldStyle()).copyWith(
+                  error: ch.TextStyle(textColor: ch.ColorState(color: color)),
+                );
+              }),
         ),
         const SizedBox(height: 10),
         ElevatedButton(
@@ -682,21 +663,20 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, value, __) =>
               _colorOptionItem(value?.checkedThumbTintColor, "Checked Thumb", (color) {
-            btn.value = (value ?? ch.SwitchComponent()).copyWith(
-              checkedThumbTintColor: color,
-            );
-          }),
+                btn.value = (value ?? ch.SwitchComponent()).copyWith(checkedThumbTintColor: color);
+              }),
         ),
         subDivider(),
         const SizedBox(height: dividerPadding),
         ValueListenableBuilder(
           valueListenable: btn,
-          builder: (context, value, __) =>
-              _colorOptionItem(value?.uncheckedThumbTintColor, "Unchecked Thumb", (color) {
-            btn.value = (value ?? ch.SwitchComponent()).copyWith(
-              uncheckedThumbTintColor: color,
-            );
-          }),
+          builder: (context, value, __) => _colorOptionItem(
+            value?.uncheckedThumbTintColor,
+            "Unchecked Thumb",
+            (color) {
+              btn.value = (value ?? ch.SwitchComponent()).copyWith(uncheckedThumbTintColor: color);
+            },
+          ),
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
@@ -705,21 +685,20 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           valueListenable: btn,
           builder: (context, value, __) =>
               _colorOptionItem(value?.checkedTrackTintColor, "Checked Track", (color) {
-            btn.value = (value ?? ch.SwitchComponent()).copyWith(
-              checkedTrackTintColor: color,
-            );
-          }),
+                btn.value = (value ?? ch.SwitchComponent()).copyWith(checkedTrackTintColor: color);
+              }),
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
         ValueListenableBuilder(
           valueListenable: btn,
-          builder: (context, value, __) =>
-              _colorOptionItem(value?.uncheckedTrackTintColor, "Unchecked Track", (color) {
-            btn.value = (value ?? ch.SwitchComponent()).copyWith(
-              uncheckedTrackTintColor: color,
-            );
-          }),
+          builder: (context, value, __) => _colorOptionItem(
+            value?.uncheckedTrackTintColor,
+            "Unchecked Track",
+            (color) {
+              btn.value = (value ?? ch.SwitchComponent()).copyWith(uncheckedTrackTintColor: color);
+            },
+          ),
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
@@ -867,8 +846,8 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
     final List<String> fonts = Platform.isAndroid
         ? androidFonts
         : Platform.isIOS
-            ? iOSFonts
-            : [];
+        ? iOSFonts
+        : [];
     final List<String> fontSizes = List.generate(30, (i) => (i + 7).toString());
     final ValueNotifier<Color?> _localColor = ValueNotifier(initialColor);
     final ValueNotifier<String?> selectedFontFamily = ValueNotifier(initialFontFamily);
@@ -880,58 +859,62 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ValueListenableBuilder(
-                valueListenable: _localColor,
-                builder: (context, color, __) {
-                  return _colorOptionItem(color, title, (color) {
-                    _localColor.value = color;
-                  });
-                }),
+              valueListenable: _localColor,
+              builder: (context, color, __) {
+                return _colorOptionItem(color, title, (color) {
+                  _localColor.value = color;
+                });
+              },
+            ),
             ValueListenableBuilder(
-                valueListenable: selectedFontFamily,
-                builder: (context, font, __) {
-                  return DropdownButton<String>(
-                    value: font,
-                    elevation: 4,
-                    isExpanded: true,
-                    //style: const TextStyle(color: Colors.deepPurple),
-                    //underline: Container(height: 2, color: Colors.deepPurpleAccent),
-                    onChanged: (String? value) {
-                      selectedFontFamily.value = value!;
-                    },
-                    items: fonts.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            softWrap: false,
-                          ));
-                    }).toList(),
-                  );
-                }),
+              valueListenable: selectedFontFamily,
+              builder: (context, font, __) {
+                return DropdownButton<String>(
+                  value: font,
+                  elevation: 4,
+                  isExpanded: true,
+                  //style: const TextStyle(color: Colors.deepPurple),
+                  //underline: Container(height: 2, color: Colors.deepPurpleAccent),
+                  onChanged: (String? value) {
+                    selectedFontFamily.value = value!;
+                  },
+                  items: fonts.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        softWrap: false,
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
             ValueListenableBuilder(
-                valueListenable: editedFontSize,
-                builder: (context, size, __) {
-                  return DropdownButton<String>(
-                    value: size?.toString(),
-                    elevation: 4,
-                    //style: const TextStyle(color: Colors.deepPurple),
-                    //underline: Container(height: 2, color: Colors.deepPurpleAccent),
-                    onChanged: (String? value) {
-                      editedFontSize.value = int.tryParse(value!);
-                    },
-                    items: fontSizes.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: size != null ? TextStyle(fontSize: size.toDouble()) : null,
-                        ),
-                      );
-                    }).toList(),
-                  );
-                }),
+              valueListenable: editedFontSize,
+              builder: (context, size, __) {
+                return DropdownButton<String>(
+                  value: size?.toString(),
+                  elevation: 4,
+                  //style: const TextStyle(color: Colors.deepPurple),
+                  //underline: Container(height: 2, color: Colors.deepPurpleAccent),
+                  onChanged: (String? value) {
+                    editedFontSize.value = int.tryParse(value!);
+                  },
+                  items: fontSizes.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: size != null ? TextStyle(fontSize: size.toDouble()) : null,
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
           ],
         ),
       ),

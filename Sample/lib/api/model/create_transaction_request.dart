@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:ottu_flutter_checkout_sample/api/billing_address.dart';
-import 'package:ottu_flutter_checkout_sample/api/transaction_agreement.dart';
-import 'package:ottu_flutter_checkout_sample/api/transaction_payment_type.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/billing_address.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/transaction_agreement.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/transaction_payment_type.dart';
 
 part 'create_transaction_request.g.dart';
 
