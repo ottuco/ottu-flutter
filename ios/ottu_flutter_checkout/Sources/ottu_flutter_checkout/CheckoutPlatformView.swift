@@ -350,7 +350,7 @@ extension CheckoutPlatformView: OttuDelegate {
                 self.channel.invokeMethod(_methodPaymentSuccessResult, arguments: message)
             }
             
-            self.paymentViewController?.view.isHidden = true
+            //self.paymentViewController?.view.isHidden = true
             self.paymentViewController?.view.setNeedsLayout()
             self.paymentViewController?.view.layoutIfNeeded()
             self._view.heightHandlerView.setNeedsLayout()
