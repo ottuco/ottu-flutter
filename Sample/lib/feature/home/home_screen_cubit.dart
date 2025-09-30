@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -33,13 +32,14 @@ const billingCity = "Kuwait City";
 //    const customerPhone = "966557877988"
 const _customerPhone = "99459272";
 const nativePayMethodKey = 'native_pay';
+CheckoutTheme? _theme;
+HomeScreenState? _state;
 
 class HomeScreenCubit extends Cubit<HomeScreenState> {
   final GoRouter _navigator;
   final _logger = Logger();
   final OttuApi _api;
 
-  CheckoutTheme? _theme;
   String? _apiTransactionDetails;
   ThemeModeNotifierHolder _themeModeNotifier;
 
@@ -51,35 +51,42 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
        _themeModeNotifier = themeModeNotifier,
        _api = api,
        super(
-         HomeScreenState(
-           amount: "10",
-           merchantId: merchantId,
-           apiKey: apiKey,
-           currencyCode: currencyCode,
-           phoneNumber: _customerPhone,
-           customerId: customerId,
-           formsOfPaymentChecked: Map.from({
-             nativePayMethodKey: _hasNativePaymentAllowed(),
-             "redirect": true,
-             "flex_methods": true,
-             "stc_pay": true,
-             "token_pay": true,
-             "card_onsite": true,
-           }),
-           pgCodesChecked: Map.from({
-             PGCode.mpgs: true,
-             PGCode.tap_pg: true,
-             PGCode.knet: true,
-             PGCode.benefit: true,
-             PGCode.benefitpay: true,
-             PGCode.stc_pay: true,
-             PGCode.nbk_mpgs: true,
-             //PGCode.urpay: true,
-             PGCode.tamara: true,
-             PGCode.tabby: true,
-           }),
-         ),
+         _state ??
+             HomeScreenState(
+               amount: "10",
+               merchantId: merchantId,
+               apiKey: apiKey,
+               currencyCode: currencyCode,
+               phoneNumber: _customerPhone,
+               customerId: customerId,
+               formsOfPaymentChecked: Map.from({
+                 nativePayMethodKey: _hasNativePaymentAllowed(),
+                 "redirect": true,
+                 "flex_methods": true,
+                 "stc_pay": true,
+                 "token_pay": true,
+                 "card_onsite": true,
+               }),
+               pgCodesChecked: Map.from({
+                 PGCode.mpgs: true,
+                 PGCode.tap_pg: true,
+                 PGCode.knet: true,
+                 PGCode.benefit: true,
+                 PGCode.benefitpay: true,
+                 PGCode.stc_pay: true,
+                 PGCode.nbk_mpgs: true,
+                 //PGCode.urpay: true,
+                 PGCode.tamara: true,
+                 PGCode.tabby: true,
+               }),
+             ),
        );
+
+  @override
+  Future<void> close() {
+    _state = state;
+    return super.close();
+  }
 
   void getSessionId({required String merchantId, required String apiKey}) async {
     _logger.d("getSessionId, merchantId: $merchantId, apiKey: $apiKey");
@@ -242,7 +249,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     final theme = await _navigator.push<CheckoutTheme?>("/theme_customization", extra: _theme);
     if (theme != null) {
       _theme = theme;
-      _themeModeNotifier.themeModeNotifier.value = theme.uiMode.toThemeMode();
+      _themeModeNotifier.themeNotifier.value = theme;
     }
   }
 

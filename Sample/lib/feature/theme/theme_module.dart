@@ -5,6 +5,7 @@ import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/di/Module.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_customization_screen.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_customization_screen_cubit.dart';
+import 'package:ottu_flutter_checkout_sample/main.dart';
 
 final class ThemeModule implements Module {
   @override
@@ -19,6 +20,7 @@ final class ThemeModule implements Module {
           create: (_) => ThemeCustomizationScreenCubit(
             navigator: GoRouter.of(context),
             theme: state.extra as CheckoutTheme?,
+            themeModeNotifier: context.watch<ThemeModeNotifierHolder>(),
           ),
           child: const ThemeCustomizationScreen(),
         ),
