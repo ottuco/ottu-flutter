@@ -127,7 +127,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     );
     result.onResult(
       success: (sessionResponse) {
-        final apiTransactionDetails = sessionResponse.transactionDetails;
+        _apiTransactionDetails = sessionResponse.transactionDetails;
         emit(state.copyWith(sessionId: sessionResponse.sessionId, hasSessionLoaded: true));
       },
       error: (_) {},
