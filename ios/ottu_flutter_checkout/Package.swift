@@ -11,7 +11,7 @@ let package = Package(
         .library(name: "ottu-flutter-checkout", targets: ["ottu_flutter_checkout"])
     ],
     dependencies: [
-         .package(name: "ottu_checkout_sdk", url: "https://github.com/ottuco/ottu-flutter-ios", from: "2.1.4")
+         .package(name: "ottu_checkout_sdk", url: "https://github.com/ottuco/ottu-flutter-ios", from: "2.1.5")
     ],
     targets: [
         .target(
