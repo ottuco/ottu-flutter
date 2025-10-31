@@ -31,7 +31,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         }
         
         if checkout != nil {
-            checkout?.allowScreenRecording()
+            checkout?.dismissScreenShield()
         }
         
         checkout = nil
