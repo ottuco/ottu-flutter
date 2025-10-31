@@ -13,6 +13,7 @@ public class CheckoutViewPlugin: NSObject, FlutterPlugin {
     public static func register(
         with registrar: FlutterPluginRegistrar
     ) {
+        print("CheckoutViewPlugin, registering")
         let viewFactory = CheckoutViewFactory(
             messenger: registrar.messenger()
         )
@@ -21,5 +22,9 @@ public class CheckoutViewPlugin: NSObject, FlutterPlugin {
                 viewFactory,
                 withId: "OttuCheckoutWidget"
             )
+    }
+    
+    public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+        print("CheckoutViewPlugin detached from engine.")
     }
 }

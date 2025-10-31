@@ -15,12 +15,28 @@ private let methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT"
 private let _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT"
 private let _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT"
 private let _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT"
+private let _methodOnWidgetDetached = "METHOD_ON_WIDGET_DETACHED"
 
 public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let viewId: Int64
     private let channel: FlutterMethodChannel
     private let _view: CheckoutContainerView
     private var paymentViewController: UIViewController?
+    private var checkout: Checkout?
+    
+    private func deinitCheckout() {
+        print("deinitCheckout")
+        for subview in _view.subviews {
+            subview.removeFromSuperview()
+        }
+        
+        if checkout != nil {
+            checkout?.allowScreenRecording()
+        }
+        
+        checkout = nil
+        paymentViewController = nil
+    }
     
     @MainActor
     init(
@@ -38,7 +54,11 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         _view = CheckoutContainerView()
         super.init()
         debugPrint("createNativeView, args: \(args)")
-        
+        self.channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+            if call.method == _methodOnWidgetDetached {
+                self.deinitCheckout()
+            }
+        }
         let jsonData: Data? =
         if args != nil {
             if let dictionaryArgs = args as? [String: Any] {
@@ -130,7 +150,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             let transactionDetails: TransactionDetails? = try
             apiTransactionDetails?.transactionDetails
             debugPrint("setupPreload: \(transactionDetails)")
-            let checkout = try Checkout(
+            self.checkout = try Checkout(
                 formsOfPayments: formsOfPayment,
                 theme: theme,
                 displaySettings:paymentOptionsDisplaySettings,
@@ -141,8 +161,10 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 
                 delegate: self
             )
-            self.paymentViewController = checkout.paymentViewController()
-            tryAttachController()
+            if let cht = checkout {
+                self.paymentViewController = cht.paymentViewController()
+                tryAttachController()
+            }
         } catch {
             debugPrint(error)
             showSdkError()
