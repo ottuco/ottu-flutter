@@ -21,21 +21,22 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let viewId: Int64
     private let channel: FlutterMethodChannel
     private let _view: CheckoutContainerView
-    private var paymentViewController: UIViewController?
+    private weak var paymentViewController: UIViewController?
     private var checkout: Checkout?
     
     private func deinitCheckout() {
-        print("deinitCheckout")
-        for subview in _view.subviews {
-            subview.removeFromSuperview()
-        }
+        guard let pvc = paymentViewController,
+              let parentVC = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController
+        else { return }
         
-        if checkout != nil {
-            checkout?.dismissScreenShield()
-        }
-        
-        checkout = nil
-        paymentViewController = nil
+        if parentVC.children.contains(pvc) {
+            pvc.willMove(toParent: nil)
+            pvc.view.removeFromSuperview()
+            pvc.removeFromParent()
+            print("Removed from parent!")
+        } else {
+            print("No parent relationship found, nothing to remove.")
+        }    
     }
     
     @MainActor
@@ -54,7 +55,9 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         _view = CheckoutContainerView()
         super.init()
         debugPrint("createNativeView, args: \(args)")
-        self.channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
+        
+        self.channel.setMethodCallHandler { [weak self] call, _ in
+            guard let self else { return }
             if call.method == _methodOnWidgetDetached {
                 self.deinitCheckout()
             }
@@ -75,7 +78,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                     from: jsonData!
                 )
                 
-                self._view.onHeightChanged = { (height: Int) in
+                self._view.onHeightChanged = { [weak self] (height: Int) in
+                    guard let self else { return }
                     debugPrint(
                         "CheckoutPlatformView, onHeightChanged: \(height)")
                     self.channel.invokeMethod(
