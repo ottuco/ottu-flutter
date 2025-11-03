@@ -15,12 +15,29 @@ private let methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT"
 private let _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT"
 private let _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT"
 private let _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT"
+private let _methodOnWidgetDetached = "METHOD_ON_WIDGET_DETACHED"
 
 public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let viewId: Int64
     private let channel: FlutterMethodChannel
     private let _view: CheckoutContainerView
-    private var paymentViewController: UIViewController?
+    private weak var paymentViewController: UIViewController?
+    private var checkout: Checkout?
+    
+    private func deinitCheckout() {
+        guard let pvc = paymentViewController,
+              let parentVC = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController
+        else { return }
+        
+        if parentVC.children.contains(pvc) {
+            pvc.willMove(toParent: nil)
+            pvc.view.removeFromSuperview()
+            pvc.removeFromParent()
+            print("Removed from parent!")
+        } else {
+            print("No parent relationship found, nothing to remove.")
+        }    
+    }
     
     @MainActor
     init(
@@ -39,6 +56,12 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         super.init()
         debugPrint("createNativeView, args: \(args)")
         
+        self.channel.setMethodCallHandler { [weak self] call, _ in
+            guard let self else { return }
+            if call.method == _methodOnWidgetDetached {
+                self.deinitCheckout()
+            }
+        }
         let jsonData: Data? =
         if args != nil {
             if let dictionaryArgs = args as? [String: Any] {
@@ -55,7 +78,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                     from: jsonData!
                 )
                 
-                self._view.onHeightChanged = { (height: Int) in
+                self._view.onHeightChanged = { [weak self] (height: Int) in
+                    guard let self else { return }
                     debugPrint(
                         "CheckoutPlatformView, onHeightChanged: \(height)")
                     self.channel.invokeMethod(
@@ -130,7 +154,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             let transactionDetails: TransactionDetails? = try
             apiTransactionDetails?.transactionDetails
             debugPrint("setupPreload: \(transactionDetails)")
-            let checkout = try Checkout(
+            self.checkout = try Checkout(
                 formsOfPayments: formsOfPayment,
                 theme: theme,
                 displaySettings:paymentOptionsDisplaySettings,
@@ -141,8 +165,10 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 
                 delegate: self
             )
-            self.paymentViewController = checkout.paymentViewController()
-            tryAttachController()
+            if let cht = checkout {
+                self.paymentViewController = cht.paymentViewController()
+                tryAttachController()
+            }
         } catch {
             debugPrint(error)
             showSdkError()
