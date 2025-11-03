@@ -22,7 +22,7 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   static const StandardMessageCodec _decoder = StandardMessageCodec();
 
   @override
-  dispose() {
+  void dispose() {
     print("OttuCheckoutWidget.dispose()");
     _methodChannel.invokeMethod(_methodOnWidgetDetached);
     super.dispose();
