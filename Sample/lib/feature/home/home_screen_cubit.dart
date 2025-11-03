@@ -286,7 +286,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     } else if (Platform.isIOS && kReleaseMode) {
       return true;
     } else {
-      return true;
+      return false;
     }
   }
 }

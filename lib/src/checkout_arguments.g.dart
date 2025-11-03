@@ -55,4 +55,6 @@ const _$FormsOfPaymentEnumMap = {
   FormsOfPayment.stcPay: 'stc_pay',
   FormsOfPayment.tokenPay: 'token_pay',
   FormsOfPayment.cardOnSite: 'card_onsite',
+  FormsOfPayment.googlePay: 'google_pay',
+  FormsOfPayment.applePay: 'apple_pay',
 };
