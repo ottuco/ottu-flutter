@@ -31,7 +31,6 @@ const billingCity = "Kuwait City";
 
 //    const customerPhone = "966557877988"
 const _customerPhone = "99459272";
-const nativePayMethodKey = 'native_pay';
 CheckoutTheme? _theme;
 HomeScreenState? _state;
 
@@ -60,7 +59,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
                phoneNumber: _customerPhone,
                customerId: customerId,
                formsOfPaymentChecked: Map.from({
-                 nativePayMethodKey: _hasNativePaymentAllowed(),
+                 if (_hasNativePaymentAllowed() && _nativePaymentMethod() != null)
+                   _nativePaymentMethod()!.name: true,
                  "redirect": true,
                  "flex_methods": true,
                  "stc_pay": true,
@@ -98,7 +98,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     final request = CreateTransactionRequest(
       amount: state.amount != null ? (double.tryParse(state.amount!).toString() ?? "0.0") : "0.0",
       currencyCode: state.currencyCode ?? "",
-      pgCodes: pgCodesNative(),
+      pgCodes: _pgCodesNative(),
       type: transactionType,
       customerId: state.customerId?.isNotEmpty == true ? state.customerId : null,
       customerPhone: state.phoneNumber,
@@ -134,7 +134,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     );
   }
 
-  void onFormsOfPaymentChecked(String key, bool isChecked) {
+  void onFormsOfPaymentChecked(FormsOfPayment key, bool isChecked) {
     final payments = state.formsOfPaymentChecked ?? Map.from({});
     payments[key] = isChecked;
     emit(
@@ -225,7 +225,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     final paymentsListItemCount = int.tryParse(state.paymentsListItemCount) ?? 0;
     final formOfPayments = state.formsOfPaymentChecked?.entries
         .where((entry) => entry.value)
-        .map((entry) => _nativePaymentKey(entry.key))
+        .map((entry) => entry.key)
         .toList();
     final args = CheckoutArguments(
       merchantId: state.merchantId,
@@ -253,33 +253,39 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     }
   }
 
-  String _nativePaymentKey(String key) {
-    if (key == nativePayMethodKey) {
-      return _nativePayMethodKey();
+  /*  FormsOfPayment? _nativePayment(String pgCode) {
+    if (pgCode == FormsOfPayment.googlePay.name || pgCode == FormsOfPayment.applePay.name) {
+      return _nativePaymentMethod();
     } else {
-      return key;
+      return payment;
     }
-  }
+  }*/
 
-  String _nativePayMethodKey() {
+  FormsOfPayment? _nativePaymentMethod() {
     if (Platform.isAndroid) {
-      return 'google_pay';
+      return FormsOfPayment.googlePay;
     } else if (Platform.isIOS && kReleaseMode) {
-      return 'apple_pay';
-    } else {
-      return 'native_pay';
+      return FormsOfPayment.applePay;
     }
+    return null;
   }
 
-  List<String> pgCodesNative() {
-    final codes = state.pgCodesChecked?.entries
-        .where((entry) => entry.value)
-        .map((entry) => _nativePaymentKey(entry.key.code))
-        .toList();
+  List<String> _pgCodesNative() {
+    final codes =
+        state.pgCodesChecked?.entries
+            .where((entry) => entry.value)
+            .map((entry) => entry.key.name)
+            .toList() ??
+        [];
+
+    final nativePayment = _nativePaymentMethod();
+    if (nativePayment != null) {
+      codes.add(nativePayment.name);
+    }
 
     _logger.d("pgCodesNative, pg_codes: $codes");
     print("pgCodesNative pg_codes: $codes");
-    return codes ?? [];
+    return codes;
   }
 }
 

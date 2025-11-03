@@ -19,7 +19,7 @@ CheckoutArguments _$CheckoutArgumentsFromJson(Map<String, dynamic> json) =>
       defaultSelectedPgCode: json['defaultSelectedPgCode'] as String?,
       apiTransactionDetails: json['apiTransactionDetails'] as String?,
       formsOfPayment: (json['formsOfPayment'] as List<dynamic>?)
-          ?.map((e) => e as String)
+          ?.map((e) => $enumDecode(_$FormsOfPaymentEnumMap, e))
           .toList(),
       theme: json['theme'] == null
           ? null
@@ -38,11 +38,21 @@ Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
           _$PaymentOptionsListModeEnumMap[instance.paymentOptionsListMode]!,
       'defaultSelectedPgCode': instance.defaultSelectedPgCode,
       'apiTransactionDetails': instance.apiTransactionDetails,
-      'formsOfPayment': instance.formsOfPayment,
+      'formsOfPayment': instance.formsOfPayment
+          ?.map((e) => _$FormsOfPaymentEnumMap[e]!)
+          .toList(),
       'theme': instance.theme,
     };
 
 const _$PaymentOptionsListModeEnumMap = {
   PaymentOptionsListMode.LIST: 'list',
   PaymentOptionsListMode.BOTTOM_SHEET: 'bottom_sheet',
+};
+
+const _$FormsOfPaymentEnumMap = {
+  FormsOfPayment.redirect: 'redirect',
+  FormsOfPayment.flex: 'flex_methods',
+  FormsOfPayment.stcPay: 'stc_pay',
+  FormsOfPayment.tokenPay: 'token_pay',
+  FormsOfPayment.cardOnSite: 'card_onsite',
 };

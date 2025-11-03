@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
+import 'package:ottu_flutter_checkout/src/forms_of_payment.dart';
 
 part 'checkout_arguments.g.dart';
 
@@ -14,7 +15,7 @@ final class CheckoutArguments {
   final PaymentOptionsListMode paymentOptionsListMode;
   String? defaultSelectedPgCode;
   String? apiTransactionDetails;
-  final List<String>? formsOfPayment;
+  final List<FormsOfPayment>? formsOfPayment;
   final CheckoutTheme? theme;
 
   CheckoutArguments(
