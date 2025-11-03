@@ -23,9 +23,9 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
 
   @override
   dispose() {
-    super.dispose();
     print("OttuCheckoutWidget.dispose()");
     _methodChannel.invokeMethod(_methodOnWidgetDetached);
+    super.dispose();
   }
 
   @override
