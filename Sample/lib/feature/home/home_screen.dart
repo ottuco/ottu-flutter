@@ -276,9 +276,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text('No forms of payment'),
                         ],
                       ),
-                      nativePayMethod(
-                        value: state.formsOfPaymentChecked?[nativePayMethodKey] ?? false,
-                      ),
+                      if (context.read<HomeScreenCubit>().hasNativePaymentAllowed())
+                        _nativePayMethod(formsOfPayment: state.formsOfPaymentChecked ?? {}),
                       Row(
                         children: [
                           paymentMethodCheckbox(
@@ -412,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget nativePayMethod({bool value = false}) {
+  Widget _nativePayMethod({Map<FormsOfPayment, bool> formsOfPayment = const {}}) {
     if (Platform.isAndroid) {
       return SizedBox.shrink();
     } else {
@@ -420,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Checkbox(
             checkColor: Colors.white,
-            value: value,
+            value: formsOfPayment.containsKey(FormsOfPayment.applePay),
             onChanged: (bool? value) {
               context.read<HomeScreenCubit>().onFormsOfPaymentChecked(
                 FormsOfPayment.applePay,

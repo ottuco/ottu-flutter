@@ -46,41 +46,47 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     required GoRouter navigator,
     required ThemeModeNotifierHolder themeModeNotifier,
     required OttuApi api,
-  }) : _navigator = navigator,
-       _themeModeNotifier = themeModeNotifier,
-       _api = api,
-       super(
-         _state ??
-             HomeScreenState(
-               amount: "10",
-               merchantId: merchantId,
-               apiKey: apiKey,
-               currencyCode: currencyCode,
-               phoneNumber: _customerPhone,
-               customerId: customerId,
-               formsOfPaymentChecked: Map.from({
-                 if (_hasNativePaymentAllowed() && _nativePaymentMethod() != null)
-                   _nativePaymentMethod()!.name: true,
-                 "redirect": true,
-                 "flex_methods": true,
-                 "stc_pay": true,
-                 "token_pay": true,
-                 "card_onsite": true,
-               }),
-               pgCodesChecked: Map.from({
-                 PGCode.mpgs: true,
-                 PGCode.tap_pg: true,
-                 PGCode.knet: true,
-                 PGCode.benefit: true,
-                 PGCode.benefitpay: true,
-                 PGCode.stc_pay: true,
-                 PGCode.nbk_mpgs: true,
-                 //PGCode.urpay: true,
-                 PGCode.tamara: true,
-                 PGCode.tabby: true,
-               }),
-             ),
-       );
+  })
+      : _navigator = navigator,
+        _themeModeNotifier = themeModeNotifier,
+        _api = api,
+        super(
+        _state ??
+            HomeScreenState(
+              amount: "10",
+              merchantId: merchantId,
+              apiKey: apiKey,
+              currencyCode: currencyCode,
+              phoneNumber: _customerPhone,
+              customerId: customerId,
+              formsOfPaymentChecked: Map.from({
+                FormsOfPayment.redirect: true,
+                FormsOfPayment.flex: true,
+                FormsOfPayment.stcPay: true,
+                FormsOfPayment.tokenPay: true,
+                FormsOfPayment.cardOnSite: true,
+              }),
+              pgCodesChecked: Map.from({
+                PGCode.mpgs: true,
+                PGCode.tap_pg: true,
+                PGCode.knet: true,
+                PGCode.benefit: true,
+                PGCode.benefitpay: true,
+                PGCode.stc_pay: true,
+                PGCode.nbk_mpgs: true,
+                //PGCode.urpay: true,
+                PGCode.tamara: true,
+                PGCode.tabby: true,
+              }),
+            ),
+      ) {
+    final nativePayment = _nativePaymentMethod();
+    if (hasNativePaymentAllowed() && nativePayment != null) {
+      final fopList = state.formsOfPaymentChecked ?? {};
+      fopList[nativePayment] = true;
+      emit(state.copyWith(formsOfPaymentChecked: fopList));
+    }
+  }
 
   @override
   Future<void> close() {
@@ -234,7 +240,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       amount: amount,
       showPaymentDetails: state.showPaymentDetails,
       paymentOptionsListMode:
-          state.paymentOptionsDisplayMode ?? PaymentOptionsListMode.BOTTOM_SHEET,
+      state.paymentOptionsDisplayMode ?? PaymentOptionsListMode.BOTTOM_SHEET,
       defaultSelectedPgCode: state.defaultSelectedPayment,
       paymentOptionsListCount: paymentsListItemCount,
       apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
@@ -253,14 +259,6 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     }
   }
 
-  /*  FormsOfPayment? _nativePayment(String pgCode) {
-    if (pgCode == FormsOfPayment.googlePay.name || pgCode == FormsOfPayment.applePay.name) {
-      return _nativePaymentMethod();
-    } else {
-      return payment;
-    }
-  }*/
-
   FormsOfPayment? _nativePaymentMethod() {
     if (Platform.isAndroid) {
       return FormsOfPayment.googlePay;
@@ -274,27 +272,21 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     final codes =
         state.pgCodesChecked?.entries
             .where((entry) => entry.value)
-            .map((entry) => entry.key.name)
+            .map((entry) => entry.key.code)
             .toList() ??
-        [];
-
-    final nativePayment = _nativePaymentMethod();
-    if (nativePayment != null) {
-      codes.add(nativePayment.name);
-    }
+            [];
 
     _logger.d("pgCodesNative, pg_codes: $codes");
-    print("pgCodesNative pg_codes: $codes");
     return codes;
   }
-}
 
-bool _hasNativePaymentAllowed() {
-  if (Platform.isAndroid) {
-    return false;
-  } else if (Platform.isIOS) {
-    return true;
-  } else {
-    return true;
+  bool hasNativePaymentAllowed() {
+    if (Platform.isAndroid) {
+      return false;
+    } else if (Platform.isIOS && kReleaseMode) {
+      return true;
+    } else {
+      return true;
+    }
   }
 }

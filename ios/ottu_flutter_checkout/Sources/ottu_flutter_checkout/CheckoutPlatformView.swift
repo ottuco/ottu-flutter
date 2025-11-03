@@ -54,7 +54,6 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         )
         _view = CheckoutContainerView()
         super.init()
-        debugPrint("createNativeView, args: \(args)")
         
         self.channel.setMethodCallHandler { [weak self] call, _ in
             guard let self else { return }
@@ -126,7 +125,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     
     @MainActor
     func createNativeView(arguments: CheckoutArguments) {
-        debugPrint("createNativeView, checkout args: \(arguments)")
+        debugPrint("createNativeView")
         let theme = getCheckoutTheme(
             arguments.theme, showPaymentDetails: arguments.showPaymentDetails)
         let formsOfPayment =
