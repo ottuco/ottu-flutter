@@ -20,7 +20,7 @@ final class HomeScreenState extends Equatable {
   final bool? preloadPayload;
   final bool? isAutoDebit;
   final bool hasSessionLoaded;
-  final PaymentOptionsListMode? paymentOptionsDisplayMode;
+  final PaymentOptionsDisplayMode? paymentOptionsDisplayMode;
   final Map<FormsOfPayment, bool>? formsOfPaymentChecked;
   final Map<PGCode, bool>? pgCodesChecked;
 
@@ -61,7 +61,7 @@ final class HomeScreenState extends Equatable {
     bool? preloadPayload,
     bool? isAutoDebit,
     bool? hasSessionLoaded,
-    PaymentOptionsListMode? paymentOptionsDisplayMode,
+    PaymentOptionsDisplayMode? paymentOptionsDisplayMode,
     Map<FormsOfPayment, bool>? formsOfPaymentChecked,
     Map<PGCode, bool>? pgCodesChecked,
   }) {

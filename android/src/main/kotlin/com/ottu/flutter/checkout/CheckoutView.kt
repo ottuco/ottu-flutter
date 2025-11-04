@@ -126,18 +126,20 @@ internal class CheckoutView(
         Log.d(TAG, "initCheckoutFragment, initialized: ${Checkout.isInitialized}")
 
         val builder = arguments.run {
-            val paymentOptionsDisplayMode =
-                when (paymentOptionsListMode) {
+            val paymentOptionsDisplaySettings = paymentOptionsDisplaySettings.run {
+                val paymentOptionsDisplayMode =  when (mode) {
                     "list" -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
-                        visiblePaymentItemsCount = paymentOptionsListCount
+                        visiblePaymentItemsCount = visibleItemsCount
                     )
 
                     else -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
                 }
-            val paymentOptionsDisplaySettings = Checkout.PaymentOptionsDisplaySettings(
-                mode = paymentOptionsDisplayMode,
-                defaultSelectedPgCode = defaultSelectedPgCode
-            )
+
+                Checkout.PaymentOptionsDisplaySettings(
+                    mode = paymentOptionsDisplayMode,
+                    defaultSelectedPgCode = defaultSelectedPgCode
+                )
+            }
 
             val theme = getCheckoutTheme(arguments, resources, packageName)
             val payments = formsOfPayment?.map { key ->
@@ -164,7 +166,7 @@ internal class CheckoutView(
 
         Log.d(
             TAG,
-            "initCheckoutFragment, with apiTransactionDetails: $apiTransactionDetails"
+            "initCheckoutFragment, with apiTransactionDetails"
         )
         coroutineScope.launch {
             try {

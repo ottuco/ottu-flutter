@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.only(top: 18.0),
                             child: Checkbox(
                               checkColor: Colors.white,
-                              value: state.paymentOptionsDisplayMode == PaymentOptionsListMode.LIST,
+                              value: state.paymentOptionsDisplayMode == PaymentOptionsDisplayMode.LIST,
                               onChanged: (bool? value) {
                                 context.read<HomeScreenCubit>().onShowPaymentOptionsListChange(
                                   value,
@@ -234,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               controller: paymentsListItemCountController,
                               maxLength: 2,
                               enabled:
-                                  state.paymentOptionsDisplayMode == PaymentOptionsListMode.LIST,
+                                  state.paymentOptionsDisplayMode == PaymentOptionsDisplayMode.LIST,
                               onChanged: (text) {
                                 context.read<HomeScreenCubit>().onPaymentsListItemCountChange(text);
                               },

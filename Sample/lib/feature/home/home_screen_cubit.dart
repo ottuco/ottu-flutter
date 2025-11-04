@@ -46,40 +46,39 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     required GoRouter navigator,
     required ThemeModeNotifierHolder themeModeNotifier,
     required OttuApi api,
-  })
-      : _navigator = navigator,
-        _themeModeNotifier = themeModeNotifier,
-        _api = api,
-        super(
-        _state ??
-            HomeScreenState(
-              amount: "10",
-              merchantId: merchantId,
-              apiKey: apiKey,
-              currencyCode: currencyCode,
-              phoneNumber: _customerPhone,
-              customerId: customerId,
-              formsOfPaymentChecked: Map.from({
-                FormsOfPayment.redirect: true,
-                FormsOfPayment.flex: true,
-                FormsOfPayment.stcPay: true,
-                FormsOfPayment.tokenPay: true,
-                FormsOfPayment.cardOnSite: true,
-              }),
-              pgCodesChecked: Map.from({
-                PGCode.mpgs: true,
-                PGCode.tap_pg: true,
-                PGCode.knet: true,
-                PGCode.benefit: true,
-                PGCode.benefitpay: true,
-                PGCode.stc_pay: true,
-                PGCode.nbk_mpgs: true,
-                //PGCode.urpay: true,
-                PGCode.tamara: true,
-                PGCode.tabby: true,
-              }),
-            ),
-      ) {
+  }) : _navigator = navigator,
+       _themeModeNotifier = themeModeNotifier,
+       _api = api,
+       super(
+         _state ??
+             HomeScreenState(
+               amount: "10",
+               merchantId: merchantId,
+               apiKey: apiKey,
+               currencyCode: currencyCode,
+               phoneNumber: _customerPhone,
+               customerId: customerId,
+               formsOfPaymentChecked: Map.from({
+                 FormsOfPayment.redirect: true,
+                 FormsOfPayment.flex: true,
+                 FormsOfPayment.stcPay: true,
+                 FormsOfPayment.tokenPay: true,
+                 FormsOfPayment.cardOnSite: true,
+               }),
+               pgCodesChecked: Map.from({
+                 PGCode.mpgs: true,
+                 PGCode.tap_pg: true,
+                 PGCode.knet: true,
+                 PGCode.benefit: true,
+                 PGCode.benefitpay: true,
+                 PGCode.stc_pay: true,
+                 PGCode.nbk_mpgs: true,
+                 //PGCode.urpay: true,
+                 PGCode.tamara: true,
+                 PGCode.tabby: true,
+               }),
+             ),
+       ) {
     final nativePayment = _nativePaymentMethod();
     if (hasNativePaymentAllowed() && nativePayment != null) {
       final fopList = state.formsOfPaymentChecked ?? {};
@@ -219,8 +218,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     emit(
       state.copyWith(
         paymentOptionsDisplayMode: isChecked == true
-            ? PaymentOptionsListMode.LIST
-            : PaymentOptionsListMode.BOTTOM_SHEET,
+            ? PaymentOptionsDisplayMode.LIST
+            : PaymentOptionsDisplayMode.BOTTOM_SHEET,
       ),
     );
   }
@@ -233,16 +232,20 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         .where((entry) => entry.value)
         .map((entry) => entry.key)
         .toList();
+
+    final displaySettings = PaymentOptionsDisplaySettings(
+      mode: state.paymentOptionsDisplayMode ?? PaymentOptionsDisplayMode.BOTTOM_SHEET,
+      visibleItemsCount: paymentsListItemCount,
+      defaultSelectedPgCode: state.defaultSelectedPayment,
+    );
+
     final args = CheckoutArguments(
       merchantId: state.merchantId,
       apiKey: state.apiKey,
       sessionId: state.sessionId ?? "",
       amount: amount,
       showPaymentDetails: state.showPaymentDetails,
-      paymentOptionsListMode:
-      state.paymentOptionsDisplayMode ?? PaymentOptionsListMode.BOTTOM_SHEET,
-      defaultSelectedPgCode: state.defaultSelectedPayment,
-      paymentOptionsListCount: paymentsListItemCount,
+      paymentOptionsDisplaySettings: displaySettings,
       apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
       formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
       theme: _theme,
@@ -274,7 +277,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
             .where((entry) => entry.value)
             .map((entry) => entry.key.code)
             .toList() ??
-            [];
+        [];
 
     _logger.d("pgCodesNative, pg_codes: $codes");
     return codes;

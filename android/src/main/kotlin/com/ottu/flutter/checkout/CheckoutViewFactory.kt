@@ -23,7 +23,7 @@ class CheckoutViewFactory(private val messenger: BinaryMessenger) :
         if (checkoutArguments == null) {
             throw NotFoundException("There are no argument to start Checkout SDK")
         }
-        Log.d(TAG, "create, with arguments: $checkoutArguments")
+        Log.d(TAG, "create, with arguments")
         return CheckoutView(
             context = context,
             id = viewId,
