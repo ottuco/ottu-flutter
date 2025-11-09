@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import com.ottu.checkout.Checkout
 import com.ottu.checkout.network.model.payment.TransactionDetails
 import com.ottu.checkout.network.moshi.MoshiFactory
@@ -123,7 +124,7 @@ internal class CheckoutView(
     private fun initCheckoutFragment(
         resources: Resources,
         packageName: String,
-        onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit,
+        onInitialized: (sdkFragment: Fragment) -> Unit,
     ) {
         Log.d(TAG, "initCheckoutFragment, initialized: ${Checkout.isInitialized}")
 
@@ -138,8 +139,7 @@ internal class CheckoutView(
             }
 
             Checkout.DisplaySettings(
-                mode = paymentOptionsDisplayMode,
-                defaultSelectedPgCode = defaultSelectedPgCode
+                mode = paymentOptionsDisplayMode, defaultSelectedPgCode = defaultSelectedPgCode
             )
         }
 
@@ -332,9 +332,7 @@ internal class CheckoutView(
                 TAG,
                 "onLayoutChange, height has been changed, height: $height, oldHeight: $oldHeight"
             )
-            //if (height != oldHeight) {
             onHeightChanged(abs(height))
-            //}
         }
     }
 }
