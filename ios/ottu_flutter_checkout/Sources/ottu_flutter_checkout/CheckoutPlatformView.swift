@@ -36,7 +36,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             print("Removed from parent!")
         } else {
             print("No parent relationship found, nothing to remove.")
-        }    
+        }
     }
     
     @MainActor
@@ -54,7 +54,6 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         )
         _view = CheckoutContainerView()
         super.init()
-        debugPrint("createNativeView, args: \(args)")
         
         self.channel.setMethodCallHandler { [weak self] call, _ in
             guard let self else { return }
@@ -126,7 +125,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     
     @MainActor
     func createNativeView(arguments: CheckoutArguments) {
-        debugPrint("createNativeView, checkout args: \(arguments)")
+        debugPrint("createNativeView")
         let theme = getCheckoutTheme(
             arguments.theme, showPaymentDetails: arguments.showPaymentDetails)
         let formsOfPayment =
@@ -134,13 +133,20 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             { code in FormOfPayment(rawValue: code)
             }).compactMap { $0 } ?? []
         
-        debugPrint("formsOfPayment: \(formsOfPayment)")
+        debugPrint("formsOfPayment")
         
-        let paymentOptionsDisplaySettings:PaymentOptionsDisplaySettings =
-        if arguments.paymentOptionsListMode == "list" {
-            PaymentOptionsDisplaySettings(mode: .list, visibleItemsCount: UInt(arguments.paymentOptionsListCount), defaultSelectedPgCode: arguments.defaultSelectedPgCode)
+        let paymentOptionsDisplaySettings:ottu_checkout_sdk.PaymentOptionsDisplaySettings =
+        if arguments.paymentOptionsDisplaySettings.mode == "list" {
+            ottu_checkout_sdk.PaymentOptionsDisplaySettings(
+                mode: .list,
+                visibleItemsCount:UInt(arguments.paymentOptionsDisplaySettings.visibleItemsCount),
+                defaultSelectedPgCode:arguments.paymentOptionsDisplaySettings.defaultSelectedPgCode,
+            )
         } else {
-            PaymentOptionsDisplaySettings(mode: .bottomSheet, defaultSelectedPgCode: arguments.defaultSelectedPgCode)
+            ottu_checkout_sdk.PaymentOptionsDisplaySettings(
+                mode: .bottomSheet,
+                defaultSelectedPgCode: arguments.paymentOptionsDisplaySettings.defaultSelectedPgCode,
+            )
         }
         
         
@@ -153,7 +159,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         do {
             let transactionDetails: TransactionDetails? = try
             apiTransactionDetails?.transactionDetails
-            debugPrint("setupPreload: \(transactionDetails)")
+            debugPrint("setupPreload")
             self.checkout = try Checkout(
                 formsOfPayments: formsOfPayment,
                 theme: theme,
@@ -448,10 +454,10 @@ private class CheckoutHeightHandlerView: UIView {
         super.layoutSubviews()
         self.setNeedsDisplay()
         debugPrint("--------------------------\n")
-        debugPrint("layoutSubviews, parent: \(String(describing: self))")
+        debugPrint("layoutSubviews, parent")
         self.subviews.forEach {
             let subview = $0
-            debugPrint("layoutSubviews, child: \(String(describing: subview))\n \(subview.accessibilityIdentifier)")
+            debugPrint("layoutSubviews, child")
             if(subview.accessibilityIdentifier == "CheckoutView" ) {
                 if(subview.isHidden == false){
                     NSLayoutConstraint.activate([
@@ -474,7 +480,7 @@ private class CheckoutHeightHandlerView: UIView {
             debugPrint("\n")
         }
         
-        debugPrint("layoutSubviews, bounds: \(self.bounds)")
+        debugPrint("layoutSubviews, bounds")
         onHeightChanged?(
             Int(self.bounds.height)
         )

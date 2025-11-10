@@ -20,8 +20,8 @@ final class HomeScreenState extends Equatable {
   final bool? preloadPayload;
   final bool? isAutoDebit;
   final bool hasSessionLoaded;
-  final PaymentOptionsListMode? paymentOptionsDisplayMode;
-  final Map<String, bool>? formsOfPaymentChecked;
+  final PaymentOptionsDisplayMode? paymentOptionsDisplayMode;
+  final Map<FormsOfPayment, bool>? formsOfPaymentChecked;
   final Map<PGCode, bool>? pgCodesChecked;
 
   const HomeScreenState({
@@ -61,8 +61,8 @@ final class HomeScreenState extends Equatable {
     bool? preloadPayload,
     bool? isAutoDebit,
     bool? hasSessionLoaded,
-    PaymentOptionsListMode? paymentOptionsDisplayMode,
-    Map<String, bool>? formsOfPaymentChecked,
+    PaymentOptionsDisplayMode? paymentOptionsDisplayMode,
+    Map<FormsOfPayment, bool>? formsOfPaymentChecked,
     Map<PGCode, bool>? pgCodesChecked,
   }) {
     return HomeScreenState(

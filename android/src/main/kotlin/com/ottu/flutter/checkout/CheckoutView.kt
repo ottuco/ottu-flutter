@@ -10,8 +10,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import com.ottu.checkout.Checkout
-import com.ottu.checkout.network.model.payment.ApiTransactionDetails
+import com.ottu.checkout.network.model.payment.TransactionDetails
 import com.ottu.checkout.network.moshi.MoshiFactory
 import com.ottu.checkout.ui.base.CheckoutSdkFragment
 import com.ottu.checkout.ui.theme.CheckoutTheme
@@ -42,7 +43,7 @@ const val CHANNEL = "com.ottu.sample/checkout"
 private const val TAG = "CheckoutView"
 
 private val sessionCoroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
-    Log.w(TAG, "CoroutineExceptionHandler", t)
+    Log.w(TAG, "sessionCoroutineExceptionHandler", t)
 }
 
 private val dispatcher: CoroutineDispatcher = Dispatchers.Main
@@ -86,21 +87,23 @@ internal class CheckoutView(
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
 
-        Log.i(TAG, "onFlutterViewAttached")
+        Log.i(TAG, "onFlutterViewAttached, isCheckoutInitializing: ${isCheckoutInitializing.get()}")
         if (isCheckoutInitializing.getAndSet(true).not()) {
             val fa = checkoutView.context as FragmentActivity
             val fm = fa.supportFragmentManager
             Log.i(TAG, "onFlutterViewAttached, start init")
-            coroutineScope.launch {
-                initCheckoutFragment(
-                    resources = flutterView.resources,
-                    packageName = flutterView.context.packageName
-                ) { fragment ->
-                    Log.d(TAG, "onFlutterViewAttached, Checkout initialized")
-                    fm.beginTransaction().replace(R.id.checkout_fragment_container, fragment)
-                        .commitAllowingStateLoss()
-                }
+
+            initCheckoutFragment(
+                resources = flutterView.resources,
+                packageName = flutterView.context.packageName
+            ) { fragment ->
+                Log.d(TAG, "onFlutterViewAttached, Checkout initialized")
+                fm.beginTransaction().replace(R.id.checkout_fragment_container, fragment)
+                    .commitAllowingStateLoss()
             }
+
+        } else {
+            Log.d(TAG, "onFlutterViewAttached, isCheckoutInitializing: $isCheckoutInitializing")
         }
 
 
@@ -118,39 +121,44 @@ internal class CheckoutView(
             })
     }
 
-    private suspend fun initCheckoutFragment(
+    private fun initCheckoutFragment(
         resources: Resources,
         packageName: String,
-        onInitialized: (sdkFragment: CheckoutSdkFragment) -> Unit,
+        onInitialized: (sdkFragment: Fragment) -> Unit,
     ) {
         Log.d(TAG, "initCheckoutFragment, initialized: ${Checkout.isInitialized}")
 
-        val builder = arguments.run {
-            val paymentOptionsDisplayMode =
-                when (paymentOptionsListMode) {
-                    "list" -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
-                        visiblePaymentItemsCount = paymentOptionsListCount
-                    )
 
-                    else -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
-                }
-            val paymentOptionsDisplaySettings = Checkout.PaymentOptionsDisplaySettings(
-                mode = paymentOptionsDisplayMode,
-                defaultSelectedPgCode = defaultSelectedPgCode
+        val displaySettings = arguments.paymentOptionsDisplaySettings.run {
+            val paymentOptionsDisplayMode = when (mode) {
+                "list" -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
+                    visibleItemsCount = visibleItemsCount
+                )
+
+                else -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
+            }
+
+            Checkout.PaymentOptionsDisplaySettings(
+                mode = paymentOptionsDisplayMode, defaultSelectedPgCode = defaultSelectedPgCode
             )
+        }
+
+        val builder = arguments.run {
+            Log.d(TAG, "initCheckoutFragment, display mode")
 
             val theme = getCheckoutTheme(arguments, resources, packageName)
             val payments = formsOfPayment?.map { key ->
                 Checkout.FormsOfPayment.of(key)
             }?.filterNotNull()
-
+            Log.d(TAG, "initCheckoutFragment, create builder")
             Checkout.Builder(
                 merchantId = merchantId,
                 sessionId = sessionId,
                 apiKey = apiKey,
                 amount = amount
-            ).formsOfPayments(payments).theme(theme)
-                .paymentOptionsDisplaySettings(settings = paymentOptionsDisplaySettings)
+            ).formsOfPayments(payments)
+                .theme(theme)
+                .displaySettings(settings = displaySettings)
                 .logger(Checkout.Logger.INFO).build()
         }
 
@@ -164,7 +172,7 @@ internal class CheckoutView(
 
         Log.d(
             TAG,
-            "initCheckoutFragment, with apiTransactionDetails: $apiTransactionDetails"
+            "initCheckoutFragment, with apiTransactionDetails"
         )
         coroutineScope.launch {
             try {
@@ -224,14 +232,16 @@ internal class CheckoutView(
 
     }
 
-    private fun getApiTransactionDetails(apiTransactionDetails: String): ApiTransactionDetails? {
+    private fun getApiTransactionDetails(apiTransactionDetails: String): TransactionDetails? {
+        Log.d(TAG, "getApiTransactionDetails")
         val moshi = MoshiFactory.newInstance()
-        val jsonAdapter: JsonAdapter<ApiTransactionDetails> =
-            moshi.adapter(ApiTransactionDetails::class.java)
+        val jsonAdapter: JsonAdapter<TransactionDetails> =
+            moshi.adapter(TransactionDetails::class.java)
 
         return try {
             jsonAdapter.fromJson(apiTransactionDetails)
         } catch (e: Exception) {
+            print(e.toString())
             Log.w(TAG, "getApiTransactionDetails", e)
             null
         }
@@ -250,7 +260,10 @@ internal class CheckoutView(
                 CheckoutTheme.Appearance(
                     mainTitleText = mainTitleText?.toCheckoutText(resources, packageName),
                     titleText = titleText?.toCheckoutText(resources, packageName),
-                    selectPaymentMethodHeaderText = selectPaymentMethodHeaderText?.toCheckoutText(resources, packageName),
+                    selectPaymentMethodHeaderText = selectPaymentMethodHeaderText?.toCheckoutText(
+                        resources,
+                        packageName
+                    ),
                     subtitleText = subtitleText?.toCheckoutText(resources, packageName),
                     feesTitleText = feesTitleText?.toCheckoutText(resources, packageName),
                     feesSubtitleText = feesSubtitleText?.toCheckoutText(resources, packageName),
@@ -274,7 +287,10 @@ internal class CheckoutView(
                 CheckoutTheme.Appearance(
                     mainTitleText = mainTitleText?.toCheckoutText(resources, packageName),
                     titleText = titleText?.toCheckoutText(resources, packageName),
-                    selectPaymentMethodHeaderText = selectPaymentMethodHeaderText?.toCheckoutText(resources, packageName),
+                    selectPaymentMethodHeaderText = selectPaymentMethodHeaderText?.toCheckoutText(
+                        resources,
+                        packageName
+                    ),
                     subtitleText = subtitleText?.toCheckoutText(resources, packageName),
                     feesTitleText = feesTitleText?.toCheckoutText(resources, packageName),
                     feesSubtitleText = feesSubtitleText?.toCheckoutText(resources, packageName),
@@ -316,9 +332,7 @@ internal class CheckoutView(
                 TAG,
                 "onLayoutChange, height has been changed, height: $height, oldHeight: $oldHeight"
             )
-            //if (height != oldHeight) {
             onHeightChanged(abs(height))
-            //}
         }
     }
 }

@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
+import 'package:ottu_flutter_checkout/src/forms_of_payment.dart';
+import 'package:ottu_flutter_checkout/src/payment_options_display_settings.dart';
 
 part 'checkout_arguments.g.dart';
 
@@ -8,13 +10,11 @@ final class CheckoutArguments {
   final String merchantId;
   final String apiKey;
   final String sessionId;
-  final int paymentOptionsListCount;
   final double amount;
   final bool showPaymentDetails;
-  final PaymentOptionsListMode paymentOptionsListMode;
-  String? defaultSelectedPgCode;
+  final PaymentOptionsDisplaySettings paymentOptionsDisplaySettings;
   String? apiTransactionDetails;
-  final List<String>? formsOfPayment;
+  final List<FormsOfPayment>? formsOfPayment;
   final CheckoutTheme? theme;
 
   CheckoutArguments(
@@ -23,9 +23,7 @@ final class CheckoutArguments {
       required this.sessionId,
       required this.amount,
       required this.showPaymentDetails,
-      required this.paymentOptionsListMode,
-      required this.paymentOptionsListCount,
-      required this.defaultSelectedPgCode,
+      required this.paymentOptionsDisplaySettings,
       this.apiTransactionDetails,
       this.formsOfPayment,
       this.theme});
