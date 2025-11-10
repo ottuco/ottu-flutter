@@ -19,6 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keep class com.ottu.** { *; }
 -keep class com.google.devtools.ksp.processing.** { *; }
 -keep class  com.squareup.moshi.kotlin.codegen.** { *; }
 -dontwarn com.google.devtools.ksp.UtilsKt
