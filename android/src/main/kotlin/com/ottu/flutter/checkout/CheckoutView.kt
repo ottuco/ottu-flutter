@@ -131,14 +131,14 @@ internal class CheckoutView(
 
         val displaySettings = arguments.paymentOptionsDisplaySettings.run {
             val paymentOptionsDisplayMode = when (mode) {
-                "list" -> Checkout.DisplaySettings.PaymentOptionsDisplayMode.List(
+                "list" -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.List(
                     visibleItemsCount = visibleItemsCount
                 )
 
-                else -> Checkout.DisplaySettings.PaymentOptionsDisplayMode.BottomSheet
+                else -> Checkout.PaymentOptionsDisplaySettings.PaymentOptionsDisplayMode.BottomSheet
             }
 
-            Checkout.DisplaySettings(
+            Checkout.PaymentOptionsDisplaySettings(
                 mode = paymentOptionsDisplayMode, defaultSelectedPgCode = defaultSelectedPgCode
             )
         }
