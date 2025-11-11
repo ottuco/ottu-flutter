@@ -13,7 +13,8 @@ final class CheckoutArguments {
   final double amount;
   final bool showPaymentDetails;
   final PaymentOptionsDisplaySettings paymentOptionsDisplaySettings;
-  String? apiTransactionDetails;
+  @JsonKey(name: "apiTransactionDetails")
+  String? setupPreload;
   final List<FormsOfPayment>? formsOfPayment;
   final CheckoutTheme? theme;
 
@@ -24,7 +25,7 @@ final class CheckoutArguments {
       required this.amount,
       required this.showPaymentDetails,
       required this.paymentOptionsDisplaySettings,
-      this.apiTransactionDetails,
+      this.setupPreload,
       this.formsOfPayment,
       this.theme});
 

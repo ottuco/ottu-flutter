@@ -15,7 +15,7 @@ CheckoutArguments _$CheckoutArgumentsFromJson(Map<String, dynamic> json) =>
       showPaymentDetails: json['showPaymentDetails'] as bool,
       paymentOptionsDisplaySettings: PaymentOptionsDisplaySettings.fromJson(
           json['paymentOptionsDisplaySettings'] as Map<String, dynamic>),
-      apiTransactionDetails: json['apiTransactionDetails'] as String?,
+      setupPreload: json['apiTransactionDetails'] as String?,
       formsOfPayment: (json['formsOfPayment'] as List<dynamic>?)
           ?.map((e) => $enumDecode(_$FormsOfPaymentEnumMap, e))
           .toList(),
@@ -32,7 +32,7 @@ Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
       'amount': instance.amount,
       'showPaymentDetails': instance.showPaymentDetails,
       'paymentOptionsDisplaySettings': instance.paymentOptionsDisplaySettings,
-      'apiTransactionDetails': instance.apiTransactionDetails,
+      'apiTransactionDetails': instance.setupPreload,
       'formsOfPayment': instance.formsOfPayment
           ?.map((e) => _$FormsOfPaymentEnumMap[e]!)
           .toList(),

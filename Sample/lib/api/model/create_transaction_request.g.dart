@@ -48,7 +48,7 @@ Map<String, dynamic> _$CreateTransactionRequestToJson(
   'currency_code': instance.currencyCode,
   'pg_codes': instance.pgCodes,
   'type': instance.type,
-  if (instance.customerId case final value?) 'customer_id': value,
+  'customer_id': ?instance.customerId,
   'customer_phone': instance.customerPhone,
   'customer_first_name': instance.customerFirstName,
   'customer_last_name': instance.customerLastName,
@@ -56,11 +56,9 @@ Map<String, dynamic> _$CreateTransactionRequestToJson(
   'billing_address': instance.billingAddress,
   'include_sdk_setup_preload': instance.includeSdkSetupPreload,
   'language': instance.language,
-  if (_$TransactionPaymentTypeEnumMap[instance.paymentType] case final value?)
-    'payment_type': value,
-  if (instance.agreement case final value?) 'agreement': value,
-  if (instance.cardAcceptanceCriteria case final value?)
-    'card_acceptance_criteria': value,
+  'payment_type': ?_$TransactionPaymentTypeEnumMap[instance.paymentType],
+  'agreement': ?instance.agreement,
+  'card_acceptance_criteria': ?instance.cardAcceptanceCriteria,
 };
 
 const _$TransactionPaymentTypeEnumMap = {
