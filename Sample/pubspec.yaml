@@ -37,7 +37,7 @@ dependencies:
   ottu_flutter_checkout:
     git:
       url: https://github.com/ottuco/ottu-flutter.git
-      ref: 2.1.11
+      ref: 2.1.12
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
