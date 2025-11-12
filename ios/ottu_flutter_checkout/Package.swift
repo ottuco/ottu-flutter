@@ -11,8 +11,8 @@ let package = Package(
         .library(name: "ottu-flutter-checkout", targets: ["ottu_flutter_checkout"])
     ],
     dependencies: [
-          .package(name: "ottu_checkout_sdk", path: "../ottu-ios"),
-          .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.57.0"),
+         .package(name: "ottu_checkout_sdk", path: "/Users/vi/Downloads/AS-Projects/ottu-ios"),
+         .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.57.0"),
     ],
     targets: [
         .target(
