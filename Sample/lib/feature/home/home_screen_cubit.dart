@@ -246,7 +246,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       amount: amount,
       showPaymentDetails: state.showPaymentDetails,
       paymentOptionsDisplaySettings: displaySettings,
-      apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
+      setupPreload: state.preloadPayload == true ? _apiTransactionDetails : null,
       formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
       theme: _theme,
     );
