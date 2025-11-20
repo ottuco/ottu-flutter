@@ -11,15 +11,12 @@ import 'package:ottu_flutter_checkout_sample/api/model/create_transaction_reques
 import 'package:ottu_flutter_checkout_sample/api/model/pg_codes.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/transaction_agreement.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/transaction_payment_type.dart';
+import 'package:ottu_flutter_checkout_sample/api/ottu_api.dart';
 import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_state.dart';
 import 'package:ottu_flutter_checkout_sample/main.dart';
 
-import '../../api/ottu_api.dart';
-
-const merchantId = "alpha.ottu.net";
-const apiKey = "cHSLW0bE.56PLGcUYEhRvzhHVVO9CbF68hmDiXcPI";
-//const merchantId = "staging4.ottu.dev";
-//const apiKey = "kZia0dfY.vEWS0cUV5gWV1JDzIvzDfSxKLUh4qAa3"; //staging
+const merchantId = String.fromEnvironment('MERCHANT_ID', defaultValue: "add your merchant Id there");
+const apiKey = String.fromEnvironment('API_KEY', defaultValue: "add your Api key there");
 const customerId = "john2";
 const currencyCode = "KWD";
 const transactionType = "e_commerce";

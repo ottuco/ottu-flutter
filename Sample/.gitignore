@@ -9,3 +9,5 @@
 /android/build
 /Ottu_logo.png
 /flutter_launcher_icons.yaml
+env.var.alpha.json
+env.var.staging.json
