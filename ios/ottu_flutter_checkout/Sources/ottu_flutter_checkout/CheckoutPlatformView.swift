@@ -23,6 +23,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let _view: CheckoutContainerView
     private weak var paymentViewController: UIViewController?
     private var checkout: Checkout?
+    private var uiMode: String?
     
     private func deinitCheckout() {
         guard let pvc = paymentViewController,
@@ -126,6 +127,10 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     @MainActor
     func createNativeView(arguments: CheckoutArguments) {
         debugPrint("createNativeView")
+
+        // Store uiMode from theme for applying to view controller
+        self.uiMode = arguments.theme?.uiMode
+
         let theme = getCheckoutTheme(
             arguments.theme, showPaymentDetails: arguments.showPaymentDetails)
         let formsOfPayment =
@@ -183,8 +188,11 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     
     func tryAttachController() {
         guard let pvc = self.paymentViewController else { return }
-        
+
         if let parentVC = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController {
+            // Apply uiMode to override system appearance if specified
+            applyUserInterfaceStyle(to: pvc)
+
             parentVC.addChild(pvc)
             _view.addCheckoutView(pvc.view)
             pvc.didMove(toParent: parentVC)
@@ -195,6 +203,23 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 self.tryAttachController()
             }
         }
+    }
+
+    private func applyUserInterfaceStyle(to viewController: UIViewController) {
+        guard let mode = uiMode?.lowercased() else { return }
+
+        let style: UIUserInterfaceStyle
+        switch mode {
+        case "light":
+            style = .light
+        case "dark":
+            style = .dark
+        default:
+            return // Don't override if not specified or "auto"
+        }
+
+        viewController.overrideUserInterfaceStyle = style
+        viewController.view.overrideUserInterfaceStyle = style
     }
     
     private func getApiTransactionDetails(_ transactionDetails: String) throws
