@@ -3,6 +3,8 @@ enum PGCode {
   knet(code: "knet-staging", name: "Knet"),
   benefit(code: "benefit", name: "Benefit"),
   benefitpay(code: "benefitpay", name: "Benefit Pay"),
+  benefitRedirect(code: "benefit-direct", name: "Benefit Redirect"),
+  pgAlphaBaulk(code: "pg_alphabulk", name: "pg_alphabulk"),
   stc_pay(code: "stc_pay", name: "Stc Pay"),
   nbk_mpgs(code: "nbk-mpgs", name: "Nbk Mpgs"),
   //urpay(code: "urpay", name: "Ur Pay"),
