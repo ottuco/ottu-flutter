@@ -1,10 +1,12 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/di/Module.dart';
-import 'package:ottu_flutter_checkout_sample/feature/checkout/chackout_screen.dart';
+import 'package:ottu_flutter_checkout_sample/feature/checkout/checkout_screen.dart';
 
 final class CheckoutModule implements Module {
   final _logger = Logger();
@@ -17,13 +19,18 @@ final class CheckoutModule implements Module {
     return [
       GoRoute(
         path: '/checkout',
-        builder: (context, state) => PopScope(
+        builder: (context, state) {
+          final Map<String,dynamic> extra = state.extra as Map<String, dynamic>;
+          final args = extra["args"] as CheckoutArguments;
+          final failPaymentValidation = extra["failPaymentValidation"] as bool;
+          return PopScope(
           onPopInvokedWithResult: (didPop, result) => _canPop(context, didPop, result),
           child: CheckoutScreen(
             title: "Checkout",
-            checkoutArguments: state.extra as CheckoutArguments,
+            checkoutArguments: args,
+            failPaymentValidation: failPaymentValidation,
           ),
-        ),
+        );},
         onExit: (BuildContext, GoRouterState) async {
           _logger.d("router, /checkout, exit");
           return true;

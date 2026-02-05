@@ -20,6 +20,7 @@ final class HomeScreenState extends Equatable {
   final bool? preloadPayload;
   final bool? isAutoDebit;
   final bool hasSessionLoaded;
+  final bool? failPaymentValidation;
   final PaymentOptionsDisplayMode? paymentOptionsDisplayMode;
   final Map<FormsOfPayment, bool>? formsOfPaymentChecked;
   final Map<PGCode, bool>? pgCodesChecked;
@@ -40,6 +41,7 @@ final class HomeScreenState extends Equatable {
     this.isAutoDebit = false,
     this.noForms,
     this.hasSessionLoaded = false,
+    this.failPaymentValidation = false,
     this.paymentOptionsDisplayMode,
     this.formsOfPaymentChecked,
     this.pgCodesChecked,
@@ -61,50 +63,54 @@ final class HomeScreenState extends Equatable {
     bool? preloadPayload,
     bool? isAutoDebit,
     bool? hasSessionLoaded,
+    bool? failPaymentValidation,
     PaymentOptionsDisplayMode? paymentOptionsDisplayMode,
     Map<FormsOfPayment, bool>? formsOfPaymentChecked,
     Map<PGCode, bool>? pgCodesChecked,
   }) {
     return HomeScreenState(
-        merchantId: merchantId ?? this.merchantId,
-        apiKey: apiKey ?? this.apiKey,
-        sessionId: sessionId ?? this.sessionId,
-        amount: amount ?? this.amount,
-        currencyCode: currencyCode ?? this.currencyCode,
-        phoneNumber: phoneNumber ?? this.phoneNumber,
-        customerId: customerId ?? this.customerId,
-        cardExpiryTime: cardExpiryTime ?? this.cardExpiryTime,
-        paymentsListItemCount: paymentsListItemCount ?? this.paymentsListItemCount,
-        defaultSelectedPayment: defaultSelectedPayment ?? this.defaultSelectedPayment,
-        showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
-        noForms: noForms ?? this.noForms,
-        preloadPayload: preloadPayload ?? this.preloadPayload,
-        isAutoDebit: isAutoDebit ?? this.isAutoDebit,
-        hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
-        paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
-        formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
-        pgCodesChecked: pgCodesChecked ?? this.pgCodesChecked);
+      merchantId: merchantId ?? this.merchantId,
+      apiKey: apiKey ?? this.apiKey,
+      sessionId: sessionId ?? this.sessionId,
+      amount: amount ?? this.amount,
+      currencyCode: currencyCode ?? this.currencyCode,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      customerId: customerId ?? this.customerId,
+      cardExpiryTime: cardExpiryTime ?? this.cardExpiryTime,
+      paymentsListItemCount: paymentsListItemCount ?? this.paymentsListItemCount,
+      defaultSelectedPayment: defaultSelectedPayment ?? this.defaultSelectedPayment,
+      showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
+      noForms: noForms ?? this.noForms,
+      preloadPayload: preloadPayload ?? this.preloadPayload,
+      isAutoDebit: isAutoDebit ?? this.isAutoDebit,
+      failPaymentValidation: failPaymentValidation ?? this.failPaymentValidation,
+      hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
+      paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
+      formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
+      pgCodesChecked: pgCodesChecked ?? this.pgCodesChecked,
+    );
   }
 
   @override
   List<Object?> get props => [
-        showPaymentDetails,
-        merchantId,
-        apiKey,
-        amount,
-        currencyCode,
-        noForms,
-        customerId,
-        cardExpiryTime,
-        paymentsListItemCount,
-        defaultSelectedPayment,
-        sessionId,
-        preloadPayload,
-        isAutoDebit,
-        phoneNumber,
-        hasSessionLoaded,
-        paymentOptionsDisplayMode?.name,
-        formsOfPaymentChecked.hashCode,
-        pgCodesChecked.hashCode
-      ];
+    showPaymentDetails,
+    merchantId,
+    apiKey,
+    amount,
+    currencyCode,
+    noForms,
+    customerId,
+    cardExpiryTime,
+    paymentsListItemCount,
+    defaultSelectedPayment,
+    sessionId,
+    preloadPayload,
+    isAutoDebit,
+    failPaymentValidation,
+    phoneNumber,
+    hasSessionLoaded,
+    paymentOptionsDisplayMode?.name,
+    formsOfPaymentChecked.hashCode,
+    pgCodesChecked.hashCode,
+  ];
 }
