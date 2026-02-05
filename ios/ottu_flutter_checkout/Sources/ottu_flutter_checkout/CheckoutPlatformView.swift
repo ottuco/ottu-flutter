@@ -11,6 +11,7 @@ import ottu_checkout_sdk
 //
 
 private let checkoutChannelName = "com.ottu.sample/checkout"
+private let checkoutVerifyPaymentChannelName = "com.ottu.sample/checkout/payment/verify"
 private let methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT"
 private let _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT"
 private let _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT"
@@ -20,6 +21,7 @@ private let _methodOnWidgetDetached = "METHOD_ON_WIDGET_DETACHED"
 public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let viewId: Int64
     private let channel: FlutterMethodChannel
+    private let channelVerifyPayment: FlutterMethodChannel
     private let _view: CheckoutContainerView
     private weak var paymentViewController: UIViewController?
     private var checkout: Checkout?
@@ -50,6 +52,10 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         self.viewId = viewId
         self.channel = FlutterMethodChannel(
             name: checkoutChannelName,
+            binaryMessenger: messenger
+        )
+        self.channelVerifyPayment = FlutterMethodChannel(
+            name: checkoutVerifyPaymentChannelName,
             binaryMessenger: messenger
         )
         _view = CheckoutContainerView()
@@ -168,8 +174,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 merchantId: arguments.merchantId,
                 apiKey: arguments.apiKey,
                 setupPreload: transactionDetails,
-                
-                delegate: self
+                delegate: self,
+                verifyPayment: verifyPaymentCallback,
             )
             if let cht = checkout {
                 self.paymentViewController = cht.paymentViewController()
@@ -335,7 +341,26 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             }
         }
         
+        if let uiMode = theme?.uiMode{
+            cht.uiMode = switch(uiMode){
+            case "light": .LIGHT
+            case "dark": .DARK
+            default: .SYSTEM
+            }
+        }
+        
         return cht
+    }
+    
+    private func verifyPaymentCallback(_ payload: String?) async -> CardVerificationResult<Bool> {
+        Logger.app.info("OttuPaymentsViewController.verifyPaymentCallback, payload: \(String(describing: payload))")
+        let seconds = 2.0
+        try? await Task.sleep(nanoseconds: UInt64(seconds * Double(NSEC_PER_SEC)))
+        if failPaymentValidation {
+            return CardVerificationResult.failure("Cannot pay your order.\nPlease, check purchase information")
+        } else {
+            return CardVerificationResult.success(true)
+        }
     }
 }
 
