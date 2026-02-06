@@ -17,7 +17,7 @@ final class Success<T, E> extends CardVerificationResult<T, E> {
 }
 
 final class Failure<T, E> extends CardVerificationResult<T, E> {
-  const Failure(this.error);
+  const Failure(this.message);
 
-  final E error;
+  final E message;
 }
