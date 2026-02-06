@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
+import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart' as checkout;
 import 'package:ottu_flutter_checkout_sample/api/model/pg_codes.dart';
 import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_cubit.dart';
 import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_state.dart';
@@ -214,7 +214,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.only(top: 18.0),
                             child: Checkbox(
                               checkColor: Colors.white,
-                              value: state.paymentOptionsDisplayMode == PaymentOptionsDisplayMode.LIST,
+                              value:
+                                  state.paymentOptionsDisplayMode ==
+                                  checkout.PaymentOptionsDisplayMode.LIST,
                               onChanged: (bool? value) {
                                 context.read<HomeScreenCubit>().onShowPaymentOptionsListChange(
                                   value,
@@ -234,7 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               controller: paymentsListItemCountController,
                               maxLength: 2,
                               enabled:
-                                  state.paymentOptionsDisplayMode == PaymentOptionsDisplayMode.LIST,
+                                  state.paymentOptionsDisplayMode ==
+                                  checkout.PaymentOptionsDisplayMode.LIST,
                               onChanged: (text) {
                                 context.read<HomeScreenCubit>().onPaymentsListItemCountChange(text);
                               },
@@ -261,6 +264,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text('Auto debit'),
                         ],
                       ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            checkColor: Colors.red,
+                            value: state.failPaymentValidation ?? false,
+                            onChanged: (bool? value) {
+                              context.read<HomeScreenCubit>().onFailPaymentValidation(value);
+                            },
+                          ),
+                          Text('Fail payment validation', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
                       const SizedBox(height: 24),
                       Divider(height: 2, thickness: 3),
                       const Text('Payment methods:'),
@@ -282,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           paymentMethodCheckbox(
                             state.formsOfPaymentChecked,
-                            FormsOfPayment.redirect,
+                            checkout.FormsOfPayment.redirect,
                             context,
                           ),
                           const Text('Redirect'),
@@ -292,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           paymentMethodCheckbox(
                             state.formsOfPaymentChecked,
-                            FormsOfPayment.flex,
+                            checkout.FormsOfPayment.flex,
                             context,
                           ),
                           const Text('Flex'),
@@ -302,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           paymentMethodCheckbox(
                             state.formsOfPaymentChecked,
-                            FormsOfPayment.stcPay,
+                            checkout.FormsOfPayment.stcPay,
                             context,
                           ),
                           const Text('Stc Pay'),
@@ -312,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           paymentMethodCheckbox(
                             state.formsOfPaymentChecked,
-                            FormsOfPayment.tokenPay,
+                            checkout.FormsOfPayment.tokenPay,
                             context,
                           ),
                           const Text('Token Pay'),
@@ -322,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           paymentMethodCheckbox(
                             state.formsOfPaymentChecked,
-                            FormsOfPayment.cardOnSite,
+                            checkout.FormsOfPayment.cardOnSite,
                             context,
                           ),
                           const Text('CardOnsite'),
@@ -382,8 +397,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Checkbox paymentMethodCheckbox(
-    Map<FormsOfPayment, bool>? payments,
-    FormsOfPayment key,
+    Map<checkout.FormsOfPayment, bool>? payments,
+    checkout.FormsOfPayment key,
     BuildContext context,
   ) {
     return Checkbox(
@@ -411,7 +426,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _nativePayMethod({Map<FormsOfPayment, bool> formsOfPayment = const {}}) {
+  Widget _nativePayMethod({Map<checkout.FormsOfPayment, bool> formsOfPayment = const {}}) {
     if (Platform.isAndroid) {
       return SizedBox.shrink();
     } else {
@@ -419,10 +434,10 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Checkbox(
             checkColor: Colors.white,
-            value: formsOfPayment.containsKey(FormsOfPayment.applePay),
+            value: formsOfPayment.containsKey(checkout.FormsOfPayment.applePay),
             onChanged: (bool? value) {
               context.read<HomeScreenCubit>().onFormsOfPaymentChecked(
-                FormsOfPayment.applePay,
+                checkout.FormsOfPayment.applePay,
                 value ?? false,
               );
             },
