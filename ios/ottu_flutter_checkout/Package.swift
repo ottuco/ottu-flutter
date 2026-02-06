@@ -11,15 +11,13 @@ let package = Package(
         .library(name: "ottu-flutter-checkout", targets: ["ottu_flutter_checkout"])
     ],
     dependencies: [
-         .package(name: "ottu_checkout_sdk", path: "/Users/vi/Downloads/AS-Projects/ottu-ios"),
-         .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.57.0"),
+         .package(name: "ottu_checkout_sdk", url: "https://github.com/ottuco/ottu-ios", from: "2.1.10")
     ],
     targets: [
         .target(
             name: "ottu_flutter_checkout",
             dependencies: [
                 .product(name: "ottu_checkout_sdk", package: "ottu_checkout_sdk"),
-                .product(name: "Sentry", package: "sentry-cocoa")
             ],
             resources: [
                 .process("PrivacyInfo.xcprivacy"),
