@@ -47,10 +47,11 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
             print("CheckoutWidget, verifyPayment, result: ${result.runtimeType}");
             switch (result) {
               case Success():
-                return "" ;
-              case Failure(:final error): return PlatformException(code: "1", message: error);
+                return "";
+              case Failure(:final message):
+                throw PlatformException(code: _method_verify_payment, message: message);
               case null:
-                ;
+                throw PlatformException(code: _method_verify_payment, message: "Unknown error");
             }
           }
       }

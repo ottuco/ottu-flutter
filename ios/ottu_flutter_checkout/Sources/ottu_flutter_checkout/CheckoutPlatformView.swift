@@ -2,6 +2,7 @@ import Flutter
 import Foundation
 import SwiftUI
 import ottu_checkout_sdk
+import OSLog
 
 //
 //  CheckoutPlatformView.swift
@@ -17,6 +18,7 @@ private let _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT"
 private let _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT"
 private let _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT"
 private let _methodOnWidgetDetached = "METHOD_ON_WIDGET_DETACHED"
+private let _methodVerifyPayment = "METHOD_VERIFY_PAYMENT"
 
 public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let viewId: Int64
@@ -352,14 +354,63 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         return cht
     }
     
-    private func verifyPaymentCallback(_ payload: String?) async -> CardVerificationResult<Bool> {
-        Logger.app.info("OttuPaymentsViewController.verifyPaymentCallback, payload: \(String(describing: payload))")
-        let seconds = 2.0
-        try? await Task.sleep(nanoseconds: UInt64(seconds * Double(NSEC_PER_SEC)))
-        if failPaymentValidation {
-            return CardVerificationResult.failure("Cannot pay your order.\nPlease, check purchase information")
-        } else {
-            return CardVerificationResult.success(true)
+    private func verifyPaymentCallback(_ payload: String?) async
+        -> CardVerificationResult<Void>
+    {
+        return await withCheckedContinuation { continuation in
+            Logger.sdk.info("CheckoutPlatformView.verifyPaymentCallback")
+            DispatchQueue.main.async {
+                self.channelVerifyPayment.invokeMethod(
+                    _methodVerifyPayment,
+                    arguments: payload,
+                    result: { [weak self] (result) -> Void in
+                        if let data = result as? String {
+                            continuation.resume(
+                                returning: CardVerificationResult.success(())
+                            )
+                        } else if let error = result as? FlutterError {
+                            continuation.resume(
+                                returning: CardVerificationResult.failure(
+                                    error.message ?? "Unknown eror"
+                                )
+                            )
+                        } else if let res = result {
+                            if let nsObjectValue = res as? NSObject {
+                                if (nsObjectValue == FlutterMethodNotImplemented)
+                                {
+                                    continuation.resume(
+                                        returning:
+                                            CardVerificationResult.failure(
+                                                "Method not implemented"
+                                            )
+                                    )
+                                } else {
+                                    continuation.resume(
+                                        returning:
+                                            CardVerificationResult.failure(
+                                                "Unidentified error"
+                                            )
+                                    )
+                                }
+                            } else {
+                                continuation.resume(
+                                    returning:
+                                        CardVerificationResult.failure(
+                                            "Unidentified error"
+                                        )
+                                )
+                            }
+                        } else {
+                            continuation.resume(
+                                returning:
+                                    CardVerificationResult.failure(
+                                        "Unknown error"
+                                    )
+                            )
+                        }
+                    }
+                )
+            }
         }
     }
 }
@@ -370,9 +421,12 @@ extension CheckoutPlatformView: OttuDelegate {
         DispatchQueue.main
             .async {
                 if let message = data?.description {
-                    self.channel.invokeMethod(_methodPaymentErrorResult, arguments: message)
+                    self.channel.invokeMethod(
+                        _methodPaymentErrorResult,
+                        arguments: message
+                    )
                 }
-                
+
                 self.paymentViewController?.view.isHidden = true
                 self.paymentViewController?.view.setNeedsLayout()
                 self.paymentViewController?.view.layoutIfNeeded()
