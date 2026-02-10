@@ -7,7 +7,7 @@ import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 
 const _checkoutViewType = 'OttuCheckoutWidget';
 const _methodOnWidgetDetached = "METHOD_ON_WIDGET_DETACHED";
-const _method_verify_payment = "METHOD_VERIFY_PAYMENT";
+const _methodVerifyPayment = "METHOD_VERIFY_PAYMENT";
 const _methodChannel = MethodChannel('com.ottu.sample/checkout');
 const _methodChannelPaymentVerify = MethodChannel('com.ottu.sample/checkout/payment/verify');
 
@@ -19,7 +19,7 @@ class OttuCheckoutWidget extends StatefulWidget {
   final VerifyPaymentDelegate? _verifyPayment;
 
   const OttuCheckoutWidget(
-      {super.key, required this.arguments, VerifyPaymentDelegate? verifyPayment = null})
+      {super.key, required this.arguments, VerifyPaymentDelegate? verifyPayment})
       : _verifyPayment = verifyPayment;
 
   @override
@@ -41,7 +41,7 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
     _methodChannelPaymentVerify.setMethodCallHandler((call) async {
       print("CheckoutWidget, method call: ${call.method}");
       switch (call.method) {
-        case _method_verify_payment:
+        case _methodVerifyPayment:
           {
             final result = await widget._verifyPayment?.call(call.arguments);
             print("CheckoutWidget, verifyPayment, result: ${result.runtimeType}");
@@ -49,9 +49,9 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
               case Success():
                 return "";
               case Failure(:final message):
-                throw PlatformException(code: _method_verify_payment, message: message);
+                throw PlatformException(code: _methodVerifyPayment, message: message);
               case null:
-                throw PlatformException(code: _method_verify_payment, message: "Unknown error");
+                throw PlatformException(code: _methodVerifyPayment, message: "Unknown error");
             }
           }
       }
