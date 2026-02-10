@@ -263,6 +263,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const Text('Auto debit'),
                         ],
+                      ),Row(
+                        children: [
+                          Checkbox(
+                            checkColor: Colors.white,
+                            value: state.useCustomText ?? false,
+                            onChanged: (bool? value) {
+                              context.read<HomeScreenCubit>().onUseCustomTextChecked(value);
+                            },
+                          ),
+                          const Text('Use custom text'),
+                        ],
                       ),
                       Row(
                         children: [

@@ -15,4 +15,5 @@ struct CheckoutArguments: Decodable {
     let apiTransactionDetails: String?
     let formsOfPayment: [String]?
     let theme: CustomerTheme?
+    let payButtonText: PayButtonText?
 }

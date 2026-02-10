@@ -1,7 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
-import 'package:ottu_flutter_checkout/src/forms_of_payment.dart';
-import 'package:ottu_flutter_checkout/src/payment_options_display_settings.dart';
 
 part 'checkout_arguments.g.dart';
 
@@ -17,17 +15,20 @@ final class CheckoutArguments {
   String? setupPreload;
   final List<FormsOfPayment>? formsOfPayment;
   final CheckoutTheme? theme;
+  final PayButtonText? payButtonText;
 
-  CheckoutArguments(
-      {required this.merchantId,
-      required this.apiKey,
-      required this.sessionId,
-      required this.amount,
-      required this.showPaymentDetails,
-      required this.paymentOptionsDisplaySettings,
-      this.setupPreload,
-      this.formsOfPayment,
-      this.theme});
+  CheckoutArguments({
+    required this.merchantId,
+    required this.apiKey,
+    required this.sessionId,
+    required this.amount,
+    required this.showPaymentDetails,
+    required this.paymentOptionsDisplaySettings,
+    this.setupPreload,
+    this.formsOfPayment,
+    this.theme,
+    this.payButtonText,
+  });
 
   factory CheckoutArguments.fromJson(Map<String, dynamic> json) =>
       _$CheckoutArgumentsFromJson(json);

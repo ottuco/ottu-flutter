@@ -15,4 +15,5 @@ data class CheckoutArguments(
     val formsOfPayment: List<String>?,
     val theme: CustomerTheme?,
     val paymentOptionsDisplaySettings: PaymentOptionsDisplaySettings,
+    val payButtonText: PayButtonText?,
 )

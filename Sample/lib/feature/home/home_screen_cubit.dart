@@ -15,7 +15,10 @@ import 'package:ottu_flutter_checkout_sample/api/ottu_api.dart';
 import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_state.dart';
 import 'package:ottu_flutter_checkout_sample/main.dart';
 
-const merchantId = String.fromEnvironment('MERCHANT_ID', defaultValue: "add your merchant Id there");
+const merchantId = String.fromEnvironment(
+  'MERCHANT_ID',
+  defaultValue: "add your merchant Id there",
+);
 const apiKey = String.fromEnvironment('API_KEY', defaultValue: "add your Api key there");
 const customerId = "john2";
 const currencyCode = "KWD";
@@ -175,6 +178,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     emit(state.copyWith(isAutoDebit: isChecked));
   }
 
+  void onUseCustomTextChecked(bool? isChecked) {
+    emit(state.copyWith(useCustomText: isChecked));
+  }
+
   void onAmountChanged(String amount) async {
     emit(state.copyWith(amount: amount));
   }
@@ -250,6 +257,9 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       setupPreload: state.preloadPayload == true ? _apiTransactionDetails : null,
       formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
       theme: _theme,
+      payButtonText: state.useCustomText == true
+          ? PayButtonText(en: "Checkout", ar: "الدفع")
+          : null,
     );
     _navigator.push(
       "/checkout",
