@@ -22,6 +22,7 @@ import com.ottu.flutter.checkout.ext.toCheckoutRipple
 import com.ottu.flutter.checkout.ext.toCheckoutSwitch
 import com.ottu.flutter.checkout.ext.toCheckoutText
 import com.ottu.flutter.checkout.ext.toCheckoutTextField
+import com.ottu.flutter.checkout.ext.toPayButtonText
 import com.squareup.moshi.JsonAdapter
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
@@ -202,7 +203,8 @@ internal class CheckoutView(
                             errorData.toString()
                         )
                     },
-                    verifyPayment = ::verifyPayment
+                    verifyPayment = ::verifyPayment,
+                    payButtonText = arguments.payButtonText?.toPayButtonText(),
                 )
 
                 onInitialized(sdkFragment)

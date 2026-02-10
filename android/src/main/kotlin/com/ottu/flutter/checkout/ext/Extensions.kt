@@ -7,12 +7,14 @@ import com.ottu.checkout.ui.theme.CheckoutTheme
 import com.ottu.flutter.checkout.ButtonComponent
 import com.ottu.flutter.checkout.ColorState
 import com.ottu.flutter.checkout.Margins
+import com.ottu.flutter.checkout.PayButtonText
 import com.ottu.flutter.checkout.RippleColor
 import com.ottu.flutter.checkout.SwitchComponent
 import com.ottu.flutter.checkout.TextFieldStyle
 import com.ottu.flutter.checkout.TextStyle
 import java.lang.Exception
 import com.ottu.checkout.ui.theme.style.Margins as CheckoutMargins
+import com.ottu.checkout.data.model.localization.PayButtonText as pbt
 
 fun String.toColor() = this.let {
     try {
@@ -74,3 +76,5 @@ fun SwitchComponent.toCheckoutSwitch() = CheckoutTheme.Switch(
     checkedTrackDecorationColor = this.checkedTrackDecorationColor?.toColor(),
     uncheckedTrackDecorationColor = this.uncheckedTrackDecorationColor?.toColor()
 )
+
+fun PayButtonText.toPayButtonText() = pbt(en = en, ar = ar)

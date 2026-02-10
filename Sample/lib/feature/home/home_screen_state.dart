@@ -21,6 +21,7 @@ final class HomeScreenState extends Equatable {
   final bool? isAutoDebit;
   final bool hasSessionLoaded;
   final bool? failPaymentValidation;
+  final bool useCustomText;
   final PaymentOptionsDisplayMode? paymentOptionsDisplayMode;
   final Map<FormsOfPayment, bool>? formsOfPaymentChecked;
   final Map<PGCode, bool>? pgCodesChecked;
@@ -45,6 +46,7 @@ final class HomeScreenState extends Equatable {
     this.paymentOptionsDisplayMode,
     this.formsOfPaymentChecked,
     this.pgCodesChecked,
+    this.useCustomText = false,
   });
 
   HomeScreenState copyWith({
@@ -64,6 +66,7 @@ final class HomeScreenState extends Equatable {
     bool? isAutoDebit,
     bool? hasSessionLoaded,
     bool? failPaymentValidation,
+    bool? useCustomText,
     PaymentOptionsDisplayMode? paymentOptionsDisplayMode,
     Map<FormsOfPayment, bool>? formsOfPaymentChecked,
     Map<PGCode, bool>? pgCodesChecked,
@@ -84,6 +87,7 @@ final class HomeScreenState extends Equatable {
       preloadPayload: preloadPayload ?? this.preloadPayload,
       isAutoDebit: isAutoDebit ?? this.isAutoDebit,
       failPaymentValidation: failPaymentValidation ?? this.failPaymentValidation,
+      useCustomText: useCustomText ?? this.useCustomText,
       hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
       paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
       formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
@@ -107,6 +111,7 @@ final class HomeScreenState extends Equatable {
     preloadPayload,
     isAutoDebit,
     failPaymentValidation,
+    useCustomText,
     phoneNumber,
     hasSessionLoaded,
     paymentOptionsDisplayMode?.name,

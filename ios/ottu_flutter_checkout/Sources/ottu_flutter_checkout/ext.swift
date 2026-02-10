@@ -9,18 +9,20 @@ import SwiftUI
 import UIKit
 import ottu_checkout_sdk
 
+internal typealias SDKPayButtonText = ottu_checkout_sdk.PayButtonText
+
 extension ColorState {
     public func toUIColors() -> (color: UIColor?, disabledColor: UIColor?) {
         let ucNormal: UIColor? =
-        if self.color != nil {
-            UIColor(hexString: self.color!)
-        } else { nil }
-        
+            if self.color != nil {
+                UIColor(hexString: self.color!)
+            } else { nil }
+
         let ucDisabled: UIColor? =
-        if self.colorDisabled != nil {
-            UIColor(hexString: self.colorDisabled!)
-        } else { nil }
-        
+            if self.colorDisabled != nil {
+                UIColor(hexString: self.colorDisabled!)
+            } else { nil }
+
         return (ucNormal, ucDisabled)
     }
 }
@@ -28,30 +30,33 @@ extension ColorState {
 extension String {
     public func toUIColor() -> UIColor? {
         let ucNormal: UIColor? =
-        if self != nil {
-            UIColor(hexString: self)
-        } else { nil }
+            if self != nil {
+                UIColor(hexString: self)
+            } else { nil }
         return ucNormal
     }
 }
 
 extension TextStyle {
-    public func toLabelComponent(ofSize fontSize: CGFloat, weight: UIFont.Weight? = nil) -> LabelComponent? {
+    public func toLabelComponent(
+        ofSize fontSize: CGFloat,
+        weight: UIFont.Weight? = nil
+    ) -> LabelComponent? {
         let labelComponent = LabelComponent()
         if let color = self.textColor?.toUIColors() {
             if let cc = color.color {
                 labelComponent.color = cc
             }
         }
-        
-        var size:CGFloat = fontSize
+
+        var size: CGFloat = fontSize
         if let fs = self.fontSize {
             size = CGFloat(integerLiteral: fs)
         }
-        
+
         if let ff = self.fontFamily {
-        if let customFont = UIFont(name: ff, size: size) {
-            labelComponent.font = customFont
+            if let customFont = UIFont(name: ff, size: size) {
+                labelComponent.font = customFont
             } else {
                 if let fw = weight {
                     labelComponent.font = .systemFont(ofSize: size, weight: fw)
@@ -66,7 +71,7 @@ extension TextStyle {
                 labelComponent.font = .systemFont(ofSize: size)
             }
         }
-        
+
         return labelComponent
     }
 }
@@ -74,7 +79,8 @@ extension TextStyle {
 extension UIColor {
     convenience init(hexString: String) {
         let hex = hexString.trimmingCharacters(
-            in: CharacterSet.alphanumerics.inverted)
+            in: CharacterSet.alphanumerics.inverted
+        )
         var int = UInt64()
         Scanner(string: hex).scanHexInt64(&int)
         let a: UInt64
@@ -96,8 +102,11 @@ extension UIColor {
             (a, r, g, b) = (255, 0, 0, 0)
         }
         self.init(
-            red: CGFloat(r) / 255, green: CGFloat(g) / 255,
-            blue: CGFloat(b) / 255, alpha: CGFloat(a) / 255)
+            red: CGFloat(r) / 255,
+            green: CGFloat(g) / 255,
+            blue: CGFloat(b) / 255,
+            alpha: CGFloat(a) / 255
+        )
     }
 }
 
@@ -141,24 +150,24 @@ extension TextFieldStyle {
         let tfc = TextFieldComponent()
         let label = LabelComponent()
         let text = LabelComponent()
-        
+
         let textStyleColor = self.text?.textColor
-        
+
         if let textColors = textStyleColor?.toUIColors() {
             if let color = textColors.color {
                 label.color = color
                 text.color = color
             }
         }
-        
+
         //primaryColor = this.primaryColor?.toCheckoutColor(),
         //focusedColor = this.focusedColor?.toCheckoutColor(),
         //text = this.text?.toCheckoutText(),
         //error = this.error?.toCheckoutText()
-        
+
         tfc.label = label
         tfc.text = text
-        
+
         return tfc
     }
 }
@@ -177,38 +186,38 @@ extension Margins {
 extension ButtonCmt {
     public func toCheckoutButton() -> ButtonComponent {
         let bc = ButtonComponent()
-        
+
         let textColors = self.textColor?.toUIColors()
         let buttonColor = self.rippleColor?.color?.toUIColor()
         let buttonDisabledColor = self.rippleColor?.colorDisabled?.toUIColor()
         let fontType = self.fontType
-        
+
         if let btnC = buttonColor {
             bc.enabledBackgroundColor = btnC
         }
-        
+
         if let btnDC = buttonDisabledColor {
             bc.disabledBackgroundColor = btnDC
         }
-        
+
         if let textColorNormal = textColors?.color {
             bc.enabledTitleColor = textColorNormal
         }
         if let textColorDisabled = textColors?.disabledColor {
             bc.disabledTitleColor = textColorDisabled
         }
-        
+
         return bc
     }
 }
 
 extension SwitchComponent {
     public func toCheckoutSwitch() -> UIColor? {
-        
+
         return if self.checkedThumbTintColor != nil {
             UIColor(hexString: self.checkedThumbTintColor!)
         } else { nil }
-        
+
         //        CheckoutTheme.Switch(
         //    checkedThumbTintColor = this.checkedThumbTintColor?.toColor(),
         //    uncheckedThumbTintColor = this.uncheckedThumbTintColor?.toColor(),
@@ -219,5 +228,13 @@ extension SwitchComponent {
         //
         //
         //
+    }
+}
+
+extension PayButtonText {
+    internal func toPayButtonText() -> SDKPayButtonText? {
+        return if self != nil {
+            SDKPayButtonText(en: self.en, ar: self.ar)
+        } else { nil }
     }
 }

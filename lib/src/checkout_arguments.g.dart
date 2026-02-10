@@ -22,6 +22,10 @@ CheckoutArguments _$CheckoutArgumentsFromJson(Map<String, dynamic> json) =>
       theme: json['theme'] == null
           ? null
           : CheckoutTheme.fromJson(json['theme'] as Map<String, dynamic>),
+      payButtonText: json['payButtonText'] == null
+          ? null
+          : PayButtonText.fromJson(
+              json['payButtonText'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
@@ -37,6 +41,7 @@ Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
           ?.map((e) => _$FormsOfPaymentEnumMap[e]!)
           .toList(),
       'theme': instance.theme,
+      'payButtonText': instance.payButtonText,
     };
 
 const _$FormsOfPaymentEnumMap = {
