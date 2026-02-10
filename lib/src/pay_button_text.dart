@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'pay_button_text.g.dart';
 
 /**
@@ -11,16 +12,7 @@ final class PayButtonText {
 
   PayButtonText({required this.en, required this.ar});
 
-  factory PayButtonText.fromJson(Map<String, dynamic> json) =>
-      _$PayButtonTextFromJson(json);
+  factory PayButtonText.fromJson(Map<String, dynamic> json) => _$PayButtonTextFromJson(json);
 
   Map<String, dynamic> toJson() => _$PayButtonTextToJson(this);
 }
-/*
-  extention Language on PayButtonText {
-  forLanguage(String language) =
-switch (language) {
-case "en" : en;
-case "ar" : ar;
-}
-}*/
