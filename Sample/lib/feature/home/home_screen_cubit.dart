@@ -68,8 +68,6 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
                  PGCode.knet: true,
                  PGCode.benefit: true,
                  PGCode.benefitpay: true,
-                 PGCode.benefitRedirect: true,
-                 PGCode.pgAlphaBaulk: true,
                  PGCode.stc_pay: true,
                  PGCode.nbk_mpgs: true,
                  //PGCode.urpay: true,
