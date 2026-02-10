@@ -9,12 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.ottu.checkout.Checkout
+import com.ottu.checkout.data.model.payment.CardVerificationResult
 import com.ottu.checkout.network.model.payment.TransactionDetails
 import com.ottu.checkout.network.moshi.MoshiFactory
-import com.ottu.checkout.ui.base.CheckoutSdkFragment
 import com.ottu.checkout.ui.theme.CheckoutTheme
 import com.ottu.flutter.checkout.ext.toCheckoutButton
 import com.ottu.flutter.checkout.ext.toCheckoutColor
@@ -30,6 +30,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
@@ -39,7 +40,9 @@ private const val METHOD_CHECKOUT_HEIGHT = "METHOD_CHECKOUT_HEIGHT"
 private const val METHOD_PAYMENT_SUCCESS_RESULT = "METHOD_PAYMENT_SUCCESS_RESULT"
 private const val METHOD_PAYMENT_ERROR_RESULT = "METHOD_PAYMENT_ERROR_RESULT"
 private const val METHOD_PAYMENT_CANCEL_RESULT = "METHOD_PAYMENT_CANCEL_RESULT"
-const val CHANNEL = "com.ottu.sample/checkout"
+private const val METHOD_VERIFY_PAYMENT = "METHOD_VERIFY_PAYMENT"
+private const val CHANNEL = "com.ottu.sample/checkout"
+private const val CHANNEL_PAYMENT_VERIFY = "com.ottu.sample/checkout/payment/verify"
 private const val TAG = "CheckoutView"
 
 private val sessionCoroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
@@ -54,6 +57,8 @@ private val coroutineScope = CoroutineScope(
 
 private val isCheckoutInitializing = AtomicBoolean(false)
 
+private const val defaultCheckoutPadding = 40
+
 internal class CheckoutView(
     messenger: BinaryMessenger,
     id: Int,
@@ -61,6 +66,7 @@ internal class CheckoutView(
     private val arguments: CheckoutArguments,
 ) : PlatformView {
     private val methodChannel: MethodChannel
+    private val methodChannelVerifyPayment: MethodChannel
 
     private val checkoutView: FrameLayout = LayoutInflater.from(context)
         .inflate(R.layout.fragment_checkout_wrapper_view, null) as FrameLayout
@@ -73,6 +79,7 @@ internal class CheckoutView(
         )
         checkoutView.layoutParams = vParams
         methodChannel = MethodChannel(messenger, CHANNEL)
+        methodChannelVerifyPayment = MethodChannel(messenger, CHANNEL_PAYMENT_VERIFY)
     }
 
     override fun getView(): View = checkoutView
@@ -113,11 +120,11 @@ internal class CheckoutView(
                     checkoutView.findViewById<ScrollView>(R.id.checkout_fragment_container_scroll)
                 val maxScroll = scroll.maxScrollAmount
                 val density = checkoutView.context.resources.displayMetrics.density
-                val px = ((height + 40) / density).toInt()
+                val height = ((height + defaultCheckoutPadding) / density).toInt()
                 Log.d(
-                    TAG, "addOnLayoutChangeListener, height in px: $px, max scroll: $maxScroll"
+                    TAG, "addOnLayoutChangeListener, height in px: $height, max scroll: $maxScroll"
                 )
-                methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, px)
+                methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, height)
             })
     }
 
@@ -195,6 +202,7 @@ internal class CheckoutView(
                             errorData.toString()
                         )
                     },
+                    verifyPayment = ::verifyPayment
                 )
 
                 onInitialized(sdkFragment)
@@ -205,6 +213,30 @@ internal class CheckoutView(
                 isCheckoutInitializing.set(false)
             }
         }
+    }
+
+    private suspend fun verifyPayment(payload: String?): CardVerificationResult<Nothing> {
+        val deferredResult = CompletableDeferred<CardVerificationResult<Nothing>>()
+        methodChannelVerifyPayment.invokeMethod(
+            METHOD_VERIFY_PAYMENT,
+            payload,
+            object : MethodChannel.Result {
+                override fun success(result: Any?) {
+                    Log.i(TAG, "verifyPayment, success")
+                    deferredResult.complete(CardVerificationResult.Success(null))
+                }
+
+                override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {
+                    Log.e(TAG, "verifyPayment, error")
+                    deferredResult.complete(CardVerificationResult.Failure(errorMessage ?: ""))
+                }
+
+                override fun notImplemented() {
+                    deferredResult.complete(CardVerificationResult.Failure("Unable to find merchant Application"))
+                }
+            })
+
+        return deferredResult.await()
     }
 
     private fun handleInitException(e: Exception) {
@@ -224,10 +256,11 @@ internal class CheckoutView(
         val title = context.getString(R.string.failed)
         val ok = context.getString(R.string.ok)
 
-        initializerErrorDialog = AlertDialog.Builder(context).setMessage(message).setTitle(title)
-            .setPositiveButton(ok) { intfc, _ ->
-                intfc.dismiss()
-            }.create()
+        initializerErrorDialog =
+            AlertDialog.Builder(context).setMessage(message).setTitle(title)
+                .setPositiveButton(ok) { intfc, _ ->
+                    intfc.dismiss()
+                }.create()
         initializerErrorDialog?.show()
 
     }
@@ -253,8 +286,9 @@ internal class CheckoutView(
         packageName: String,
     ): CheckoutTheme {
 
-        return CheckoutTheme(uiMode = CheckoutTheme.UiMode.entries.find { mode -> mode.name.lowercase() == checkoutArguments.theme?.uiMode }
-            ?: CheckoutTheme.UiMode.AUTO,
+        return CheckoutTheme(
+            uiMode = CheckoutTheme.UiMode.entries.find { mode -> mode.name.lowercase() == checkoutArguments.theme?.uiMode }
+                ?: CheckoutTheme.UiMode.AUTO,
             showPaymentDetails = checkoutArguments.showPaymentDetails,
             appearanceLight = checkoutArguments.theme?.run {
                 CheckoutTheme.Appearance(
@@ -270,7 +304,10 @@ internal class CheckoutView(
                     dataLabelText = dataLabelText?.toCheckoutText(resources, packageName),
                     dataValueText = dataValueText?.toCheckoutText(resources, packageName),
                     errorMessageText = errorMessageText?.toCheckoutText(resources, packageName),
-                    inputTextField = inputTextField?.toCheckoutTextField(resources, packageName),
+                    inputTextField = inputTextField?.toCheckoutTextField(
+                        resources,
+                        packageName
+                    ),
                     sdkBackgroundColor = sdkBackgroundColor?.toCheckoutColor(),
                     selectPaymentMethodHeaderBackgroundColor = selectPaymentMethodHeaderBackgroundColor?.toCheckoutColor(),
                     modalBackgroundColor = modalBackgroundColor?.toCheckoutColor(),
@@ -297,7 +334,10 @@ internal class CheckoutView(
                     dataLabelText = dataLabelText?.toCheckoutText(resources, packageName),
                     dataValueText = dataValueText?.toCheckoutText(resources, packageName),
                     errorMessageText = errorMessageText?.toCheckoutText(resources, packageName),
-                    inputTextField = inputTextField?.toCheckoutTextField(resources, packageName),
+                    inputTextField = inputTextField?.toCheckoutTextField(
+                        resources,
+                        packageName
+                    ),
                     sdkBackgroundColor = sdkBackgroundColor?.toCheckoutColor(),
                     selectPaymentMethodHeaderBackgroundColor = selectPaymentMethodHeaderBackgroundColor?.toCheckoutColor(),
                     modalBackgroundColor = modalBackgroundColor?.toCheckoutColor(),

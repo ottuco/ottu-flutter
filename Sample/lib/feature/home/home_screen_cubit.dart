@@ -68,8 +68,6 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
                  PGCode.knet: true,
                  PGCode.benefit: true,
                  PGCode.benefitpay: true,
-                 PGCode.benefitRedirect: true,
-                 PGCode.pgAlphaBaulk: true,
                  PGCode.stc_pay: true,
                  PGCode.nbk_mpgs: true,
                  //PGCode.urpay: true,
@@ -223,6 +221,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     );
   }
 
+  void onFailPaymentValidation(bool? isChecked) {
+    emit(state.copyWith(failPaymentValidation: isChecked == true));
+  }
+
   void onPay() async {
     _logger.d("onPay");
     final amount = state.amount != null ? double.tryParse(state.amount!) ?? 0.1 : 0.1;
@@ -249,7 +251,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
       theme: _theme,
     );
-    _navigator.push("/checkout", extra: args);
+    _navigator.push(
+      "/checkout",
+      extra: {"args": args, "failPaymentValidation": state.failPaymentValidation ?? false},
+    );
   }
 
   void onThemeCustomization() async {
