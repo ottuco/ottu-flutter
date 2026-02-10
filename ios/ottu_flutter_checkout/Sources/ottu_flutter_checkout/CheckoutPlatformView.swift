@@ -161,7 +161,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         var apiTransactionDetails: TransactionDetailsResponse?
         if let transactionDetails: String? = arguments.apiTransactionDetails {
             if let td = transactionDetails {
-                apiTransactionDetails = try! getApiTransactionDetails(td)
+                apiTransactionDetails = try? getApiTransactionDetails(td)
             }
         }
         do {
@@ -371,7 +371,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                         } else if let error = result as? FlutterError {
                             continuation.resume(
                                 returning: CardVerificationResult.failure(
-                                    error.message ?? "Unknown eror"
+                                    error.message ?? "Unknown error"
                                 )
                             )
                         } else if let res = result {

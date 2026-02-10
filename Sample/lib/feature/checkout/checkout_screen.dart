@@ -146,7 +146,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       logger.d("verifyPayment, fail verification: ${widget.failPaymentValidation}");
       return widget.failPaymentValidation
           ? CardVerificationResult.failure(
-              "Cannot pay your order.\n" + "Please, check purchase information",
+              "Cannot pay your order.\nPlease, check purchase information",
             )
           : CardVerificationResult.success();
     });

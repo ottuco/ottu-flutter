@@ -57,6 +57,8 @@ private val coroutineScope = CoroutineScope(
 
 private val isCheckoutInitializing = AtomicBoolean(false)
 
+private const val defaultCheckoutPadding = 40
+
 internal class CheckoutView(
     messenger: BinaryMessenger,
     id: Int,
@@ -118,11 +120,11 @@ internal class CheckoutView(
                     checkoutView.findViewById<ScrollView>(R.id.checkout_fragment_container_scroll)
                 val maxScroll = scroll.maxScrollAmount
                 val density = checkoutView.context.resources.displayMetrics.density
-                val px = ((height + 40) / density).toInt()
+                val height = ((height + defaultCheckoutPadding) / density).toInt()
                 Log.d(
-                    TAG, "addOnLayoutChangeListener, height in px: $px, max scroll: $maxScroll"
+                    TAG, "addOnLayoutChangeListener, height in px: $height, max scroll: $maxScroll"
                 )
-                methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, px)
+                methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, height)
             })
     }
 

@@ -1,11 +1,11 @@
 /**
- *  Results class encapsulates successful outcome with a value of type [T]
+ *  Result class encapsulates successful outcome with a value of type [T]
  *  or a failure with message.
  */
 sealed class CardVerificationResult<T, E> {
   const CardVerificationResult();
 
-  factory CardVerificationResult.success({T? value = null}) => Success(value);
+  factory CardVerificationResult.success({T? value}) => Success(value);
 
   factory CardVerificationResult.failure(E message) => Failure(message);
 }
