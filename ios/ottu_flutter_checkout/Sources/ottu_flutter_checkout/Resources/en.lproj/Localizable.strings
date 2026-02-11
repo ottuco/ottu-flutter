@@ -1,4 +1,0 @@
-configuration_error = "Configuration Error";
-failed = "Failed";
-failed_start_payment = "The specified number of visible payment options is invalid. Please ensure it falls within the supported range.";
-ok ="OK";
