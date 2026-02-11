@@ -117,17 +117,17 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         {
             let title = NSLocalizedString(
                 "failed",
-                bundle: Bundle.module,
+                bundle: Bundle.main,
                 comment: "title of the dialog"
             )
             let message = NSLocalizedString(
                 "failed_start_payment",
-                bundle: Bundle.module,
+                bundle: Bundle.main,
                 comment: "messafe of the dialog"
             )
             let ok = NSLocalizedString(
                 "ok",
-                bundle: Bundle.module,
+                bundle: Bundle.main,
                 comment: "button label"
             )
 
