@@ -9,6 +9,7 @@ import 'package:ottu_flutter_checkout_sample/feature/home/home_module.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_module.dart';
 import 'package:ottu_flutter_checkout_sample/util/transformation_notifier.dart';
 import 'package:provider/provider.dart';
+import 'l10n/app_localizations.dart';
 
 import 'di/Module.dart';
 
@@ -56,6 +57,7 @@ class OttuApp extends StatelessWidget {
             themeMode: mode,
             supportedLocales: [Locale('ar'), Locale('en')],
             localizationsDelegates: const [
+              AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,

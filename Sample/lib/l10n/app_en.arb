@@ -1,0 +1,6 @@
+{
+  "prepaymentFailureMessage": "Cannot pay your order.\nPlease, check purchase information",
+  "@prepaymentFailureMessage": {
+    "description": "This message will be showed when payment validation had been failed"
+  }
+}

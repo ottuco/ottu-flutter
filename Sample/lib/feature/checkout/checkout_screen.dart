@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/src/painting/text_style.dart' as ts;
 import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
+import 'package:ottu_flutter_checkout_sample/l10n/app_localizations.dart';
 
 const _defaultCheckoutViewHeight = 200;
 const _methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT";
@@ -29,8 +30,10 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final ValueNotifier<int> _checkoutHeight = ValueNotifier<int>(_defaultCheckoutViewHeight);
-  final ValueNotifier<(String, String)> _checkoutMessage =
-      ValueNotifier<(String, String)>(("", ""));
+  final ValueNotifier<(String, String)> _checkoutMessage = ValueNotifier<(String, String)>((
+    "",
+    "",
+  ));
 
   final logger = Logger();
 
@@ -145,9 +148,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Future.delayed(Duration(seconds: 2)).then((_) {
       logger.d("verifyPayment, fail verification: ${widget.failPaymentValidation}");
       return widget.failPaymentValidation
-          ? CardVerificationResult.failure(
-              "Cannot pay your order.\nPlease, check purchase information",
-            )
+          ? CardVerificationResult.failure(AppLocalizations.of(context)!.prepaymentFailureMessage)
           : CardVerificationResult.success();
     });
   }
