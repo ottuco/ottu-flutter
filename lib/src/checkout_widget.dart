@@ -47,54 +47,61 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   final ValueNotifier<int> _checkoutHeight = ValueNotifier<int>(_defaultCheckoutViewHeight);
 
   @override
+  void initState() {
+    super.initState();
+    _methodChannel.setMethodCallHandler(_handleChannelMethod);
+  }
+
+  @override
   void dispose() {
-    print("OttuCheckoutWidget.dispose()");
+    if (kDebugMode) {
+      print("OttuCheckoutWidget.dispose()");
+    }
+    _methodChannel.setMethodCallHandler(null);
     _methodChannel.invokeMethod(_methodOnWidgetDetached);
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _methodChannel.setMethodCallHandler((call) async {
-      switch (call.method) {
-        case _methodCheckoutHeight:
-          {
-            int height = call.arguments as int;
-            _checkoutHeight.value = height;
-          }
-        case _methodPaymentSuccessResult:
-          {
-            String message = call.arguments as String;
-            widget._successCallback?.call(message);
-          }
+  Future<dynamic> _handleChannelMethod(call) async {
+    switch (call.method) {
+      case _methodCheckoutHeight:
+        {
+          int height = call.arguments as int;
+          _checkoutHeight.value = height;
+        }
+      case _methodPaymentSuccessResult:
+        {
+          String message = call.arguments as String;
+          widget._successCallback?.call(message);
+        }
 
-        case _methodPaymentCancelResult:
-          {
-            String message = call.arguments as String;
-            widget._cancelCallback?.call(message);
-          }
+      case _methodPaymentCancelResult:
+        {
+          String message = call.arguments as String;
+          widget._cancelCallback?.call(message);
+        }
 
-        case _methodPaymentErrorResult:
-          {
-            String message = call.arguments as String;
-            widget._errorCallback?.call(message);
-          }
-        case _methodVerifyPayment:
-          {
-            final result = await widget._verifyPayment?.call(call.arguments);
+      case _methodPaymentErrorResult:
+        {
+          String message = call.arguments as String;
+          widget._errorCallback?.call(message);
+        }
+      case _methodVerifyPayment:
+        {
+          final result = await widget._verifyPayment?.call(call.arguments);
+          if (kDebugMode) {
             print("CheckoutWidget, verifyPayment, result: ${result.runtimeType}");
-            switch (result) {
-              case Success():
-                return "";
-              case Failure(:final message):
-                throw PlatformException(code: _methodVerifyPayment, message: message);
-              case null:
-                throw PlatformException(code: _methodVerifyPayment, message: "Unknown error");
-            }
           }
-      }
-    });
+          switch (result) {
+            case Success():
+              return "";
+            case Failure(:final message):
+              throw PlatformException(code: _methodVerifyPayment, message: message);
+            case null:
+              throw PlatformException(code: _methodVerifyPayment, message: "Unknown error");
+          }
+        }
+    }
   }
 
   @override
