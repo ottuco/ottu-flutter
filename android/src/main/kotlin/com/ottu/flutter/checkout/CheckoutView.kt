@@ -41,9 +41,9 @@ private const val METHOD_CHECKOUT_HEIGHT = "METHOD_CHECKOUT_HEIGHT"
 private const val METHOD_PAYMENT_SUCCESS_RESULT = "METHOD_PAYMENT_SUCCESS_RESULT"
 private const val METHOD_PAYMENT_ERROR_RESULT = "METHOD_PAYMENT_ERROR_RESULT"
 private const val METHOD_PAYMENT_CANCEL_RESULT = "METHOD_PAYMENT_CANCEL_RESULT"
+private const val METHOD_ON_WIDGET_DETACHED = "METHOD_ON_WIDGET_DETACHED"
 private const val METHOD_VERIFY_PAYMENT = "METHOD_VERIFY_PAYMENT"
 private const val CHANNEL = "com.ottu.sample/checkout"
-private const val CHANNEL_PAYMENT_VERIFY = "com.ottu.sample/checkout/payment/verify"
 private const val TAG = "CheckoutView"
 
 private val sessionCoroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
@@ -67,8 +67,6 @@ internal class CheckoutView(
     private val arguments: CheckoutArguments,
 ) : PlatformView {
     private val methodChannel: MethodChannel
-    private val methodChannelVerifyPayment: MethodChannel
-
     private val checkoutView: FrameLayout = LayoutInflater.from(context)
         .inflate(R.layout.fragment_checkout_wrapper_view, null) as FrameLayout
 
@@ -80,7 +78,6 @@ internal class CheckoutView(
         )
         checkoutView.layoutParams = vParams
         methodChannel = MethodChannel(messenger, CHANNEL)
-        methodChannelVerifyPayment = MethodChannel(messenger, CHANNEL_PAYMENT_VERIFY)
     }
 
     override fun getView(): View = checkoutView
@@ -94,6 +91,14 @@ internal class CheckoutView(
 
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
+
+        methodChannel.setMethodCallHandler { call, _ ->
+            when (call.method) {
+                METHOD_ON_WIDGET_DETACHED -> {
+                    Log.d(TAG, "onFlutterViewAttached, handle onWidgetDetached")
+                }
+            }
+        }
 
         Log.i(TAG, "onFlutterViewAttached, isCheckoutInitializing: ${isCheckoutInitializing.get()}")
         if (isCheckoutInitializing.getAndSet(true).not()) {
@@ -219,7 +224,7 @@ internal class CheckoutView(
 
     private suspend fun verifyPayment(payload: String?): CardVerificationResult<Nothing> {
         val deferredResult = CompletableDeferred<CardVerificationResult<Nothing>>()
-        methodChannelVerifyPayment.invokeMethod(
+        methodChannel.invokeMethod(
             METHOD_VERIFY_PAYMENT,
             payload,
             object : MethodChannel.Result {

@@ -12,8 +12,6 @@ import ottu_checkout_sdk
 //
 
 private let checkoutChannelName = "com.ottu.sample/checkout"
-private let checkoutVerifyPaymentChannelName =
-    "com.ottu.sample/checkout/payment/verify"
 private let methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT"
 private let _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT"
 private let _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT"
@@ -24,7 +22,6 @@ private let _methodVerifyPayment = "METHOD_VERIFY_PAYMENT"
 public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let viewId: Int64
     private let channel: FlutterMethodChannel
-    private let channelVerifyPayment: FlutterMethodChannel
     private let _view: CheckoutContainerView
     private weak var paymentViewController: UIViewController?
     private var checkout: Checkout?
@@ -56,10 +53,6 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         self.viewId = viewId
         self.channel = FlutterMethodChannel(
             name: checkoutChannelName,
-            binaryMessenger: messenger
-        )
-        self.channelVerifyPayment = FlutterMethodChannel(
-            name: checkoutVerifyPaymentChannelName,
             binaryMessenger: messenger
         )
         _view = CheckoutContainerView()
@@ -426,7 +419,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         return await withCheckedContinuation { continuation in
             Logger.sdk.info("CheckoutPlatformView.verifyPaymentCallback")
             DispatchQueue.main.async {
-                self.channelVerifyPayment.invokeMethod(
+                self.channel.invokeMethod(
                     _methodVerifyPayment,
                     arguments: payload,
                     result: { [weak self] (result) -> Void in
