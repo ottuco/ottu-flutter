@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/src/painting/text_style.dart' as ts;
 import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/l10n/app_localizations.dart';
-
-const _defaultCheckoutViewHeight = 200;
-const _methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT";
-const _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT";
-const _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT";
-const _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT";
-const _methodChannel = MethodChannel('com.ottu.sample/checkout');
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({
@@ -29,7 +21,6 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  final ValueNotifier<int> _checkoutHeight = ValueNotifier<int>(_defaultCheckoutViewHeight);
   final ValueNotifier<(String, String)> _checkoutMessage = ValueNotifier<(String, String)>((
     "",
     "",
@@ -47,41 +38,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void dispose() {
     super.dispose();
     _checkoutMessage.removeListener(_showMessageDialog);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _methodChannel.setMethodCallHandler((call) async {
-      switch (call.method) {
-        case _methodCheckoutHeight:
-          {
-            int height = call.arguments as int;
-            logger.d("didChangeDependencies, height: $height");
-            _checkoutHeight.value = height;
-          }
-        case _methodPaymentSuccessResult:
-          {
-            String message = call.arguments as String;
-            logger.d("didChangeDependencies, success: $message");
-            _checkoutMessage.value = ("Success", message);
-          }
-
-        case _methodPaymentCancelResult:
-          {
-            String message = call.arguments as String;
-            logger.d("didChangeDependencies, cancel: $message");
-            _checkoutMessage.value = ("Cancel", message);
-          }
-
-        case _methodPaymentErrorResult:
-          {
-            String message = call.arguments as String;
-            logger.d("didChangeDependencies, error: $message");
-            _checkoutMessage.value = ("Error", message);
-          }
-      }
-    });
   }
 
   @override
@@ -111,17 +67,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             //End of Merchant content
             Padding(
               padding: const EdgeInsets.all(12.0),
-              child: ValueListenableBuilder<int>(
-                builder: (BuildContext context, int height, Widget? child) {
-                  return SizedBox(
-                    height: height.toDouble(),
-                    child: OttuCheckoutWidget(
-                      arguments: widget.checkoutArguments,
-                      verifyPayment: _verifyPayment,
-                    ),
-                  );
-                },
-                valueListenable: _checkoutHeight,
+              child: OttuCheckoutWidget(
+                arguments: widget.checkoutArguments,
+                verifyPayment: _verifyPayment,
+                successCallback: (message) => _checkoutMessage.value = ("Success", message),
+                cancelCallback: (message) => _checkoutMessage.value = ("Cancel", message),
+                errorCallback: (message) => _checkoutMessage.value = ("Error", message),
               ),
             ),
             const SizedBox(height: 20),
