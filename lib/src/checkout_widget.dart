@@ -49,6 +49,9 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   @override
   void initState() {
     super.initState();
+    if (kDebugMode) {
+      print("OttuCheckoutWidget.initState()");
+    }
     _methodChannel.setMethodCallHandler(_handleChannelMethod);
   }
 
