@@ -76,6 +76,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
                  //PGCode.urpay: true,
                  PGCode.tamara: true,
                  PGCode.tabby: true,
+                 PGCode.cod: true,
+                 PGCode.jamiawallet: true,
                }),
              ),
        ) {
