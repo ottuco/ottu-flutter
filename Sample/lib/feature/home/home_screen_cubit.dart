@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/billing_address.dart';
+import 'package:ottu_flutter_checkout_sample/api/model/branding_options_request.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/create_transaction_request.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/pg_codes.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/transaction_agreement.dart';
@@ -124,6 +125,17 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
           : null,
       paymentType: state.isAutoDebit == true ? TransactionPaymentType.autoDebit : null,
       agreement: state.isAutoDebit == true ? TransactionAgreement.defaultAgreement() : null,
+      brandingOptions: BrandingOptionsRequest(
+        paymentMethods: BrandingPaymentMethods(
+          knetStaging: BrandingOption(
+            text: "Branding text for KNet",
+            color: "#009DCC",
+            fontWeight: 700,
+          ),
+          cod: BrandingOption(text: "Branding text for cod", color: "#92CC00", fontWeight: 400),
+          mpgs: BrandingOption(text: "Branding text for cod", color: "#92CC00", fontWeight: 400),
+        ),
+      ),
     );
 
     final result = await _api.getSessionId(
