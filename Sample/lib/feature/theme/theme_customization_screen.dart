@@ -3,11 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart' as ch;
 import 'package:ottu_flutter_checkout_sample/feature/theme/android_fonts.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/ios_fonts.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_customization_screen_cubit.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_customization_state.dart';
+
+const _fontFamilies = ["Almarai Bold", "Almarai ExtraBold", "Almarai Light", "Almarai Regular"];
 
 class ThemeCustomizationScreen extends StatefulWidget {
   const ThemeCustomizationScreen({super.key});
@@ -16,12 +19,11 @@ class ThemeCustomizationScreen extends StatefulWidget {
   State<ThemeCustomizationScreen> createState() => _ThemeCustomizationScreenState();
 }
 
-const dividerPadding = 2.0;
+const dividerPadding = 4.0;
 
 class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
     with TickerProviderStateMixin {
-  final amountEditingController = TextEditingController();
-
+  final _logger = Logger();
   final uiModeController = TextEditingController();
 
   @override
@@ -290,6 +292,18 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                             context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
                           },
                         ),
+                        divider(),
+                        const SizedBox(height: dividerPadding),
+                        _colorOptionItem(
+                          state.theme?.paymentItemDescriptionTextColor?.color,
+                          "Select Payment Description Color",
+                          (color) {
+                            final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                              paymentItemDescriptionTextColor: ch.ColorState(color: color),
+                            );
+                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                          },
+                        ),
                       ],
                     );
                   },
@@ -510,6 +524,45 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
               );
             },
           ),
+        ),
+        const SizedBox(height: dividerPadding),
+        subDivider(),
+        ValueListenableBuilder(
+          valueListenable: btn,
+          builder: (context, btnValue, __) =>
+              _colorOptionItem(btnValue?.borderColor?.color, "Button Border Color", (color) {
+                final button = (btnValue ?? ch.ButtonComponent());
+                btn.value = button.copyWith(
+                  borderColor: (button.borderColor ?? ch.ColorState()).copyWith(color: color),
+                );
+              }),
+        ),
+        const SizedBox(height: dividerPadding),
+        subDivider(),
+        const SizedBox(height: dividerPadding),
+        _numberModifier("Button Border Width", button?.borderWidth, (number) {
+          final component = btn.value ?? ch.ButtonComponent();
+          btn.value = component.copyWith(borderWidth: number);
+        }),
+        const SizedBox(height: dividerPadding),
+        subDivider(),
+        const SizedBox(height: dividerPadding),
+        _numberModifier("Button Corner Radius", button?.cornerRadius, (number) {
+          final component = btn.value ?? ch.ButtonComponent();
+          btn.value = component.copyWith(cornerRadius: number);
+        }),
+        const SizedBox(height: dividerPadding),
+        subDivider(),
+        const SizedBox(height: dividerPadding),
+        _dropDownModifier(
+          "Button Font Name",
+          _fontFamilies,
+          "Button Font Family",
+          btn.value?.fontFamily,
+          (selection) {
+            final component = btn.value ?? ch.ButtonComponent();
+            btn.value = component.copyWith(fontFamily: selection);
+          },
         ),
         const SizedBox(height: dividerPadding),
         subDivider(),
@@ -799,6 +852,52 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
     );
   }
 
+  Widget _numberModifier(String title, double? number, Function(double number) onChange) {
+    final controller = TextEditingController(text: number?.toString() ?? "");
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(child: Text(title)),
+        _numberInput(controller, (newNumber) {
+          final nd = double.tryParse(newNumber);
+          if (nd != null) {
+            onChange(nd);
+            _logger.d(nd);
+          }
+        }),
+      ],
+    );
+  }
+
+  SizedBox _numberInput(
+    TextEditingController controller,
+    Function(String newNumber) onTextChanged,
+  ) {
+    return SizedBox(
+      width: 64,
+      child: TextFormField(
+        maxLength: 4,
+        textAlign: TextAlign.center,
+        controller: controller,
+        decoration: InputDecoration(
+          counterText: "",
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 5),
+          fillColor: Colors.white,
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue[800] ?? Colors.black26),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue[500] ?? Colors.black26, width: 2.0),
+          ),
+        ),
+        keyboardType: TextInputType.number,
+        textInputAction: TextInputAction.done,
+        onFieldSubmitted: onTextChanged,
+      ),
+    );
+  }
+
   Divider subDivider() =>
       Divider(height: 1, thickness: 1, color: Colors.lightBlue[100], endIndent: 0);
 
@@ -873,8 +972,6 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                   value: font,
                   elevation: 4,
                   isExpanded: true,
-                  //style: const TextStyle(color: Colors.deepPurple),
-                  //underline: Container(height: 2, color: Colors.deepPurpleAccent),
                   onChanged: (String? value) {
                     selectedFontFamily.value = value!;
                   },
@@ -933,6 +1030,51 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           },
         ),
       ],
+    );
+  }
+
+  Widget _dropDownModifier(
+    String s,
+    List<String> values,
+    String title,
+    String? selection,
+    Function(String selection) onSelected,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(child: Text(title)),
+        _dropDown(values, selection, onSelected),
+      ],
+    );
+  }
+
+  Widget _dropDown(List<String> values, String? selection, Function(String selection) onSelected) {
+    final selectionNotifier = ValueNotifier(selection);
+    return ValueListenableBuilder(
+      valueListenable: selectionNotifier,
+      builder: (context, defaultSelection, child) {
+        return DropdownButton<String>(
+          value: defaultSelection,
+          items: values.map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value, style: TextStyle(fontSize: 12)),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            if (newValue != null) {
+              onSelected(newValue);
+              selectionNotifier.value = newValue;
+            }
+          },
+
+          icon: Icon(Icons.arrow_downward, color: Colors.lightBlueAccent),
+          elevation: 16,
+          style: TextStyle(color: Colors.deepPurple, fontSize: 12),
+          underline: Container(height: 2, color: Colors.lightBlueAccent),
+        );
+      },
     );
   }
 }

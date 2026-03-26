@@ -14,7 +14,8 @@ CheckoutArguments _$CheckoutArgumentsFromJson(Map<String, dynamic> json) =>
       amount: (json['amount'] as num).toDouble(),
       showPaymentDetails: json['showPaymentDetails'] as bool,
       paymentOptionsDisplaySettings: PaymentOptionsDisplaySettings.fromJson(
-          json['paymentOptionsDisplaySettings'] as Map<String, dynamic>),
+        json['paymentOptionsDisplaySettings'] as Map<String, dynamic>,
+      ),
       setupPreload: json['apiTransactionDetails'] as String?,
       formsOfPayment: (json['formsOfPayment'] as List<dynamic>?)
           ?.map((e) => $enumDecode(_$FormsOfPaymentEnumMap, e))
@@ -25,7 +26,8 @@ CheckoutArguments _$CheckoutArgumentsFromJson(Map<String, dynamic> json) =>
       payButtonText: json['payButtonText'] == null
           ? null
           : PayButtonText.fromJson(
-              json['payButtonText'] as Map<String, dynamic>),
+              json['payButtonText'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>

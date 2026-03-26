@@ -3,6 +3,8 @@ import 'package:ottu_flutter_checkout_sample/api/model/billing_address.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/transaction_agreement.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/transaction_payment_type.dart';
 
+import 'branding_options_request.dart';
+
 part 'create_transaction_request.g.dart';
 
 @JsonSerializable()
@@ -32,6 +34,8 @@ class CreateTransactionRequest {
   final TransactionPaymentType? paymentType;
   @JsonKey(includeIfNull: false)
   final TransactionAgreement? agreement;
+  @JsonKey(name: "branding_options", includeIfNull: false)
+  final BrandingOptionsRequest? brandingOptions;
 
   CreateTransactionRequest({
     required this.amount,
@@ -49,6 +53,7 @@ class CreateTransactionRequest {
     this.cardAcceptanceCriteria,
     this.paymentType,
     this.agreement,
+    this.brandingOptions,
   });
 
   @JsonKey(name: "card_acceptance_criteria", includeIfNull: false)

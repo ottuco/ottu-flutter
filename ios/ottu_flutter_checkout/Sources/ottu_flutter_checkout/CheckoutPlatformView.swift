@@ -385,6 +385,12 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             }
         }
 
+        if let color = theme?.paymentItemDescriptionTextColor?.toUIColors() {
+            if let cc = color {
+                cht.selectPaymentMethodDescriptionTextColor = cc
+            }
+        }
+
         if let switchColor = theme?.switchControl?.toCheckoutSwitch() {
             cht.switchOnTintColor = switchColor
         }

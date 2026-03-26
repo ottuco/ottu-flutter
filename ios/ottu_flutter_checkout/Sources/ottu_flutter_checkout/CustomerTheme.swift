@@ -21,6 +21,7 @@ struct CustomerTheme: Decodable {
     let modalBackgroundColor: ColorState?
     let selectPaymentMethodHeaderBackgroundColor: ColorState?
     let paymentItemBackgroundColor: ColorState?
+    let paymentItemDescriptionTextColor: ColorState?
     let selectorIconColor: ColorState?
     let savePhoneNumberIconColor: ColorState?
     let button: ButtonCmt?
@@ -64,9 +65,12 @@ struct Margins: Decodable {
 
 struct ButtonCmt: Decodable {
     let rippleColor: RippleColor?
-    let fontType: Int?
+    let fontFamily: String?
     let textColor: ColorState?
     let textDisabledColor: ColorState?
+    let borderColor: ColorState?
+    let borderWidth: Float?
+    let cornerRadius: Float?
 }
 
 struct SwitchComponent: Decodable {

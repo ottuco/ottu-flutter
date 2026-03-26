@@ -7,13 +7,7 @@ part of 'pay_button_text.dart';
 // **************************************************************************
 
 PayButtonText _$PayButtonTextFromJson(Map<String, dynamic> json) =>
-    PayButtonText(
-      en: json['en'] as String,
-      ar: json['ar'] as String,
-    );
+    PayButtonText(en: json['en'] as String, ar: json['ar'] as String);
 
 Map<String, dynamic> _$PayButtonTextToJson(PayButtonText instance) =>
-    <String, dynamic>{
-      'en': instance.en,
-      'ar': instance.ar,
-    };
+    <String, dynamic>{'en': instance.en, 'ar': instance.ar};
