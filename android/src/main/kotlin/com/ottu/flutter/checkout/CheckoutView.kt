@@ -319,6 +319,7 @@ internal class CheckoutView(
                     selectPaymentMethodHeaderBackgroundColor = selectPaymentMethodHeaderBackgroundColor?.toCheckoutColor(),
                     modalBackgroundColor = modalBackgroundColor?.toCheckoutColor(),
                     paymentItemBackgroundColor = paymentItemBackgroundColor?.toCheckoutColor(),
+                    paymentItemDescriptionTextColor = paymentItemDescriptionTextColor?.toCheckoutColor(),
                     selectorIconColor = selectorIconColor?.toCheckoutColor(),
                     savePhoneNumberIconColor = savePhoneNumberIconColor?.toCheckoutColor(),
                     button = button?.toCheckoutButton(),

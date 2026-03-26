@@ -17,11 +17,13 @@ class BrandingOptionsRequest {
 
 @JsonSerializable()
 class BrandingPaymentMethods {
-  @JsonKey(name: "knet-staging")
+  @JsonKey(name: "knet-staging", includeIfNull: false)
   final BrandingOption? knetStaging;
+  @JsonKey(includeIfNull: false)
   final BrandingOption? stc;
+  @JsonKey(includeIfNull: false)
   final BrandingOption? cod;
-  @JsonKey(name: "mpgs-testing")
+  @JsonKey(name: "mpgs-testing", includeIfNull: false)
   final BrandingOption? mpgs;
 
   BrandingPaymentMethods({this.knetStaging, this.stc, this.cod, this.mpgs});

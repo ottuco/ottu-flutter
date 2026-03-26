@@ -21,6 +21,7 @@ struct CustomerTheme: Decodable {
     let modalBackgroundColor: ColorState?
     let selectPaymentMethodHeaderBackgroundColor: ColorState?
     let paymentItemBackgroundColor: ColorState?
+    let paymentItemDescriptionTextColor: ColorState?
     let selectorIconColor: ColorState?
     let savePhoneNumberIconColor: ColorState?
     let button: ButtonCmt?

@@ -38,10 +38,10 @@ BrandingPaymentMethods _$BrandingPaymentMethodsFromJson(
 Map<String, dynamic> _$BrandingPaymentMethodsToJson(
   BrandingPaymentMethods instance,
 ) => <String, dynamic>{
-  'knet-staging': instance.knetStaging,
-  'stc': instance.stc,
-  'cod': instance.cod,
-  'mpgs-testing': instance.mpgs,
+  'knet-staging': ?instance.knetStaging,
+  'stc': ?instance.stc,
+  'cod': ?instance.cod,
+  'mpgs-testing': ?instance.mpgs,
 };
 
 BrandingOption _$BrandingOptionFromJson(Map<String, dynamic> json) =>

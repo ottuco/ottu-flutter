@@ -19,6 +19,7 @@ data class CustomerTheme(
     val modalBackgroundColor: ColorState?,
     val selectPaymentMethodHeaderBackgroundColor: ColorState?,
     val paymentItemBackgroundColor: ColorState?,
+    val paymentItemDescriptionTextColor: ColorState?,
     val selectorIconColor: ColorState?,
     val savePhoneNumberIconColor: ColorState?,
     val button: ButtonComponent?,

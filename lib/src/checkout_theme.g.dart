@@ -81,6 +81,11 @@ CheckoutTheme _$CheckoutThemeFromJson(Map<String, dynamic> json) =>
           ? null
           : ColorState.fromJson(
               json['paymentItemBackgroundColor'] as Map<String, dynamic>),
+      paymentItemDescriptionTextColor:
+          json['paymentItemDescriptionTextColor'] == null
+              ? null
+              : ColorState.fromJson(json['paymentItemDescriptionTextColor']
+                  as Map<String, dynamic>),
       selectorIconColor: json['selectorIconColor'] == null
           ? null
           : ColorState.fromJson(
@@ -114,6 +119,8 @@ Map<String, dynamic> _$CheckoutThemeToJson(CheckoutTheme instance) =>
       'selectPaymentMethodHeaderBackgroundColor':
           instance.selectPaymentMethodHeaderBackgroundColor,
       'paymentItemBackgroundColor': instance.paymentItemBackgroundColor,
+      'paymentItemDescriptionTextColor':
+          instance.paymentItemDescriptionTextColor,
       'selectorIconColor': instance.selectorIconColor,
       'savePhoneNumberIconColor': instance.savePhoneNumberIconColor,
     };

@@ -8,6 +8,8 @@ enum PGCode {
   //urpay(code: "urpay", name: "Ur Pay"),
   tamara(code: "tamara", name: "Tamara"),
   tabby(code: "tabby", name: "Tabby"),
+  cod(code: "cod", name: "cod"),
+  jamiawallet(code: "jamiawallet", name: "jamiawallet"),
 
   apple_pay(code: "apple-pay", name: "Apple Pay"),
   tap_pg(code: "tap_pg", name: "Tag PG"),

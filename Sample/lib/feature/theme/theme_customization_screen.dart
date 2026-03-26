@@ -290,6 +290,18 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                             context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
                           },
                         ),
+                        divider(),
+                        const SizedBox(height: dividerPadding),
+                        _colorOptionItem(
+                          state.theme?.paymentItemDescriptionTextColor?.color,
+                          "Select Payment Description Color",
+                          (color) {
+                            final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                              paymentItemDescriptionTextColor: ch.ColorState(color: color),
+                            );
+                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                          },
+                        ),
                       ],
                     );
                   },
