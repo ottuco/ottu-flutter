@@ -126,17 +126,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
           : null,
       paymentType: state.isAutoDebit == true ? TransactionPaymentType.autoDebit : null,
       agreement: state.isAutoDebit == true ? TransactionAgreement.defaultAgreement() : null,
-      brandingOptions: BrandingOptionsRequest(
-        paymentMethods: BrandingPaymentMethods(
-          knetStaging: BrandingOption(
-            text: "Branding text for KNet",
-            color: "#009DCC",
-            fontWeight: 700,
-          ),
-          cod: BrandingOption(text: "Branding text for cod", color: "#92CC00", fontWeight: 400),
-          mpgs: BrandingOption(text: "Branding text for cod", color: "#92CC00", fontWeight: 400),
-        ),
-      ),
+      brandingOptions: _brandingOptions(),
     );
 
     final result = await _api.getSessionId(
@@ -320,5 +310,100 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     } else {
       return false;
     }
+  }
+
+  BrandingOptionsRequest? _brandingOptions() {
+    if (state.pgCodesChecked == null || state.pgCodesChecked?.isEmpty == true) {
+      return null;
+    }
+
+    final brandingOptionsRequest = BrandingOptionsRequest(paymentMethods: BrandingPaymentMethods());
+    state.pgCodesChecked?.forEach((code, isSelected) {
+      if(isSelected) {
+        switch (code) {
+          case PGCode.knet:
+            brandingOptionsRequest.paymentMethods.knetStaging = BrandingOption(
+              text: "Branding text for KNet",
+              color: "#009DCC",
+              fontWeight: 700,
+            );
+          case PGCode.mpgs:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for MPGS",
+              color: "#92CC00",
+              fontWeight: 400,
+            );
+          case PGCode.benefit:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for Benefit",
+              color: "#006400",
+              fontWeight: 900,
+            );
+          case PGCode.benefitpay:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for BenefitPay",
+              color: "#48D1CC",
+              fontWeight: 900,
+            );
+          case PGCode.stc_pay:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for STC",
+              color: "#FF00FF",
+              fontWeight: 600,
+            );
+          case PGCode.nbk_mpgs:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for NBK",
+              color: "#FFFF00",
+              fontWeight: 600,
+            );
+          case PGCode.tamara:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for Tamara",
+              color: "#A52A2A",
+              fontWeight: 600,
+            );
+          case PGCode.tabby:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for Tabby",
+              color: "#6A5ACD",
+              fontWeight: 600,
+            );
+          case PGCode.cod:
+            brandingOptionsRequest.paymentMethods.cod = BrandingOption(
+              text: "Branding text for cod",
+              color: "#92CC00",
+              fontWeight: 400,
+            );
+          case PGCode.jamiawallet:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for jamia",
+              color: "#708090",
+              fontWeight: 700,
+            );
+          case PGCode.cs:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for cs",
+              color: "#D2691E",
+              fontWeight: 300,
+            );
+          case PGCode.apple_pay:
+          case PGCode.tap_pg:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for Tap",
+              color: "#808000",
+              fontWeight: 500,
+            );
+          case PGCode.ottu_sdk:
+            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+              text: "Branding text for Ottu",
+              color: "#2F4F4F",
+              fontWeight: 300,
+            );
+        }
+      }
+    });
+
+    return brandingOptionsRequest;
   }
 }

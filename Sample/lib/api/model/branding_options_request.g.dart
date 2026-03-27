@@ -24,24 +24,44 @@ BrandingPaymentMethods _$BrandingPaymentMethodsFromJson(
   knetStaging: json['knet-staging'] == null
       ? null
       : BrandingOption.fromJson(json['knet-staging'] as Map<String, dynamic>),
-  stc: json['stc'] == null
+  tabby: json['tabby'] == null
       ? null
-      : BrandingOption.fromJson(json['stc'] as Map<String, dynamic>),
+      : BrandingOption.fromJson(json['tabby'] as Map<String, dynamic>),
   cod: json['cod'] == null
       ? null
       : BrandingOption.fromJson(json['cod'] as Map<String, dynamic>),
   mpgs: json['mpgs-testing'] == null
       ? null
       : BrandingOption.fromJson(json['mpgs-testing'] as Map<String, dynamic>),
+  stcPay: json['stc_pay'] == null
+      ? null
+      : BrandingOption.fromJson(json['stc_pay'] as Map<String, dynamic>),
+  cs: json['cs'] == null
+      ? null
+      : BrandingOption.fromJson(json['cs'] as Map<String, dynamic>),
+  nbkMpgs: json['nbk-mpgs'] == null
+      ? null
+      : BrandingOption.fromJson(json['nbk-mpgs'] as Map<String, dynamic>),
+  tapPg: json['tap_pg'] == null
+      ? null
+      : BrandingOption.fromJson(json['tap_pg'] as Map<String, dynamic>),
+  ottuSdk: json['ottu_sdk'] == null
+      ? null
+      : BrandingOption.fromJson(json['ottu_sdk'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$BrandingPaymentMethodsToJson(
   BrandingPaymentMethods instance,
 ) => <String, dynamic>{
   'knet-staging': ?instance.knetStaging,
-  'stc': ?instance.stc,
+  'tabby': ?instance.tabby,
   'cod': ?instance.cod,
   'mpgs-testing': ?instance.mpgs,
+  'stc_pay': ?instance.stcPay,
+  'cs': ?instance.cs,
+  'nbk-mpgs': ?instance.nbkMpgs,
+  'tap_pg': ?instance.tapPg,
+  'ottu_sdk': ?instance.ottuSdk,
 };
 
 BrandingOption _$BrandingOptionFromJson(Map<String, dynamic> json) =>

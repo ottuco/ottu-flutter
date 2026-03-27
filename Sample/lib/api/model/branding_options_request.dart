@@ -18,15 +18,35 @@ class BrandingOptionsRequest {
 @JsonSerializable()
 class BrandingPaymentMethods {
   @JsonKey(name: "knet-staging", includeIfNull: false)
-  final BrandingOption? knetStaging;
+  BrandingOption? knetStaging;
   @JsonKey(includeIfNull: false)
-  final BrandingOption? stc;
+  BrandingOption? tabby;
   @JsonKey(includeIfNull: false)
-  final BrandingOption? cod;
+  BrandingOption? cod;
   @JsonKey(name: "mpgs-testing", includeIfNull: false)
-  final BrandingOption? mpgs;
+  BrandingOption? mpgs;
+  @JsonKey(name: "stc_pay", includeIfNull: false)
+  BrandingOption? stcPay;
+  @JsonKey(includeIfNull: false)
+  BrandingOption? cs;
+  @JsonKey(name: "nbk-mpgs", includeIfNull: false)
+  BrandingOption? nbkMpgs;
+  @JsonKey(name: "tap_pg", includeIfNull: false)
+  BrandingOption? tapPg;
+  @JsonKey(name: "ottu_sdk", includeIfNull: false)
+  BrandingOption? ottuSdk;
 
-  BrandingPaymentMethods({this.knetStaging, this.stc, this.cod, this.mpgs});
+  BrandingPaymentMethods({
+    this.knetStaging,
+    this.tabby,
+    this.cod,
+    this.mpgs,
+    this.stcPay,
+    this.cs,
+    this.nbkMpgs,
+    this.tapPg,
+    this.ottuSdk,
+  });
 
   factory BrandingPaymentMethods.fromJson(Map<String, dynamic> json) =>
       _$BrandingPaymentMethodsFromJson(json);
