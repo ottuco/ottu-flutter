@@ -287,18 +287,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text('Fail payment validation', style: TextStyle(color: Colors.red)),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            checkColor: Colors.red,
-                            value: state.failPaymentValidation ?? false,
-                            onChanged: (bool? value) {
-                              context.read<HomeScreenCubit>().onFailPaymentValidation(value);
-                            },
-                          ),
-                          Text('Fail payment validation', style: TextStyle(color: Colors.red)),
-                        ],
-                      ),
                       const SizedBox(height: 24),
                       Divider(height: 2, thickness: 3),
                       const Text('Payment methods:'),

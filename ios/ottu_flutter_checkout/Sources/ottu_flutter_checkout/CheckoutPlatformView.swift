@@ -221,19 +221,25 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     }
 
     func tryAttachController() {
+        Logger.sdk.info("tryAttachController")
         guard let pvc = self.paymentViewController else { return }
 
-        if let parentVC = UIApplication.shared.delegate?.window??
-            .rootViewController as? FlutterViewController
-        {
-            parentVC.addChild(pvc)
-            _view.addCheckoutView(pvc.view)
-            pvc.didMove(toParent: parentVC)
-            Logger.sdk.info("Added to parent!")
-        } else {
-            Logger.sdk.info("Waiting for parent...")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                self.tryAttachController()
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let window = scene.windows.first(where: { $0.isKeyWindow }) {
+                let rootViewController = window.rootViewController
+                Logger.sdk.info("tryAttachController, pvc: \(rootViewController)")
+                if let parentVC = rootViewController as? FlutterViewController {
+                    Logger.sdk.debug("tryAttachController, addChild PVC")
+                    parentVC.addChild(pvc)
+                    _view.addCheckoutView(pvc.view)
+                    pvc.didMove(toParent: parentVC)
+                    Logger.sdk.info("Added to parent!")
+                } else {
+                    Logger.sdk.info("tryAttachController, PVC hasn found, waiting for parent...")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        self.tryAttachController()
+                    }
+                }
             }
         }
     }
