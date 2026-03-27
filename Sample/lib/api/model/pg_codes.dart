@@ -10,6 +10,7 @@ enum PGCode {
   tabby(code: "tabby", name: "Tabby"),
   cod(code: "cod", name: "cod"),
   jamiawallet(code: "jamiawallet", name: "jamiawallet"),
+  cs(code: "cs", name: "cs"),
 
   apple_pay(code: "apple-pay", name: "Apple Pay"),
   tap_pg(code: "tap_pg", name: "Tag PG"),

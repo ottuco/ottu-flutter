@@ -79,6 +79,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
                  PGCode.tabby: true,
                  PGCode.cod: true,
                  PGCode.jamiawallet: true,
+                 PGCode.cs: true,
                }),
              ),
        ) {
