@@ -5,24 +5,31 @@
 //  Created by Vi on 25.09.2024.
 //
 
-import Foundation
 import Flutter
+import Foundation
 
-public class CheckoutViewFactory: NSObject, @preconcurrency FlutterPlatformViewFactory {
-    
+public class CheckoutViewFactory: NSObject,
+    @preconcurrency FlutterPlatformViewFactory
+{
+
     private var messenger: FlutterBinaryMessenger
-    
+
     init(messenger: FlutterBinaryMessenger) {
         self.messenger = messenger
+        super.init()
     }
 
-    @MainActor public func create(withFrame frame: CGRect,
-                       viewIdentifier viewId: Int64,
-                       arguments args: Any?) -> FlutterPlatformView {
-        return CheckoutPlatformView(messenger: messenger,
-                                    frame: frame,
-                                    viewId: viewId,
-                                    args: args)
+    @MainActor public func create(
+        withFrame frame: CGRect,
+        viewIdentifier viewId: Int64,
+        arguments args: Any?
+    ) -> FlutterPlatformView {
+        return CheckoutPlatformView(
+            messenger: messenger,
+            frame: frame,
+            viewId: viewId,
+            args: args
+        )
     }
 
     public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
