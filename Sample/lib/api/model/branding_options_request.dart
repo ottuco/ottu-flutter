@@ -22,6 +22,8 @@ class BrandingPaymentMethods {
   @JsonKey(includeIfNull: false)
   BrandingOption? tabby;
   @JsonKey(includeIfNull: false)
+  BrandingOption? tamara;
+  @JsonKey(includeIfNull: false)
   BrandingOption? cod;
   @JsonKey(name: "mpgs-testing", includeIfNull: false)
   BrandingOption? mpgs;
@@ -29,6 +31,8 @@ class BrandingPaymentMethods {
   BrandingOption? stcPay;
   @JsonKey(includeIfNull: false)
   BrandingOption? cs;
+  @JsonKey(includeIfNull: false)
+  BrandingOption? jamiawallet;
   @JsonKey(name: "nbk-mpgs", includeIfNull: false)
   BrandingOption? nbkMpgs;
   @JsonKey(name: "tap_pg", includeIfNull: false)

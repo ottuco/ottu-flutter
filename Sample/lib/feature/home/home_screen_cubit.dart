@@ -334,37 +334,37 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               fontWeight: 400,
             );
           case PGCode.benefit:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+           /* brandingOptionsRequest.paymentMethods.benefit = BrandingOption(
               text: "Branding text for Benefit",
               color: "#006400",
               fontWeight: 900,
-            );
+            );*/
           case PGCode.benefitpay:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+           /* brandingOptionsRequest.paymentMethods.benefitpay = BrandingOption(
               text: "Branding text for BenefitPay",
               color: "#48D1CC",
               fontWeight: 900,
-            );
+            );*/
           case PGCode.stc_pay:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+            brandingOptionsRequest.paymentMethods.stcPay = BrandingOption(
               text: "Branding text for STC",
               color: "#FF00FF",
               fontWeight: 600,
             );
           case PGCode.nbk_mpgs:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+            brandingOptionsRequest.paymentMethods.nbkMpgs = BrandingOption(
               text: "Branding text for NBK",
               color: "#FFFF00",
               fontWeight: 600,
             );
           case PGCode.tamara:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+            brandingOptionsRequest.paymentMethods.tamara = BrandingOption(
               text: "Branding text for Tamara",
               color: "#A52A2A",
               fontWeight: 600,
             );
           case PGCode.tabby:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+            brandingOptionsRequest.paymentMethods.tabby = BrandingOption(
               text: "Branding text for Tabby",
               color: "#6A5ACD",
               fontWeight: 600,
@@ -376,26 +376,26 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               fontWeight: 400,
             );
           case PGCode.jamiawallet:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+            brandingOptionsRequest.paymentMethods.jamiawallet = BrandingOption(
               text: "Branding text for jamia",
               color: "#708090",
               fontWeight: 700,
             );
           case PGCode.cs:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+            brandingOptionsRequest.paymentMethods.cs = BrandingOption(
               text: "Branding text for cs",
               color: "#D2691E",
               fontWeight: 300,
             );
           case PGCode.apple_pay:
           case PGCode.tap_pg:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+            brandingOptionsRequest.paymentMethods.tapPg = BrandingOption(
               text: "Branding text for Tap",
               color: "#808000",
               fontWeight: 500,
             );
           case PGCode.ottu_sdk:
-            brandingOptionsRequest.paymentMethods.mpgs = BrandingOption(
+            brandingOptionsRequest.paymentMethods.ottuSdk = BrandingOption(
               text: "Branding text for Ottu",
               color: "#2F4F4F",
               fontWeight: 300,
