@@ -36,59 +36,61 @@ class CheckoutTheme extends Equatable {
   final ColorState? selectorIconColor;
   final ColorState? savePhoneNumberIconColor;
 
-  CheckoutTheme({this.uiMode = CustomerUiMode.auto,
-    this.titleText,
-    this.mainTitleText,
-    this.selectPaymentMethodHeaderText,
-    this.subtitleText,
-    this.feesTitleText,
-    this.feesSubtitleText,
-    this.dataLabelText,
-    this.dataValueText,
-    this.errorMessageText,
-    this.inputTextField,
-    this.button,
-    this.backButton,
-    this.selectorButton,
-    this.switchControl,
-    this.margins,
-    this.sdkBackgroundColor,
-    this.modalBackgroundColor,
-    this.selectPaymentMethodHeaderBackgroundColor,
-    this.paymentItemBackgroundColor,
-    this.paymentItemDescriptionTextColor,
-    this.selectorIconColor,
-    this.savePhoneNumberIconColor});
+  CheckoutTheme(
+      {this.uiMode = CustomerUiMode.auto,
+      this.titleText,
+      this.mainTitleText,
+      this.selectPaymentMethodHeaderText,
+      this.subtitleText,
+      this.feesTitleText,
+      this.feesSubtitleText,
+      this.dataLabelText,
+      this.dataValueText,
+      this.errorMessageText,
+      this.inputTextField,
+      this.button,
+      this.backButton,
+      this.selectorButton,
+      this.switchControl,
+      this.margins,
+      this.sdkBackgroundColor,
+      this.modalBackgroundColor,
+      this.selectPaymentMethodHeaderBackgroundColor,
+      this.paymentItemBackgroundColor,
+      this.paymentItemDescriptionTextColor,
+      this.selectorIconColor,
+      this.savePhoneNumberIconColor});
 
-  CheckoutTheme copyWith({CustomerUiMode? uiMode,
-    TextStyle? titleText,
-    TextStyle? mainTitleText,
-    TextStyle? selectPaymentMethodHeaderText,
-    TextStyle? subtitleText,
-    TextStyle? feesTitleText,
-    TextStyle? feesSubtitleText,
-    TextStyle? dataLabelText,
-    TextStyle? dataValueText,
-    TextStyle? errorMessageText,
-    TextFieldStyle? inputTextField,
-    ButtonComponent? button,
-    RippleColor? backButton,
-    ButtonComponent? selectorButton,
-    SwitchComponent? switchControl,
-    Margins? margins,
-    ColorState? sdkBackgroundColor,
-    ColorState? modalBackgroundColor,
-    ColorState? selectPaymentMethodHeaderBackgroundColor,
-    ColorState? paymentItemBackgroundColor,
-    ColorState? paymentItemDescriptionTextColor,
-    ColorState? selectorIconColor,
-    ColorState? savePhoneNumberIconColor}) {
+  CheckoutTheme copyWith(
+      {CustomerUiMode? uiMode,
+      TextStyle? titleText,
+      TextStyle? mainTitleText,
+      TextStyle? selectPaymentMethodHeaderText,
+      TextStyle? subtitleText,
+      TextStyle? feesTitleText,
+      TextStyle? feesSubtitleText,
+      TextStyle? dataLabelText,
+      TextStyle? dataValueText,
+      TextStyle? errorMessageText,
+      TextFieldStyle? inputTextField,
+      ButtonComponent? button,
+      RippleColor? backButton,
+      ButtonComponent? selectorButton,
+      SwitchComponent? switchControl,
+      Margins? margins,
+      ColorState? sdkBackgroundColor,
+      ColorState? modalBackgroundColor,
+      ColorState? selectPaymentMethodHeaderBackgroundColor,
+      ColorState? paymentItemBackgroundColor,
+      ColorState? paymentItemDescriptionTextColor,
+      ColorState? selectorIconColor,
+      ColorState? savePhoneNumberIconColor}) {
     return CheckoutTheme(
       uiMode: uiMode ?? this.uiMode,
       titleText: titleText ?? this.titleText,
       mainTitleText: mainTitleText ?? this.mainTitleText,
       selectPaymentMethodHeaderText:
-      selectPaymentMethodHeaderText ?? this.selectPaymentMethodHeaderText,
+          selectPaymentMethodHeaderText ?? this.selectPaymentMethodHeaderText,
       subtitleText: subtitleText ?? this.subtitleText,
       feesTitleText: feesTitleText ?? this.feesTitleText,
       feesSubtitleText: feesSubtitleText ?? this.feesSubtitleText,
@@ -103,18 +105,18 @@ class CheckoutTheme extends Equatable {
       margins: margins ?? this.margins,
       sdkBackgroundColor: sdkBackgroundColor ?? this.sdkBackgroundColor,
       modalBackgroundColor: modalBackgroundColor ?? this.modalBackgroundColor,
-      selectPaymentMethodHeaderBackgroundColor: selectPaymentMethodHeaderBackgroundColor ??
-          this.selectPaymentMethodHeaderBackgroundColor,
+      selectPaymentMethodHeaderBackgroundColor:
+          selectPaymentMethodHeaderBackgroundColor ?? this.selectPaymentMethodHeaderBackgroundColor,
       paymentItemBackgroundColor: paymentItemBackgroundColor ?? this.paymentItemBackgroundColor,
-      paymentItemDescriptionTextColor: paymentItemDescriptionTextColor ?? this.paymentItemDescriptionTextColor,
+      paymentItemDescriptionTextColor:
+          paymentItemDescriptionTextColor ?? this.paymentItemDescriptionTextColor,
       selectorIconColor: selectorIconColor ?? this.selectorIconColor,
       savePhoneNumberIconColor: savePhoneNumberIconColor ?? this.savePhoneNumberIconColor,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [
+  List<Object?> get props => [
         uiMode,
         titleText,
         mainTitleText,
@@ -238,11 +240,12 @@ final class TextFieldStyle {
 
   TextFieldStyle({this.background, this.primaryColor, this.focusedColor, this.text, this.error});
 
-  TextFieldStyle copyWith({ColorState? background,
-    ColorState? primaryColor,
-    ColorState? focusedColor,
-    TextStyle? text,
-    TextStyle? error}) {
+  TextFieldStyle copyWith(
+      {ColorState? background,
+      ColorState? primaryColor,
+      ColorState? focusedColor,
+      TextStyle? text,
+      TextStyle? error}) {
     return TextFieldStyle(
         background: background ?? this.background,
         primaryColor: primaryColor ?? this.primaryColor,
@@ -259,16 +262,35 @@ final class TextFieldStyle {
 @JsonSerializable()
 class ButtonComponent {
   final RippleColor? rippleColor;
-  final int? fontType;
+  final String? fontFamily;
   final ColorState? textColor;
+  final ColorState? borderColor;
+  final double? borderWidth;
+  final double? cornerRadius;
 
-  ButtonComponent({this.rippleColor, this.fontType, this.textColor});
+  ButtonComponent(
+      {this.rippleColor,
+      this.fontFamily,
+      this.textColor,
+      this.borderColor,
+      this.borderWidth,
+      this.cornerRadius});
 
-  ButtonComponent copyWith({RippleColor? rippleColor, int? fontType, ColorState? textColor}) {
+  ButtonComponent copyWith(
+      {RippleColor? rippleColor,
+      String? fontFamily,
+      ColorState? textColor,
+      ColorState? borderColor,
+      double? borderWidth,
+      double? cornerRadius}) {
     return ButtonComponent(
-        rippleColor: rippleColor ?? this.rippleColor,
-        textColor: textColor ?? this.textColor,
-        fontType: fontType ?? this.fontType);
+      rippleColor: rippleColor ?? this.rippleColor,
+      textColor: textColor ?? this.textColor,
+      fontFamily: fontFamily ?? this.fontFamily,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
+      cornerRadius: cornerRadius ?? this.cornerRadius,
+    );
   }
 
   factory ButtonComponent.fromJson(Map<String, dynamic> json) => _$ButtonComponentFromJson(json);
@@ -291,28 +313,30 @@ class SwitchComponent {
   @_ColorJsonConverter()
   final Color? uncheckedTrackDecorationColor;
 
-  SwitchComponent({this.checkedThumbTintColor,
-    this.uncheckedThumbTintColor,
-    this.checkedTrackTintColor,
-    this.uncheckedTrackTintColor,
-    this.checkedTrackDecorationColor,
-    this.uncheckedTrackDecorationColor});
+  SwitchComponent(
+      {this.checkedThumbTintColor,
+      this.uncheckedThumbTintColor,
+      this.checkedTrackTintColor,
+      this.uncheckedTrackTintColor,
+      this.checkedTrackDecorationColor,
+      this.uncheckedTrackDecorationColor});
 
-  SwitchComponent copyWith({Color? checkedThumbTintColor,
-    Color? uncheckedThumbTintColor,
-    Color? checkedTrackTintColor,
-    Color? uncheckedTrackTintColor,
-    Color? checkedTrackDecorationColor,
-    Color? uncheckedTrackDecorationColor}) {
+  SwitchComponent copyWith(
+      {Color? checkedThumbTintColor,
+      Color? uncheckedThumbTintColor,
+      Color? checkedTrackTintColor,
+      Color? uncheckedTrackTintColor,
+      Color? checkedTrackDecorationColor,
+      Color? uncheckedTrackDecorationColor}) {
     return SwitchComponent(
         checkedThumbTintColor: checkedThumbTintColor ?? this.checkedThumbTintColor,
         uncheckedThumbTintColor: uncheckedThumbTintColor ?? this.uncheckedThumbTintColor,
         checkedTrackTintColor: checkedTrackTintColor ?? this.checkedTrackTintColor,
         uncheckedTrackTintColor: uncheckedTrackTintColor ?? this.uncheckedTrackTintColor,
         checkedTrackDecorationColor:
-        checkedTrackDecorationColor ?? this.checkedTrackDecorationColor,
+            checkedTrackDecorationColor ?? this.checkedTrackDecorationColor,
         uncheckedTrackDecorationColor:
-        uncheckedTrackDecorationColor ?? this.uncheckedTrackDecorationColor);
+            uncheckedTrackDecorationColor ?? this.uncheckedTrackDecorationColor);
   }
 
   factory SwitchComponent.fromJson(Map<String, dynamic> json) => _$SwitchComponentFromJson(json);
@@ -346,7 +370,7 @@ enum CustomerUiMode {
 
   static CustomerUiMode of(String value) =>
       values.firstWhereOrNull((element) => element.name.toLowerCase() == value) ??
-          CustomerUiMode.auto;
+      CustomerUiMode.auto;
 
   ThemeMode toThemeMode() {
     switch (this) {

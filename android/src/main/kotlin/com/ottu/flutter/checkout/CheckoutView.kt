@@ -27,11 +27,11 @@ import com.squareup.moshi.JsonAdapter
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
@@ -322,9 +322,9 @@ internal class CheckoutView(
                     paymentItemDescriptionTextColor = paymentItemDescriptionTextColor?.toCheckoutColor(),
                     selectorIconColor = selectorIconColor?.toCheckoutColor(),
                     savePhoneNumberIconColor = savePhoneNumberIconColor?.toCheckoutColor(),
-                    button = button?.toCheckoutButton(),
+                    button = button?.toCheckoutButton(resources, packageName),
                     backButton = backButton?.toCheckoutRipple(),
-                    selectorButton = selectorButton?.toCheckoutButton(),
+                    selectorButton = selectorButton?.toCheckoutButton(resources, packageName),
                     switch = switchControl?.toCheckoutSwitch()
                 )
             },
@@ -352,9 +352,9 @@ internal class CheckoutView(
                     paymentItemBackgroundColor = paymentItemBackgroundColor?.toCheckoutColor(),
                     selectorIconColor = selectorIconColor?.toCheckoutColor(),
                     savePhoneNumberIconColor = savePhoneNumberIconColor?.toCheckoutColor(),
-                    button = button?.toCheckoutButton(),
+                    button = button?.toCheckoutButton(resources, packageName),
                     backButton = backButton?.toCheckoutRipple(),
-                    selectorButton = selectorButton?.toCheckoutButton(),
+                    selectorButton = selectorButton?.toCheckoutButton(resources, packageName),
                     switch = switchControl?.toCheckoutSwitch()
                 )
             })

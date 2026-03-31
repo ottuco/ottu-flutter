@@ -69,8 +69,11 @@ data class Margins(
 @Serializable
 data class ButtonComponent(
     val rippleColor: RippleColor? = null,
-    val fontType: Int? = null,
+    val fontFamily: String? = null,
     val textColor: ColorState? = null,
+    val borderColor: ColorState? = null,
+    val borderWidth: Float? = null,
+    val cornerRadius: Float? = null,
 )
 
 @Serializable

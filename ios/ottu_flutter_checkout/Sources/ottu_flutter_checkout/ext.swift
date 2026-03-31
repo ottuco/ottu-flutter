@@ -5,6 +5,7 @@
 //  Created by Vi on 29.10.2024.
 //
 import Foundation
+import OSLog
 import SwiftUI
 import UIKit
 import ottu_checkout_sdk
@@ -190,7 +191,7 @@ extension ButtonCmt {
         let textColors = self.textColor?.toUIColors()
         let buttonColor = self.rippleColor?.color?.toUIColor()
         let buttonDisabledColor = self.rippleColor?.colorDisabled?.toUIColor()
-        let fontType = self.fontType
+        let borderColor = self.borderColor?.toUIColors()
 
         if let btnC = buttonColor {
             bc.enabledBackgroundColor = btnC
@@ -203,8 +204,30 @@ extension ButtonCmt {
         if let textColorNormal = textColors?.color {
             bc.enabledTitleColor = textColorNormal
         }
+
         if let textColorDisabled = textColors?.disabledColor {
             bc.disabledTitleColor = textColorDisabled
+        }
+
+        if let bColor = borderColor?.color {
+            bc.borderColor = bColor
+        }
+
+        if let border = self.borderWidth {
+            bc.borderWidth = CGFloat(border)
+        }
+
+        if let corner = self.cornerRadius {
+            bc.cornerRadius = CGFloat(corner)
+        }
+
+        if let fontFamily = self.fontFamily {
+            let name = fontFamily.replacingOccurrences(
+                of: " ",
+                with: "-",
+            )
+            bc.fontFamily = name
+            //Logger.sdk.debug("toCheckoutButton, name: \(name), set fontFamily: \(bc.fontFamily)")
         }
 
         return bc

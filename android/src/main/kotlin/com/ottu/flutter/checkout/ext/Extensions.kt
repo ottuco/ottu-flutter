@@ -12,9 +12,8 @@ import com.ottu.flutter.checkout.RippleColor
 import com.ottu.flutter.checkout.SwitchComponent
 import com.ottu.flutter.checkout.TextFieldStyle
 import com.ottu.flutter.checkout.TextStyle
-import java.lang.Exception
-import com.ottu.checkout.ui.theme.style.Margins as CheckoutMargins
 import com.ottu.checkout.data.model.localization.PayButtonText as pbt
+import com.ottu.checkout.ui.theme.style.Margins as CheckoutMargins
 
 fun String.toColor() = this.let {
     try {
@@ -30,14 +29,12 @@ fun ColorState.toCheckoutColor() = CheckoutTheme.Color(
 )
 
 fun TextStyle.toCheckoutText(resources: Resources, packageName: String): CheckoutTheme.Text {
-    var fontResId: Int? = null;
-    try {
-        fontResId = resources.getIdentifier(this.fontFamily, "font", packageName)
-    } catch (e: Exception) {
-        Log.e("Extensions", "toCheckoutText", e)
-    }
+    val fontResId = this.fontFamily?.findFontResId(resources = resources, packageName = packageName)
 
-    return CheckoutTheme.Text(textColor = this.textColor?.toCheckoutColor(), fontType = fontResId)
+    return CheckoutTheme.Text(
+        textColor = this.textColor?.toCheckoutColor(),
+        fontType = fontResId
+    )
 }
 
 fun TextFieldStyle.toCheckoutTextField(resources: Resources, packageName: String) =
@@ -56,11 +53,20 @@ fun Margins.toMargins() = CheckoutMargins(
     bottom = this.bottom,
 )
 
-fun ButtonComponent.toCheckoutButton() = CheckoutTheme.Button(
-    textColor = this.textColor?.toCheckoutColor(),
-    rippleColor = this.rippleColor?.toCheckoutRipple(),
-    fontType = this.fontType
-)
+fun ButtonComponent.toCheckoutButton(
+    resources: Resources,
+    packageName: String,
+): CheckoutTheme.Button {
+    val fontResId = this.fontFamily?.findFontResId(resources = resources, packageName = packageName)
+    return CheckoutTheme.Button(
+        textColor = this.textColor?.toCheckoutColor(),
+        rippleColor = this.rippleColor?.toCheckoutRipple(),
+        fontType = fontResId,
+        borderColor = this.borderColor?.toCheckoutColor(),
+        borderWidth = this.borderWidth,
+        cornerRadius = this.cornerRadius,
+    )
+}
 
 fun RippleColor.toCheckoutRipple() = CheckoutTheme.RippleColor(
     color = this.color?.toColor(),
@@ -78,3 +84,12 @@ fun SwitchComponent.toCheckoutSwitch() = CheckoutTheme.Switch(
 )
 
 fun PayButtonText.toPayButtonText() = pbt(en = en, ar = ar)
+
+fun String.findFontResId(resources: Resources, packageName: String) = try {
+    val sanitized = this.lowercase().replace(" ", "_")
+    println("findFontResId, with name: $sanitized")
+    resources.getIdentifier(sanitized, "font", packageName).let { if (it == 0) null else it }
+} catch (e: Exception) {
+    Log.e("Extensions", "toCheckoutText", e)
+    null
+}
