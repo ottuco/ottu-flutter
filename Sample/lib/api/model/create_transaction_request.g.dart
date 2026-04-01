@@ -39,6 +39,11 @@ CreateTransactionRequest _$CreateTransactionRequestFromJson(
       : TransactionAgreement.fromJson(
           json['agreement'] as Map<String, dynamic>,
         ),
+  brandingOptions: json['branding_options'] == null
+      ? null
+      : BrandingOptionsRequest.fromJson(
+          json['branding_options'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$CreateTransactionRequestToJson(
@@ -58,6 +63,7 @@ Map<String, dynamic> _$CreateTransactionRequestToJson(
   'language': instance.language,
   'payment_type': ?_$TransactionPaymentTypeEnumMap[instance.paymentType],
   'agreement': ?instance.agreement,
+  'branding_options': ?instance.brandingOptions,
   'card_acceptance_criteria': ?instance.cardAcceptanceCriteria,
 };
 

@@ -8,12 +8,13 @@ enum PGCode {
   //urpay(code: "urpay", name: "Ur Pay"),
   tamara(code: "tamara", name: "Tamara"),
   tabby(code: "tabby", name: "Tabby"),
+  cod(code: "cod", name: "cod"),
+  jamiawallet(code: "jamiawallet", name: "jamiawallet"),
+  cs(code: "cs", name: "cs"),
 
   apple_pay(code: "apple-pay", name: "Apple Pay"),
   tap_pg(code: "tap_pg", name: "Tag PG"),
-  ottu_sdk(code: "ottu_sdk", name: "Ottu Sdk"),
-  cod(code: "cod", name: "cod"),
-  jamiawallet(code: "jamiawallet", name: "jamiawallet");
+  ottu_sdk(code: "ottu_sdk", name: "Ottu Sdk");
 
   const PGCode({required this.code, required this.name, this.inverselyRelated});
 

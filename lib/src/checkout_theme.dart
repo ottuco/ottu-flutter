@@ -32,6 +32,7 @@ class CheckoutTheme extends Equatable {
   final ColorState? modalBackgroundColor;
   final ColorState? selectPaymentMethodHeaderBackgroundColor;
   final ColorState? paymentItemBackgroundColor;
+  final ColorState? paymentItemDescriptionTextColor;
   final ColorState? selectorIconColor;
   final ColorState? savePhoneNumberIconColor;
 
@@ -56,6 +57,7 @@ class CheckoutTheme extends Equatable {
       this.modalBackgroundColor,
       this.selectPaymentMethodHeaderBackgroundColor,
       this.paymentItemBackgroundColor,
+      this.paymentItemDescriptionTextColor,
       this.selectorIconColor,
       this.savePhoneNumberIconColor});
 
@@ -80,6 +82,7 @@ class CheckoutTheme extends Equatable {
       ColorState? modalBackgroundColor,
       ColorState? selectPaymentMethodHeaderBackgroundColor,
       ColorState? paymentItemBackgroundColor,
+      ColorState? paymentItemDescriptionTextColor,
       ColorState? selectorIconColor,
       ColorState? savePhoneNumberIconColor}) {
     return CheckoutTheme(
@@ -102,9 +105,11 @@ class CheckoutTheme extends Equatable {
       margins: margins ?? this.margins,
       sdkBackgroundColor: sdkBackgroundColor ?? this.sdkBackgroundColor,
       modalBackgroundColor: modalBackgroundColor ?? this.modalBackgroundColor,
-      selectPaymentMethodHeaderBackgroundColor: selectPaymentMethodHeaderBackgroundColor ??
-          this.selectPaymentMethodHeaderBackgroundColor,
+      selectPaymentMethodHeaderBackgroundColor:
+          selectPaymentMethodHeaderBackgroundColor ?? this.selectPaymentMethodHeaderBackgroundColor,
       paymentItemBackgroundColor: paymentItemBackgroundColor ?? this.paymentItemBackgroundColor,
+      paymentItemDescriptionTextColor:
+          paymentItemDescriptionTextColor ?? this.paymentItemDescriptionTextColor,
       selectorIconColor: selectorIconColor ?? this.selectorIconColor,
       savePhoneNumberIconColor: savePhoneNumberIconColor ?? this.savePhoneNumberIconColor,
     );
@@ -132,6 +137,7 @@ class CheckoutTheme extends Equatable {
         modalBackgroundColor,
         selectPaymentMethodHeaderBackgroundColor,
         paymentItemBackgroundColor,
+        paymentItemDescriptionTextColor,
         selectorIconColor,
         savePhoneNumberIconColor
       ];
@@ -256,16 +262,35 @@ final class TextFieldStyle {
 @JsonSerializable()
 class ButtonComponent {
   final RippleColor? rippleColor;
-  final int? fontType;
+  final String? fontFamily;
   final ColorState? textColor;
+  final ColorState? borderColor;
+  final double? borderWidth;
+  final double? cornerRadius;
 
-  ButtonComponent({this.rippleColor, this.fontType, this.textColor});
+  ButtonComponent(
+      {this.rippleColor,
+      this.fontFamily,
+      this.textColor,
+      this.borderColor,
+      this.borderWidth,
+      this.cornerRadius});
 
-  ButtonComponent copyWith({RippleColor? rippleColor, int? fontType, ColorState? textColor}) {
+  ButtonComponent copyWith(
+      {RippleColor? rippleColor,
+      String? fontFamily,
+      ColorState? textColor,
+      ColorState? borderColor,
+      double? borderWidth,
+      double? cornerRadius}) {
     return ButtonComponent(
-        rippleColor: rippleColor ?? this.rippleColor,
-        textColor: textColor ?? this.textColor,
-        fontType: fontType ?? this.fontType);
+      rippleColor: rippleColor ?? this.rippleColor,
+      textColor: textColor ?? this.textColor,
+      fontFamily: fontFamily ?? this.fontFamily,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
+      cornerRadius: cornerRadius ?? this.cornerRadius,
+    );
   }
 
   factory ButtonComponent.fromJson(Map<String, dynamic> json) => _$ButtonComponentFromJson(json);
