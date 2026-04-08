@@ -381,13 +381,12 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               color: "#708090",
               fontWeight: 700,
             );
-          case PGCode.cs:
-            brandingOptionsRequest.paymentMethods.cs = BrandingOption(
+         case PGCode.cs:
+           brandingOptionsRequest.paymentMethods.cs = BrandingOption(
               text: "Branding text for cs",
               color: "#D2691E",
               fontWeight: 300,
             );
-          case PGCode.apple_pay:
           case PGCode.tap_pg:
             brandingOptionsRequest.paymentMethods.tapPg = BrandingOption(
               text: "Branding text for Tap",
@@ -400,6 +399,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               color: "#2F4F4F",
               fontWeight: 300,
             );
+            default:
         }
       }
     });

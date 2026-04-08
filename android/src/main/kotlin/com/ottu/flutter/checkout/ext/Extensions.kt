@@ -87,9 +87,9 @@ fun PayButtonText.toPayButtonText() = pbt(en = en, ar = ar)
 
 fun String.findFontResId(resources: Resources, packageName: String) = try {
     val sanitized = this.lowercase().replace(" ", "_")
-    println("findFontResId, with name: $sanitized")
+    Log.d("Extensions", "findFontResId, with name: $sanitized")
     resources.getIdentifier(sanitized, "font", packageName).let { if (it == 0) null else it }
 } catch (e: Exception) {
-    Log.e("Extensions", "toCheckoutText", e)
+    Log.e("Extensions", "findFontResId", e)
     null
 }

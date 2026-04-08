@@ -10,8 +10,6 @@ import 'package:ottu_flutter_checkout_sample/feature/theme/ios_fonts.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_customization_screen_cubit.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_customization_state.dart';
 
-const _fontFamilies = ["Almarai Bold", "Almarai ExtraBold", "Almarai Light", "Almarai Regular"];
-
 class ThemeCustomizationScreen extends StatefulWidget {
   const ThemeCustomizationScreen({super.key});
 
@@ -555,8 +553,11 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
         subDivider(),
         const SizedBox(height: dividerPadding),
         _dropDownModifier(
-          "Button Font Name",
-          _fontFamilies,
+          Platform.isAndroid
+              ? androidFonts
+              : Platform.isIOS
+              ? iOSFonts
+              : [],
           "Button Font Family",
           btn.value?.fontFamily,
           (selection) {
@@ -1034,7 +1035,6 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
   }
 
   Widget _dropDownModifier(
-    String s,
     List<String> values,
     String title,
     String? selection,

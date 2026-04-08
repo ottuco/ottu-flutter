@@ -1,5 +1,9 @@
 const List<String> androidFonts = [
-  "nter_regular",
+  "Almarai Bold",
+  "Almarai ExtraBold",
+  "Almarai Light",
+  "Almarai Regular",
+  "inter_regular",
   "montserrat_regular",
   "montserrat_semibold",
   "poppins_regular",
