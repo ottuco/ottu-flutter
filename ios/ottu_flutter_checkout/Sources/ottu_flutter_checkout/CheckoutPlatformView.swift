@@ -193,7 +193,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
 
         var apiTransactionDetails: TransactionDetailsResponse?
         if let transactionDetails: String? = arguments.apiTransactionDetails {
-           
+
             if let td = transactionDetails {
                 apiTransactionDetails = try? getApiTransactionDetails(td)
             }
@@ -288,6 +288,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                     "Decoding error (valueNotFound): value not found for \(type) in \(context.debugDescription)"
                 )
                 Logger.sdk.debug("Coding path: \(context.codingPath)")
+            } catch {
+                Logger.sdk.error("Failed to decode transactionDetails \(error)")
             }
 
             return nil
