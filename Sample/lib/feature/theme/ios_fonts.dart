@@ -1,4 +1,8 @@
 const List<String> iOSFonts = [
+  "Almarai Bold",
+  "Almarai ExtraBold",
+  "Almarai Light",
+  "Almarai Regular",
   "Academy Engraved LET Plain",
   "Adelle Sans Devanagari Bold",
   "Adelle Sans Devanagari Extrabold",

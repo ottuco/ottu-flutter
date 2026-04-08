@@ -105,6 +105,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     }
 
     fileprivate func showSdkError() {
+        Logger.sdk.info("showSdkError")
         if let parentVC = UIApplication.shared.delegate?.window??
             .rootViewController as? FlutterViewController
         {
@@ -149,6 +150,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 )
             )
             parentVC.present(alert, animated: true, completion: nil)
+        } else {
+            Logger.sdk.info("showSdkError, unable to find parentVC")
         }
     }
 
@@ -190,11 +193,13 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
 
         var apiTransactionDetails: TransactionDetailsResponse?
         if let transactionDetails: String? = arguments.apiTransactionDetails {
+
             if let td = transactionDetails {
                 apiTransactionDetails = try? getApiTransactionDetails(td)
             }
         }
         do {
+            Logger.sdk.info("Get transactionDetails from apiTransactionDetails")
             let transactionDetails: TransactionDetails? = try
                 apiTransactionDetails?.transactionDetails
             Logger.sdk.info("setupPreload")
@@ -215,7 +220,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 tryAttachController()
             }
         } catch {
-            Logger.sdk.warning("Unable to get TransactionDetails")
+            Logger.sdk.error("Unable to get TransactionDetails, \(error)")
             showSdkError()
         }
     }
@@ -224,10 +229,14 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         Logger.sdk.info("tryAttachController")
         guard let pvc = self.paymentViewController else { return }
 
-        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+        if let scene = UIApplication.shared.connectedScenes.first
+            as? UIWindowScene
+        {
             if let window = scene.windows.first(where: { $0.isKeyWindow }) {
                 let rootViewController = window.rootViewController
-                Logger.sdk.info("tryAttachController, pvc: \(rootViewController)")
+                Logger.sdk.info(
+                    "tryAttachController, pvc: \(rootViewController)"
+                )
                 if let parentVC = rootViewController as? FlutterViewController {
                     Logger.sdk.debug("tryAttachController, addChild PVC")
                     parentVC.addChild(pvc)
@@ -235,7 +244,9 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                     pvc.didMove(toParent: parentVC)
                     Logger.sdk.info("Added to parent!")
                 } else {
-                    Logger.sdk.info("tryAttachController, PVC hasn found, waiting for parent...")
+                    Logger.sdk.info(
+                        "tryAttachController, PVC hasn found, waiting for parent..."
+                    )
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         self.tryAttachController()
                     }
@@ -244,12 +255,15 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         }
     }
 
-    private func getApiTransactionDetails(_ transactionDetails: String) throws
+    private func getApiTransactionDetails(_ transactionDetails: String)
         -> TransactionDetailsResponse?
     {
+        Logger.sdk.info("getApiTransactionDetails")
         if let jsonData = transactionDetails.data(using: .utf8) {
+            Logger.sdk.info("getApiTransactionDetails, json data")
             let decoder = JSONDecoder()
             do {
+                Logger.sdk.info("getApiTransactionDetails, try to decode")
                 return try decoder.decode(
                     TransactionDetailsResponse.self,
                     from: jsonData
@@ -274,6 +288,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                     "Decoding error (valueNotFound): value not found for \(type) in \(context.debugDescription)"
                 )
                 Logger.sdk.debug("Coding path: \(context.codingPath)")
+            } catch {
+                Logger.sdk.error("Failed to decode transactionDetails \(error)")
             }
 
             return nil
