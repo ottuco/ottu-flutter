@@ -28,8 +28,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
 
     private func deinitCheckout() {
         guard let pvc = paymentViewController,
-            let parentVC = UIApplication.shared.delegate?.window??
-                .rootViewController as? FlutterViewController
+            let parentVC = findRootViewController() as? FlutterViewController
         else { return }
 
         if parentVC.children.contains(pvc) {
@@ -106,9 +105,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
 
     fileprivate func showSdkError() {
         Logger.sdk.info("showSdkError")
-        if let parentVC = UIApplication.shared.delegate?.window??
-            .rootViewController as? FlutterViewController
-        {
+        if let parentVC = findRootViewController() as? FlutterViewController {
             let title = NSLocalizedString(
                 "failed",
                 bundle: Bundle.module,
@@ -202,6 +199,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             Logger.sdk.info("Get transactionDetails from apiTransactionDetails")
             let transactionDetails: TransactionDetails? = try
                 apiTransactionDetails?.transactionDetails
+        
             Logger.sdk.info("setupPreload")
             self.checkout = try Checkout(
                 formsOfPayments: formsOfPayment,
@@ -229,32 +227,44 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         Logger.sdk.info("tryAttachController")
         guard let pvc = self.paymentViewController else { return }
 
-        if let scene = UIApplication.shared.connectedScenes.first
-            as? UIWindowScene
-        {
-            if let window = scene.windows.first(where: { $0.isKeyWindow }) {
-                let rootViewController = window.rootViewController
-                Logger.sdk.info(
-                    "tryAttachController, pvc: \(rootViewController)"
-                )
-                if let parentVC = rootViewController as? FlutterViewController {
-                    Logger.sdk.debug("tryAttachController, addChild PVC")
-                    parentVC.addChild(pvc)
-                    _view.addCheckoutView(pvc.view)
-                    pvc.didMove(toParent: parentVC)
-                    Logger.sdk.info("Added to parent!")
-                } else {
-                    Logger.sdk.info(
-                        "tryAttachController, PVC hasn found, waiting for parent..."
-                    )
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        self.tryAttachController()
-                    }
-                }
+        let rootViewController = findRootViewController()
+        Logger.sdk.info(
+            "tryAttachController, pvc: \(rootViewController)"
+        )
+        if let parentVC = rootViewController as? FlutterViewController {
+            Logger.sdk.debug("tryAttachController, addChild PVC")
+            parentVC.addChild(pvc)
+            _view.addCheckoutView(pvc.view)
+            pvc.didMove(toParent: parentVC)
+            Logger.sdk.info("Added to parent!")
+        } else {
+            Logger.sdk.info(
+                "tryAttachController, PVC hasn found, waiting for parent..."
+            )
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.tryAttachController()
             }
         }
     }
 
+    private func findRootViewController() -> UIViewController? {
+
+        if let scene = UIApplication.shared.connectedScenes.first
+            as? UIWindowScene
+        {
+            if let window = scene.windows.first(where: { $0.isKeyWindow }) {
+                return window.rootViewController
+
+            } else {
+                Logger.sdk.error(
+                    "findRootViewController, unable to find window in scene"
+                )
+            }
+        } else {
+            Logger.sdk.error("findRootViewController, connectedScenes is empty")
+        }
+        return nil
+    }
     private func getApiTransactionDetails(_ transactionDetails: String)
         -> TransactionDetailsResponse?
     {
