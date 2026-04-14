@@ -199,7 +199,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             Logger.sdk.info("Get transactionDetails from apiTransactionDetails")
             let transactionDetails: TransactionDetails? = try
                 apiTransactionDetails?.transactionDetails
-        
+
             Logger.sdk.info("setupPreload")
             self.checkout = try Checkout(
                 formsOfPayments: formsOfPayment,
@@ -415,6 +415,20 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             if let cc = color.color {
                 cht.selectPaymentMethodDescriptionTextColor = cc
             }
+        }
+
+        if let color = theme?.paymentItemBorderColor?.toUIColors() {
+            if let cc = color.color {
+                cht.selectPaymentMethodBorderColor = cc
+            }
+        }
+
+        if let width = theme?.paymentItemBorderWidth {
+            cht.selectPaymentMethodBorderWidth = CGFloat(width)
+        }
+
+        if let radius = theme?.paymentItemCornerRadius {
+            cht.selectPaymentMethodCornerRadius = CGFloat(radius)
         }
 
         if let switchColor = theme?.switchControl?.toCheckoutSwitch() {

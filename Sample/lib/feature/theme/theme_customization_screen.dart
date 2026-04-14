@@ -302,6 +302,46 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                             context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
                           },
                         ),
+                        divider(),
+                        const SizedBox(height: dividerPadding),
+                        _colorOptionItem(
+                          state.theme?.paymentItemBorderColor?.color,
+                          "Select Payment Border Color",
+                          (color) {
+                            final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                              paymentItemBorderColor: ch.ColorState(color: color),
+                            );
+                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                          },
+                        ),
+                        const SizedBox(height: dividerPadding),
+                        divider(),
+                        const SizedBox(height: dividerPadding),
+                        _numberModifier(
+                          "Select Payment Method Border Width",
+                          state.theme?.paymentItemBorderWidth,
+                          (number) {
+                            final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                              paymentItemBorderWidth: number,
+                            );
+                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                          },
+                        ),
+                        const SizedBox(height: dividerPadding),
+                        subDivider(),
+                        const SizedBox(height: dividerPadding),
+                        _numberModifier(
+                          "Select Payment Corner Radius",
+                          state.theme?.paymentItemCornerRadius,
+                          (number) {
+                            final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
+                              paymentItemCornerRadius: number,
+                            );
+                            context.read<ThemeCustomizationScreenCubit>().onThemeChanged(newTheme);
+                          },
+                        ),
+                        const SizedBox(height: dividerPadding),
+                        subDivider(),
                       ],
                     );
                   },
@@ -895,6 +935,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
         keyboardType: TextInputType.number,
         textInputAction: TextInputAction.done,
         onFieldSubmitted: onTextChanged,
+        onChanged: onTextChanged,
       ),
     );
   }

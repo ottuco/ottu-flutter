@@ -87,6 +87,14 @@ CheckoutTheme _$CheckoutThemeFromJson(
       : ColorState.fromJson(
           json['paymentItemDescriptionTextColor'] as Map<String, dynamic>,
         ),
+  paymentItemBorderColor: json['paymentItemBorderColor'] == null
+      ? null
+      : ColorState.fromJson(
+          json['paymentItemBorderColor'] as Map<String, dynamic>,
+        ),
+  paymentItemBorderWidth: (json['paymentItemBorderWidth'] as num?)?.toDouble(),
+  paymentItemCornerRadius: (json['paymentItemCornerRadius'] as num?)
+      ?.toDouble(),
   selectorIconColor: json['selectorIconColor'] == null
       ? null
       : ColorState.fromJson(json['selectorIconColor'] as Map<String, dynamic>),
@@ -122,6 +130,9 @@ Map<String, dynamic> _$CheckoutThemeToJson(
       instance.selectPaymentMethodHeaderBackgroundColor,
   'paymentItemBackgroundColor': instance.paymentItemBackgroundColor,
   'paymentItemDescriptionTextColor': instance.paymentItemDescriptionTextColor,
+  'paymentItemBorderColor': instance.paymentItemBorderColor,
+  'paymentItemBorderWidth': instance.paymentItemBorderWidth,
+  'paymentItemCornerRadius': instance.paymentItemCornerRadius,
   'selectorIconColor': instance.selectorIconColor,
   'savePhoneNumberIconColor': instance.savePhoneNumberIconColor,
 };
