@@ -22,6 +22,9 @@ struct CustomerTheme: Decodable {
     let selectPaymentMethodHeaderBackgroundColor: ColorState?
     let paymentItemBackgroundColor: ColorState?
     let paymentItemDescriptionTextColor: ColorState?
+    let paymentItemBorderColor: ColorState?
+    let paymentItemBorderWidth: Float?
+    let paymentItemCornerRadius: Float?
     let selectorIconColor: ColorState?
     let savePhoneNumberIconColor: ColorState?
     let button: ButtonCmt?

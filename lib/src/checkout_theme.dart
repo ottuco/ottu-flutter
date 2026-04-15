@@ -33,6 +33,9 @@ class CheckoutTheme extends Equatable {
   final ColorState? selectPaymentMethodHeaderBackgroundColor;
   final ColorState? paymentItemBackgroundColor;
   final ColorState? paymentItemDescriptionTextColor;
+  final ColorState? paymentItemBorderColor;
+  final double? paymentItemBorderWidth;
+  final double? paymentItemCornerRadius;
   final ColorState? selectorIconColor;
   final ColorState? savePhoneNumberIconColor;
 
@@ -58,6 +61,9 @@ class CheckoutTheme extends Equatable {
     this.selectPaymentMethodHeaderBackgroundColor,
     this.paymentItemBackgroundColor,
     this.paymentItemDescriptionTextColor,
+    this.paymentItemBorderColor,
+    this.paymentItemBorderWidth,
+    this.paymentItemCornerRadius,
     this.selectorIconColor,
     this.savePhoneNumberIconColor,
   });
@@ -84,6 +90,9 @@ class CheckoutTheme extends Equatable {
     ColorState? selectPaymentMethodHeaderBackgroundColor,
     ColorState? paymentItemBackgroundColor,
     ColorState? paymentItemDescriptionTextColor,
+    ColorState? paymentItemBorderColor,
+    double? paymentItemBorderWidth,
+    double? paymentItemCornerRadius,
     ColorState? selectorIconColor,
     ColorState? savePhoneNumberIconColor,
   }) {
@@ -92,7 +101,7 @@ class CheckoutTheme extends Equatable {
       titleText: titleText ?? this.titleText,
       mainTitleText: mainTitleText ?? this.mainTitleText,
       selectPaymentMethodHeaderText:
-          selectPaymentMethodHeaderText ?? this.selectPaymentMethodHeaderText,
+      selectPaymentMethodHeaderText ?? this.selectPaymentMethodHeaderText,
       subtitleText: subtitleText ?? this.subtitleText,
       feesTitleText: feesTitleText ?? this.feesTitleText,
       feesSubtitleText: feesSubtitleText ?? this.feesSubtitleText,
@@ -108,41 +117,48 @@ class CheckoutTheme extends Equatable {
       sdkBackgroundColor: sdkBackgroundColor ?? this.sdkBackgroundColor,
       modalBackgroundColor: modalBackgroundColor ?? this.modalBackgroundColor,
       selectPaymentMethodHeaderBackgroundColor:
-          selectPaymentMethodHeaderBackgroundColor ?? this.selectPaymentMethodHeaderBackgroundColor,
+      selectPaymentMethodHeaderBackgroundColor ?? this.selectPaymentMethodHeaderBackgroundColor,
       paymentItemBackgroundColor: paymentItemBackgroundColor ?? this.paymentItemBackgroundColor,
       paymentItemDescriptionTextColor:
-          paymentItemDescriptionTextColor ?? this.paymentItemDescriptionTextColor,
+      paymentItemDescriptionTextColor ?? this.paymentItemDescriptionTextColor,
+      paymentItemBorderColor: paymentItemBorderColor ?? this.paymentItemBorderColor,
+      paymentItemBorderWidth: paymentItemBorderWidth ?? this.paymentItemBorderWidth,
+      paymentItemCornerRadius: paymentItemCornerRadius ?? this.paymentItemCornerRadius,
       selectorIconColor: selectorIconColor ?? this.selectorIconColor,
       savePhoneNumberIconColor: savePhoneNumberIconColor ?? this.savePhoneNumberIconColor,
     );
   }
 
   @override
-  List<Object?> get props => [
-    uiMode,
-    titleText,
-    mainTitleText,
-    selectPaymentMethodHeaderText,
-    subtitleText,
-    feesTitleText,
-    feesSubtitleText,
-    dataLabelText,
-    dataValueText,
-    errorMessageText,
-    inputTextField,
-    button,
-    backButton,
-    selectorButton,
-    switchControl,
-    margins,
-    sdkBackgroundColor,
-    modalBackgroundColor,
-    selectPaymentMethodHeaderBackgroundColor,
-    paymentItemBackgroundColor,
-    paymentItemDescriptionTextColor,
-    selectorIconColor,
-    savePhoneNumberIconColor,
-  ];
+  List<Object?> get props =>
+      [
+        uiMode,
+        titleText,
+        mainTitleText,
+        selectPaymentMethodHeaderText,
+        subtitleText,
+        feesTitleText,
+        feesSubtitleText,
+        dataLabelText,
+        dataValueText,
+        errorMessageText,
+        inputTextField,
+        button,
+        backButton,
+        selectorButton,
+        switchControl,
+        margins,
+        sdkBackgroundColor,
+        modalBackgroundColor,
+        selectPaymentMethodHeaderBackgroundColor,
+        paymentItemBackgroundColor,
+        paymentItemDescriptionTextColor,
+        paymentItemBorderColor,
+        paymentItemBorderWidth,
+        paymentItemCornerRadius,
+        selectorIconColor,
+        savePhoneNumberIconColor,
+      ];
 
   factory CheckoutTheme.fromJson(Map<String, dynamic> json) => _$CheckoutThemeFromJson(json);
 
@@ -233,11 +249,12 @@ final class TextStyle {
 
   Map<String, dynamic> toJson() => _$TextStyleToJson(this);
 
-  TextStyle copyWith({ColorState? textColor, String? fontFamily, int? fontSize}) => TextStyle(
-    textColor: textColor ?? this.textColor,
-    fontFamily: fontFamily ?? this.fontFamily,
-    fontSize: fontSize ?? this.fontSize,
-  );
+  TextStyle copyWith({ColorState? textColor, String? fontFamily, int? fontSize}) =>
+      TextStyle(
+        textColor: textColor ?? this.textColor,
+        fontFamily: fontFamily ?? this.fontFamily,
+        fontSize: fontSize ?? this.fontSize,
+      );
 }
 
 @JsonSerializable()
@@ -352,7 +369,7 @@ class SwitchComponent {
       uncheckedTrackTintColor: uncheckedTrackTintColor ?? this.uncheckedTrackTintColor,
       checkedTrackDecorationColor: checkedTrackDecorationColor ?? this.checkedTrackDecorationColor,
       uncheckedTrackDecorationColor:
-          uncheckedTrackDecorationColor ?? this.uncheckedTrackDecorationColor,
+      uncheckedTrackDecorationColor ?? this.uncheckedTrackDecorationColor,
     );
   }
 
@@ -387,7 +404,7 @@ enum CustomerUiMode {
 
   static CustomerUiMode of(String value) =>
       values.firstWhereOrNull((element) => element.name.toLowerCase() == value) ??
-      CustomerUiMode.auto;
+          CustomerUiMode.auto;
 
   ThemeMode toThemeMode() {
     switch (this) {
