@@ -15,6 +15,7 @@ final class HomeScreenState extends Equatable {
   final String? cardExpiryTime;
   final String paymentsListItemCount;
   final String? defaultSelectedPayment;
+  final String? language;
   final bool showPaymentDetails;
   final bool? noForms;
   final bool? preloadPayload;
@@ -37,6 +38,7 @@ final class HomeScreenState extends Equatable {
     this.cardExpiryTime,
     this.paymentsListItemCount = "$_default_payments_list__item_count",
     this.defaultSelectedPayment,
+    this.language,
     this.showPaymentDetails = true,
     this.preloadPayload = true,
     this.isAutoDebit = false,
@@ -60,6 +62,7 @@ final class HomeScreenState extends Equatable {
     String? cardExpiryTime,
     String? paymentsListItemCount,
     String? defaultSelectedPayment,
+    String? language,
     bool? showPaymentDetails,
     bool? noForms,
     bool? preloadPayload,
@@ -82,6 +85,7 @@ final class HomeScreenState extends Equatable {
       cardExpiryTime: cardExpiryTime ?? this.cardExpiryTime,
       paymentsListItemCount: paymentsListItemCount ?? this.paymentsListItemCount,
       defaultSelectedPayment: defaultSelectedPayment ?? this.defaultSelectedPayment,
+      language: language ?? this.language,
       showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
       noForms: noForms ?? this.noForms,
       preloadPayload: preloadPayload ?? this.preloadPayload,
@@ -107,6 +111,7 @@ final class HomeScreenState extends Equatable {
     cardExpiryTime,
     paymentsListItemCount,
     defaultSelectedPayment,
+    language,
     sessionId,
     preloadPayload,
     isAutoDebit,
