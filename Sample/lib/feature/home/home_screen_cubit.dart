@@ -59,6 +59,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
                currencyCode: currencyCode,
                phoneNumber: _customerPhone,
                customerId: customerId,
+               language: Platform.localeName.split("_")[0],
                formsOfPaymentChecked: Map.from({
                  FormsOfPayment.redirect: true,
                  FormsOfPayment.flex: true,
@@ -100,7 +101,9 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   void getSessionId({required String merchantId, required String apiKey}) async {
     _logger.d("getSessionId, merchantId: $merchantId, apiKey: $apiKey");
     emit(state.copyWith(sessionId: null, hasSessionLoaded: false));
-    final language = Platform.localeName.split("_")[0];
+
+    final language = state.language ?? Platform.localeName.split("_")[0];
+
     final cardExpiryTime = state.cardExpiryTime?.isNotEmpty == true
         ? int.tryParse(state.cardExpiryTime!)
         : null;
@@ -319,7 +322,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
 
     final brandingOptionsRequest = BrandingOptionsRequest(paymentMethods: BrandingPaymentMethods());
     state.pgCodesChecked?.forEach((code, isSelected) {
-      if(isSelected) {
+      if (isSelected) {
         switch (code) {
           case PGCode.knet:
             brandingOptionsRequest.paymentMethods.knetStaging = BrandingOption(
@@ -334,13 +337,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               fontWeight: 400,
             );
           case PGCode.benefit:
-           /* brandingOptionsRequest.paymentMethods.benefit = BrandingOption(
+          /* brandingOptionsRequest.paymentMethods.benefit = BrandingOption(
               text: "Branding text for Benefit",
               color: "#006400",
               fontWeight: 900,
             );*/
           case PGCode.benefitpay:
-           /* brandingOptionsRequest.paymentMethods.benefitpay = BrandingOption(
+          /* brandingOptionsRequest.paymentMethods.benefitpay = BrandingOption(
               text: "Branding text for BenefitPay",
               color: "#48D1CC",
               fontWeight: 900,
@@ -381,8 +384,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               color: "#708090",
               fontWeight: 700,
             );
-         case PGCode.cs:
-           brandingOptionsRequest.paymentMethods.cs = BrandingOption(
+          case PGCode.cs:
+            brandingOptionsRequest.paymentMethods.cs = BrandingOption(
               text: "Branding text for cs",
               color: "#D2691E",
               fontWeight: 300,
@@ -399,11 +402,15 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
               color: "#2F4F4F",
               fontWeight: 300,
             );
-            default:
+          default:
         }
       }
     });
 
     return brandingOptionsRequest;
+  }
+
+  void onLanguageChanged(String? lang) {
+    emit(state.copyWith(language: lang));
   }
 }
