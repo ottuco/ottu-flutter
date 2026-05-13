@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late TextEditingController cardExpiryTimeController;
   late TextEditingController paymentsListItemCountController;
   late TextEditingController defaultSelectedPaymentController;
+  late TextEditingController languageController;
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     cardExpiryTimeController = TextEditingController(text: state.cardExpiryTime);
     paymentsListItemCountController = TextEditingController(text: state.paymentsListItemCount);
     defaultSelectedPaymentController = TextEditingController(text: state.defaultSelectedPayment);
+    languageController = TextEditingController(text: state.language);
   }
 
   @override
@@ -73,6 +75,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      DropdownMenu<String>(
+                        initialSelection: Platform.localeName.split("_")[0],
+                        controller: languageController,
+                        requestFocusOnTap: true,
+                        label: const Text('Language'),
+                        expandedInsets: EdgeInsets.zero,
+                        onSelected: (String? lang) {
+                          context.read<HomeScreenCubit>().onLanguageChanged(lang);
+                        },
+                        dropdownMenuEntries: ["en", "ar"].map<DropdownMenuEntry<String>>((
+                          String lang,
+                        ) {
+                          return DropdownMenuEntry<String>(value: lang, label: lang);
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 8),
                       TextFormField(
                         controller: amountEditingController,
                         onChanged: (text) {
@@ -263,7 +281,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const Text('Auto debit'),
                         ],
-                      ),Row(
+                      ),
+                      Row(
                         children: [
                           Checkbox(
                             checkColor: Colors.white,
