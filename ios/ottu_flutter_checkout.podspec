@@ -17,7 +17,7 @@ A Flutter plugin for the Ottu Checkout SDK integration on iOS.
   s.public_header_files = 'Classes/**/*.h'
 
   s.dependency 'Flutter'
-  s.dependency 'ottu_checkout_sdk', '~> 2.2.6'
+  s.dependency 'ottu_checkout_sdk', '~> 2.2.7'
   s.dependency 'Sentry', '~> 8.46.0'
 
   # Resources (Privacy and Assets)
