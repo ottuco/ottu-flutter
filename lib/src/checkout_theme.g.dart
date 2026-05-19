@@ -12,35 +12,35 @@ CheckoutTheme _$CheckoutThemeFromJson(
   uiMode: json['uiMode'] == null
       ? CustomerUiMode.auto
       : const _UiModeJsonConverter().fromJson(json['uiMode'] as String),
-  titleText: json['titleText'] == null
+  title: json['title'] == null
       ? null
-      : TextStyle.fromJson(json['titleText'] as Map<String, dynamic>),
-  mainTitleText: json['mainTitleText'] == null
+      : TextStyle.fromJson(json['title'] as Map<String, dynamic>),
+  mainTitle: json['mainTitle'] == null
       ? null
-      : TextStyle.fromJson(json['mainTitleText'] as Map<String, dynamic>),
-  selectPaymentMethodHeaderText: json['selectPaymentMethodHeaderText'] == null
+      : TextStyle.fromJson(json['mainTitle'] as Map<String, dynamic>),
+  selectPaymentMethodHeader: json['selectPaymentMethodHeader'] == null
       ? null
       : TextStyle.fromJson(
-          json['selectPaymentMethodHeaderText'] as Map<String, dynamic>,
+          json['selectPaymentMethodHeader'] as Map<String, dynamic>,
         ),
-  subtitleText: json['subtitleText'] == null
+  subtitle: json['subtitle'] == null
       ? null
-      : TextStyle.fromJson(json['subtitleText'] as Map<String, dynamic>),
-  feesTitleText: json['feesTitleText'] == null
+      : TextStyle.fromJson(json['subtitle'] as Map<String, dynamic>),
+  feesTitle: json['feesTitle'] == null
       ? null
-      : TextStyle.fromJson(json['feesTitleText'] as Map<String, dynamic>),
-  feesSubtitleText: json['feesSubtitleText'] == null
+      : TextStyle.fromJson(json['feesTitle'] as Map<String, dynamic>),
+  feesSubtitle: json['feesSubtitle'] == null
       ? null
-      : TextStyle.fromJson(json['feesSubtitleText'] as Map<String, dynamic>),
-  dataLabelText: json['dataLabelText'] == null
+      : TextStyle.fromJson(json['feesSubtitle'] as Map<String, dynamic>),
+  dataLabel: json['dataLabel'] == null
       ? null
-      : TextStyle.fromJson(json['dataLabelText'] as Map<String, dynamic>),
-  dataValueText: json['dataValueText'] == null
+      : TextStyle.fromJson(json['dataLabel'] as Map<String, dynamic>),
+  dataValue: json['dataValue'] == null
       ? null
-      : TextStyle.fromJson(json['dataValueText'] as Map<String, dynamic>),
-  errorMessageText: json['errorMessageText'] == null
+      : TextStyle.fromJson(json['dataValue'] as Map<String, dynamic>),
+  errorMessage: json['errorMessage'] == null
       ? null
-      : TextStyle.fromJson(json['errorMessageText'] as Map<String, dynamic>),
+      : TextStyle.fromJson(json['errorMessage'] as Map<String, dynamic>),
   inputTextField: json['inputTextField'] == null
       ? null
       : TextFieldStyle.fromJson(json['inputTextField'] as Map<String, dynamic>),
@@ -61,20 +61,19 @@ CheckoutTheme _$CheckoutThemeFromJson(
   margins: json['margins'] == null
       ? null
       : Margins.fromJson(json['margins'] as Map<String, dynamic>),
-  sdkBackgroundColor: json['sdkBackgroundColor'] == null
+  backgroundColor: json['backgroundColor'] == null
       ? null
-      : ColorState.fromJson(json['sdkBackgroundColor'] as Map<String, dynamic>),
+      : ColorState.fromJson(json['backgroundColor'] as Map<String, dynamic>),
   modalBackgroundColor: json['modalBackgroundColor'] == null
       ? null
       : ColorState.fromJson(
           json['modalBackgroundColor'] as Map<String, dynamic>,
         ),
-  selectPaymentMethodHeaderBackgroundColor:
-      json['selectPaymentMethodHeaderBackgroundColor'] == null
+  selectPaymentItemTitleBackgroundColor:
+      json['selectPaymentItemTitleBackgroundColor'] == null
       ? null
       : ColorState.fromJson(
-          json['selectPaymentMethodHeaderBackgroundColor']
-              as Map<String, dynamic>,
+          json['selectPaymentItemTitleBackgroundColor'] as Map<String, dynamic>,
         ),
   paymentItemBackgroundColor: json['paymentItemBackgroundColor'] == null
       ? null
@@ -109,25 +108,25 @@ Map<String, dynamic> _$CheckoutThemeToJson(
   CheckoutTheme instance,
 ) => <String, dynamic>{
   'uiMode': const _UiModeJsonConverter().toJson(instance.uiMode),
-  'mainTitleText': instance.mainTitleText,
-  'selectPaymentMethodHeaderText': instance.selectPaymentMethodHeaderText,
-  'titleText': instance.titleText,
-  'subtitleText': instance.subtitleText,
-  'feesTitleText': instance.feesTitleText,
-  'feesSubtitleText': instance.feesSubtitleText,
-  'dataLabelText': instance.dataLabelText,
-  'dataValueText': instance.dataValueText,
-  'errorMessageText': instance.errorMessageText,
+  'mainTitle': instance.mainTitle,
+  'selectPaymentMethodHeader': instance.selectPaymentMethodHeader,
+  'title': instance.title,
+  'subtitle': instance.subtitle,
+  'feesTitle': instance.feesTitle,
+  'feesSubtitle': instance.feesSubtitle,
+  'dataLabel': instance.dataLabel,
+  'dataValue': instance.dataValue,
+  'errorMessage': instance.errorMessage,
   'inputTextField': instance.inputTextField,
   'button': instance.button,
   'backButton': instance.backButton,
   'selectorButton': instance.selectorButton,
   'switchControl': instance.switchControl,
   'margins': instance.margins,
-  'sdkBackgroundColor': instance.sdkBackgroundColor,
+  'backgroundColor': instance.backgroundColor,
   'modalBackgroundColor': instance.modalBackgroundColor,
-  'selectPaymentMethodHeaderBackgroundColor':
-      instance.selectPaymentMethodHeaderBackgroundColor,
+  'selectPaymentItemTitleBackgroundColor':
+      instance.selectPaymentItemTitleBackgroundColor,
   'paymentItemBackgroundColor': instance.paymentItemBackgroundColor,
   'paymentItemDescriptionTextColor': instance.paymentItemDescriptionTextColor,
   'paymentItemBorderColor': instance.paymentItemBorderColor,

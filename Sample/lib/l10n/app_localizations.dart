@@ -103,6 +103,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cannot pay your order.\nPlease, check purchase information'**
   String get prepaymentFailureMessage;
+
+  /// This message will be showed above and below checkout widget
+  ///
+  /// In en, this message translates to:
+  /// **'Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements'**
+  String get hostAppContent;
 }
 
 class _AppLocalizationsDelegate

@@ -72,7 +72,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         ),
                         const SizedBox(height: dividerPadding),
                         divider(),
-                        _colorOptionItem(state.theme?.sdkBackgroundColor?.color, "SDK background", (
+                        _colorOptionItem(state.theme?.backgroundColor?.color, "SDK background", (
                           color,
                         ) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
@@ -97,7 +97,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         divider(),
                         const SizedBox(height: dividerPadding),
                         _colorOptionItem(
-                          state.theme?.selectPaymentMethodHeaderBackgroundColor?.color,
+                          state.theme?.selectPaymentItemTitleBackgroundColor?.color,
                           "Select payment method header background",
                           (color) {
                             final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
@@ -109,7 +109,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: 8),
-                        _textOptionItem("Main title", state.theme?.mainTitleText, (style) {
+                        _textOptionItem("Main title", state.theme?.mainTitle, (style) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                             mainTitleText: style,
                           );
@@ -118,7 +118,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem("Title", state.theme?.titleText, (style) {
+                        _textOptionItem("Title", state.theme?.title, (style) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                             titleText: style,
                           );
@@ -129,7 +129,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         _textOptionItem(
                           "Select payment method header text",
-                          state.theme?.selectPaymentMethodHeaderText,
+                          state.theme?.selectPaymentMethodHeader,
                           (style) {
                             final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                               selectPaymentMethodHeaderText: style,
@@ -140,7 +140,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem("Subtitle", state.theme?.subtitleText, (style) {
+                        _textOptionItem("Subtitle", state.theme?.subtitle, (style) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                             subtitleText: style,
                           );
@@ -149,7 +149,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem("Fees Title", state.theme?.feesTitleText, (style) {
+                        _textOptionItem("Fees Title", state.theme?.feesTitle, (style) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                             feesTitleText: style,
                           );
@@ -158,7 +158,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem("Fees Subtitle", state.theme?.feesSubtitleText, (style) {
+                        _textOptionItem("Fees Subtitle", state.theme?.feesSubtitle, (style) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                             feesSubtitleText: style,
                           );
@@ -167,7 +167,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem("Data label", state.theme?.dataLabelText, (style) {
+                        _textOptionItem("Data label", state.theme?.dataLabel, (style) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                             dataLabelText: style,
                           );
@@ -176,7 +176,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem("Data value", state.theme?.dataValueText, (style) {
+                        _textOptionItem("Data value", state.theme?.dataValue, (style) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                             dataValueText: style,
                           );
@@ -185,7 +185,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
                         const SizedBox(height: dividerPadding),
                         divider(),
                         const SizedBox(height: dividerPadding),
-                        _textOptionItem("Error message", state.theme?.errorMessageText, (style) {
+                        _textOptionItem("Error message", state.theme?.errorMessage, (style) {
                           final newTheme = (state.theme ?? ch.CheckoutTheme()).copyWith(
                             errorMessageText: style,
                           );

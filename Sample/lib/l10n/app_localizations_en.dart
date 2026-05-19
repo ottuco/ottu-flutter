@@ -11,4 +11,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get prepaymentFailureMessage =>
       'Cannot pay your order.\nPlease, check purchase information';
+
+  @override
+  String get hostAppContent =>
+      'Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements';
 }
