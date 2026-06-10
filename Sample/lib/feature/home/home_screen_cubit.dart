@@ -40,7 +40,6 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   final _logger = Logger();
   final OttuApi _api;
 
-  String? _apiTransactionDetails;
   ThemeModeNotifierHolder _themeModeNotifier;
 
   HomeScreenCubit({
@@ -93,8 +92,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   }
 
   @override
+  void onChange(Change<HomeScreenState> change) {
+    super.onChange(change);
+    _state = change.nextState;
+  }
+
+  @override
   Future<void> close() {
-    _state = state;
     return super.close();
   }
 
@@ -140,8 +144,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     );
     result.onResult(
       success: (sessionResponse) {
-        _apiTransactionDetails = sessionResponse.transactionDetails;
-        emit(state.copyWith(sessionId: sessionResponse.sessionId, hasSessionLoaded: true));
+        emit(
+          state.copyWith(
+            sessionId: sessionResponse.sessionId,
+            hasSessionLoaded: true,
+            apiTransactionDetails: sessionResponse.transactionDetails,
+          ),
+        );
       },
       error: (_) {},
     );
@@ -262,7 +271,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       amount: amount,
       showPaymentDetails: state.showPaymentDetails,
       paymentOptionsDisplaySettings: displaySettings,
-      setupPreload: state.preloadPayload == true ? _apiTransactionDetails : null,
+      setupPreload: state.preloadPayload == true ? state.apiTransactionDetails : null,
       formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
       theme: _theme,
       payButtonText: state.useCustomText == true
