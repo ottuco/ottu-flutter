@@ -26,6 +26,7 @@ final class HomeScreenState extends Equatable {
   final PaymentOptionsDisplayMode? paymentOptionsDisplayMode;
   final Map<FormsOfPayment, bool>? formsOfPaymentChecked;
   final Map<PGCode, bool>? pgCodesChecked;
+  final String? apiTransactionDetails;
 
   const HomeScreenState({
     required this.merchantId,
@@ -49,6 +50,7 @@ final class HomeScreenState extends Equatable {
     this.formsOfPaymentChecked,
     this.pgCodesChecked,
     this.useCustomText = false,
+    this.apiTransactionDetails,
   });
 
   HomeScreenState copyWith({
@@ -73,6 +75,7 @@ final class HomeScreenState extends Equatable {
     PaymentOptionsDisplayMode? paymentOptionsDisplayMode,
     Map<FormsOfPayment, bool>? formsOfPaymentChecked,
     Map<PGCode, bool>? pgCodesChecked,
+    String? apiTransactionDetails,
   }) {
     return HomeScreenState(
       merchantId: merchantId ?? this.merchantId,
@@ -96,6 +99,7 @@ final class HomeScreenState extends Equatable {
       paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
       formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
       pgCodesChecked: pgCodesChecked ?? this.pgCodesChecked,
+      apiTransactionDetails: apiTransactionDetails ?? this.apiTransactionDetails,
     );
   }
 
@@ -122,5 +126,6 @@ final class HomeScreenState extends Equatable {
     paymentOptionsDisplayMode?.name,
     formsOfPaymentChecked.hashCode,
     pgCodesChecked.hashCode,
+    apiTransactionDetails,
   ];
 }

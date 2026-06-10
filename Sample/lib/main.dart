@@ -36,12 +36,14 @@ void main() {
 }
 
 class OttuApp extends StatelessWidget {
-  final modules = [];
+  final List<Module> modules;
   final routes = <RouteBase>[];
+  late final GoRouter _router;
 
-  OttuApp({required final List<Module> modules, super.key}) {
+  OttuApp({required this.modules, super.key}) {
     modules.forEach((final module) => module.init(_service));
     modules.forEach((final module) => routes.addAll(module.router()));
+    _router = GoRouter(routes: routes);
   }
 
   @override
@@ -53,7 +55,7 @@ class OttuApp extends StatelessWidget {
         builder: (context, themeMode, _) {
           final mode = themeMode?.toThemeMode();
           return MaterialApp.router(
-            routerConfig: GoRouter(routes: routes),
+            routerConfig: _router,
             themeMode: mode,
             supportedLocales: [Locale('ar'), Locale('en')],
             localizationsDelegates: const [
