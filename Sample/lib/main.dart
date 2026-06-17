@@ -9,9 +9,10 @@ import 'package:ottu_flutter_checkout_sample/feature/home/home_module.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_module.dart';
 import 'package:ottu_flutter_checkout_sample/util/transformation_notifier.dart';
 import 'package:provider/provider.dart';
-import 'l10n/app_localizations.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'di/Module.dart';
+import 'l10n/app_localizations.dart';
 
 const tag = "MyApp";
 
@@ -31,8 +32,16 @@ final _service = GetIt.instance;
 
 final ThemeModeNotifierHolder _themeModeNotifierHolder = ThemeModeNotifierHolder();
 
-void main() {
-  runApp(OttuApp(modules: [HomeModule(), ThemeModule(), CheckoutModule()]));
+Future<void> main() async {
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = 'https://ba72fc2984c748ee891ce6996dcbb399@sentry.ottu.net/23';
+      options.enableLogs = true;
+    },
+    // Init your App.
+    appRunner: () => runApp(OttuApp(modules: [HomeModule(), ThemeModule(), CheckoutModule()])),
+  );
+  //runApp(OttuApp(modules: [HomeModule(), ThemeModule(), CheckoutModule()]));
 }
 
 class OttuApp extends StatelessWidget {
@@ -43,7 +52,7 @@ class OttuApp extends StatelessWidget {
   OttuApp({required this.modules, super.key}) {
     modules.forEach((final module) => module.init(_service));
     modules.forEach((final module) => routes.addAll(module.router()));
-    _router = GoRouter(routes: routes);
+    _router = GoRouter(routes: routes, observers: [SentryNavigatorObserver()]);
   }
 
   @override
