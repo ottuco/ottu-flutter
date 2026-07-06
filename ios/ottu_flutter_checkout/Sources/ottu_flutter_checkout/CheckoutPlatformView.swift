@@ -2,7 +2,12 @@ import Flutter
 import Foundation
 import OSLog
 import SwiftUI
+
+#if canImport(ottu_checkout_sdk_sentry)
+import ottu_checkout_sdk_sentry
+#else
 import ottu_checkout_sdk
+#endif
 
 //
 //  CheckoutPlatformView.swift
@@ -167,9 +172,9 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         Logger.sdk.info("formsOfPayment")
 
         let paymentOptionsDisplaySettings:
-            ottu_checkout_sdk.PaymentOptionsDisplaySettings =
+            SDKPaymentOptionsDisplaySettings =
                 if arguments.paymentOptionsDisplaySettings.mode == "list" {
-                    ottu_checkout_sdk.PaymentOptionsDisplaySettings(
+                    SDKPaymentOptionsDisplaySettings(
                         mode: .list,
                         visibleItemsCount: UInt(
                             arguments.paymentOptionsDisplaySettings
@@ -180,7 +185,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                             .defaultSelectedPgCode,
                     )
                 } else {
-                    ottu_checkout_sdk.PaymentOptionsDisplaySettings(
+                    SDKPaymentOptionsDisplaySettings(
                         mode: .bottomSheet,
                         defaultSelectedPgCode: arguments
                             .paymentOptionsDisplaySettings

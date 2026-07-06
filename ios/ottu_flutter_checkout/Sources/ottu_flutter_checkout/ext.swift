@@ -8,9 +8,16 @@ import Foundation
 import OSLog
 import SwiftUI
 import UIKit
-import ottu_checkout_sdk
 
+#if canImport(ottu_checkout_sdk_sentry)
+import ottu_checkout_sdk_sentry
+internal typealias SDKPayButtonText = ottu_checkout_sdk_sentry.PayButtonText
+internal typealias SDKPaymentOptionsDisplaySettings = ottu_checkout_sdk_sentry.PaymentOptionsDisplaySettings
+#else
+import ottu_checkout_sdk
 internal typealias SDKPayButtonText = ottu_checkout_sdk.PayButtonText
+internal typealias SDKPaymentOptionsDisplaySettings = ottu_checkout_sdk.PaymentOptionsDisplaySettings
+#endif
 
 extension ColorState {
     public func toUIColors() -> (color: UIColor?, disabledColor: UIColor?) {
