@@ -58,11 +58,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               style: ts.TextStyle(fontSize: 24),
             ),
             //Start of Merchant content
-            const Padding(
+             Padding(
               padding: EdgeInsets.all(12.0),
-              child: Text(
-                "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements",
-              ),
+              child: Text(AppLocalizations.of(context)!.hostAppContent),
             ),
             //End of Merchant content
             Padding(
@@ -77,13 +75,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 20),
             //Start of Merchant content
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(12.0),
-              child: Text(
-                "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements,"
-                " Some users UI elements, Some users UI elements, Some users UI elements,"
-                " Some users UI elements, Some users UI elements, Some users UI elements",
-              ),
+              child: Text(AppLocalizations.of(context)!.hostAppContent),
             ),
             //End of Merchant content
           ],

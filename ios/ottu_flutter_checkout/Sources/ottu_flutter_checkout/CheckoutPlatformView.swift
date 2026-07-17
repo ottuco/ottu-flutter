@@ -319,7 +319,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             return cht
         }
 
-        if let color = theme?.sdkBackgroundColor?.toUIColors() {
+        if let color = theme?.backgroundColor?.toUIColors() {
             if let cc = color.color {
                 cht.backgroundColor = cc
             }
@@ -331,7 +331,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             }
         }
 
-        if let color = theme?.selectPaymentMethodHeaderBackgroundColor?
+        if let color = theme?.selectPaymentItemTitleBackgroundColor?
             .toUIColors()
         {
             if let cc = color.color {
@@ -339,54 +339,54 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             }
         }
 
-        if let comp = theme?.mainTitleText?.toLabelComponent(
+        if let comp = theme?.mainTitle?.toLabelComponent(
             ofSize: 20,
             weight: .semibold
         ) {
             cht.mainTitle = comp
         }
 
-        if let comp = theme?.selectPaymentMethodHeaderText?.toLabelComponent(
+        if let comp = theme?.selectPaymentMethodHeader?.toLabelComponent(
             ofSize: 20,
             weight: .semibold
         ) {
             cht.selectPaymentMethodTitleLabel = comp
         }
 
-        if let comp = theme?.titleText?.toLabelComponent(
+        if let comp = theme?.title?.toLabelComponent(
             ofSize: 17,
             weight: .semibold
         ) {
             cht.title = comp
         }
 
-        if let comp = theme?.subtitleText?.toLabelComponent(ofSize: 15) {
+        if let comp = theme?.subtitle?.toLabelComponent(ofSize: 15) {
             cht.subtitle = comp
         }
 
-        if let comp = theme?.feesTitleText?.toLabelComponent(ofSize: 17) {
+        if let comp = theme?.feesTitle?.toLabelComponent(ofSize: 17) {
             cht.feesTitle = comp
         }
 
-        if let comp = theme?.feesSubtitleText?.toLabelComponent(ofSize: 15) {
+        if let comp = theme?.feesSubtitle?.toLabelComponent(ofSize: 15) {
             cht.feesSubtitle = comp
         }
 
-        if let comp = theme?.dataLabelText?.toLabelComponent(
+        if let comp = theme?.dataLabel?.toLabelComponent(
             ofSize: 14,
             weight: .semibold
         ) {
             cht.dataLabel = comp
         }
 
-        if let comp = theme?.dataValueText?.toLabelComponent(
+        if let comp = theme?.dataValue?.toLabelComponent(
             ofSize: 16,
             weight: .semibold
         ) {
             cht.dataValue = comp
         }
 
-        if let comp = theme?.errorMessageText?.toLabelComponent(
+        if let comp = theme?.errorMessage?.toLabelComponent(
             ofSize: 13,
             weight: .semibold
         ) {

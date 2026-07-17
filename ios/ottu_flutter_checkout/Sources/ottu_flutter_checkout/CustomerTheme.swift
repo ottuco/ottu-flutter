@@ -7,19 +7,19 @@
 
 struct CustomerTheme: Decodable {
     let uiMode: String?
-    let mainTitleText: TextStyle?
-    let selectPaymentMethodHeaderText: TextStyle?
-    let titleText: TextStyle?
-    let subtitleText: TextStyle?
-    let feesTitleText: TextStyle?
-    let feesSubtitleText: TextStyle?
-    let dataLabelText: TextStyle?
-    let dataValueText: TextStyle?
-    let errorMessageText: TextStyle?
+    let mainTitle: TextStyle?
+    let selectPaymentMethodHeader: TextStyle?
+    let title: TextStyle?
+    let subtitle: TextStyle?
+    let feesTitle: TextStyle?
+    let feesSubtitle: TextStyle?
+    let dataLabel: TextStyle?
+    let dataValue: TextStyle?
+    let errorMessage: TextStyle?
     let inputTextField: TextFieldStyle?
-    let sdkBackgroundColor: ColorState?
+    let backgroundColor: ColorState?
     let modalBackgroundColor: ColorState?
-    let selectPaymentMethodHeaderBackgroundColor: ColorState?
+    let selectPaymentItemTitleBackgroundColor: ColorState?
     let paymentItemBackgroundColor: ColorState?
     let paymentItemDescriptionTextColor: ColorState?
     let paymentItemBorderColor: ColorState?

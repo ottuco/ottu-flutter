@@ -10,15 +10,15 @@ part 'checkout_theme.g.dart';
 class CheckoutTheme extends Equatable {
   @_UiModeJsonConverter()
   final CustomerUiMode uiMode;
-  final TextStyle? mainTitleText;
-  final TextStyle? selectPaymentMethodHeaderText;
-  final TextStyle? titleText;
-  final TextStyle? subtitleText;
-  final TextStyle? feesTitleText;
-  final TextStyle? feesSubtitleText;
-  final TextStyle? dataLabelText;
-  final TextStyle? dataValueText;
-  final TextStyle? errorMessageText;
+  final TextStyle? mainTitle;
+  final TextStyle? selectPaymentMethodHeader;
+  final TextStyle? title;
+  final TextStyle? subtitle;
+  final TextStyle? feesTitle;
+  final TextStyle? feesSubtitle;
+  final TextStyle? dataLabel;
+  final TextStyle? dataValue;
+  final TextStyle? errorMessage;
 
   final TextFieldStyle? inputTextField;
 
@@ -28,9 +28,9 @@ class CheckoutTheme extends Equatable {
   final SwitchComponent? switchControl;
   final Margins? margins;
 
-  final ColorState? sdkBackgroundColor;
+  final ColorState? backgroundColor;
   final ColorState? modalBackgroundColor;
-  final ColorState? selectPaymentMethodHeaderBackgroundColor;
+  final ColorState? selectPaymentItemTitleBackgroundColor;
   final ColorState? paymentItemBackgroundColor;
   final ColorState? paymentItemDescriptionTextColor;
   final ColorState? paymentItemBorderColor;
@@ -41,24 +41,24 @@ class CheckoutTheme extends Equatable {
 
   CheckoutTheme({
     this.uiMode = CustomerUiMode.auto,
-    this.titleText,
-    this.mainTitleText,
-    this.selectPaymentMethodHeaderText,
-    this.subtitleText,
-    this.feesTitleText,
-    this.feesSubtitleText,
-    this.dataLabelText,
-    this.dataValueText,
-    this.errorMessageText,
+    this.title,
+    this.mainTitle,
+    this.selectPaymentMethodHeader,
+    this.subtitle,
+    this.feesTitle,
+    this.feesSubtitle,
+    this.dataLabel,
+    this.dataValue,
+    this.errorMessage,
     this.inputTextField,
     this.button,
     this.backButton,
     this.selectorButton,
     this.switchControl,
     this.margins,
-    this.sdkBackgroundColor,
+    this.backgroundColor,
     this.modalBackgroundColor,
-    this.selectPaymentMethodHeaderBackgroundColor,
+    this.selectPaymentItemTitleBackgroundColor,
     this.paymentItemBackgroundColor,
     this.paymentItemDescriptionTextColor,
     this.paymentItemBorderColor,
@@ -98,26 +98,26 @@ class CheckoutTheme extends Equatable {
   }) {
     return CheckoutTheme(
       uiMode: uiMode ?? this.uiMode,
-      titleText: titleText ?? this.titleText,
-      mainTitleText: mainTitleText ?? this.mainTitleText,
-      selectPaymentMethodHeaderText:
-      selectPaymentMethodHeaderText ?? this.selectPaymentMethodHeaderText,
-      subtitleText: subtitleText ?? this.subtitleText,
-      feesTitleText: feesTitleText ?? this.feesTitleText,
-      feesSubtitleText: feesSubtitleText ?? this.feesSubtitleText,
-      dataLabelText: dataLabelText ?? this.dataLabelText,
-      dataValueText: dataValueText ?? this.dataValueText,
-      errorMessageText: errorMessageText ?? this.errorMessageText,
+      title: titleText ?? this.title,
+      mainTitle: mainTitleText ?? this.mainTitle,
+      selectPaymentMethodHeader:
+      selectPaymentMethodHeaderText ?? this.selectPaymentMethodHeader,
+      subtitle: subtitleText ?? this.subtitle,
+      feesTitle: feesTitleText ?? this.feesTitle,
+      feesSubtitle: feesSubtitleText ?? this.feesSubtitle,
+      dataLabel: dataLabelText ?? this.dataLabel,
+      dataValue: dataValueText ?? this.dataValue,
+      errorMessage: errorMessageText ?? this.errorMessage,
       inputTextField: inputTextField ?? this.inputTextField,
       button: button ?? this.button,
       backButton: backButton ?? this.backButton,
       selectorButton: selectorButton ?? this.selectorButton,
       switchControl: switchControl ?? this.switchControl,
       margins: margins ?? this.margins,
-      sdkBackgroundColor: sdkBackgroundColor ?? this.sdkBackgroundColor,
+      backgroundColor: sdkBackgroundColor ?? this.backgroundColor,
       modalBackgroundColor: modalBackgroundColor ?? this.modalBackgroundColor,
-      selectPaymentMethodHeaderBackgroundColor:
-      selectPaymentMethodHeaderBackgroundColor ?? this.selectPaymentMethodHeaderBackgroundColor,
+      selectPaymentItemTitleBackgroundColor:
+      selectPaymentMethodHeaderBackgroundColor ?? this.selectPaymentItemTitleBackgroundColor,
       paymentItemBackgroundColor: paymentItemBackgroundColor ?? this.paymentItemBackgroundColor,
       paymentItemDescriptionTextColor:
       paymentItemDescriptionTextColor ?? this.paymentItemDescriptionTextColor,
@@ -133,24 +133,24 @@ class CheckoutTheme extends Equatable {
   List<Object?> get props =>
       [
         uiMode,
-        titleText,
-        mainTitleText,
-        selectPaymentMethodHeaderText,
-        subtitleText,
-        feesTitleText,
-        feesSubtitleText,
-        dataLabelText,
-        dataValueText,
-        errorMessageText,
+        title,
+        mainTitle,
+        selectPaymentMethodHeader,
+        subtitle,
+        feesTitle,
+        feesSubtitle,
+        dataLabel,
+        dataValue,
+        errorMessage,
         inputTextField,
         button,
         backButton,
         selectorButton,
         switchControl,
         margins,
-        sdkBackgroundColor,
+        backgroundColor,
         modalBackgroundColor,
-        selectPaymentMethodHeaderBackgroundColor,
+        selectPaymentItemTitleBackgroundColor,
         paymentItemBackgroundColor,
         paymentItemDescriptionTextColor,
         paymentItemBorderColor,

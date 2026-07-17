@@ -2,5 +2,9 @@
   "prepaymentFailureMessage": "Cannot pay your order.\nPlease, check purchase information",
   "@prepaymentFailureMessage": {
     "description": "This message will be showed when payment validation had been failed"
+  },
+  "hostAppContent": "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements",
+  "@hostAppContent": {
+    "description": "This message will be showed above and below checkout widget"
   }
 }
