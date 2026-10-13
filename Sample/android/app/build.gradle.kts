@@ -15,12 +15,11 @@ val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "
 
 plugins {
     id("com.android.application")
-    kotlin("android")
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
-    compileSdk = 36
+    compileSdk = 37
     namespace = "com.ottu.sample"
     lint {
         abortOnError = false
@@ -31,7 +30,7 @@ android {
     defaultConfig {
         applicationId = "com.ottu.sample"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = flutterVersionCode.toInt()
         versionName = flutterVersionName
 
@@ -68,12 +67,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
     buildFeatures {
         viewBinding = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
     }
 }
 

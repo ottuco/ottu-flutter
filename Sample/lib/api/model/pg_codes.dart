@@ -16,9 +16,8 @@ enum PGCode {
   tap_pg(code: "tap_pg", name: "Tag PG"),
   ottu_sdk(code: "ottu_sdk", name: "Ottu Sdk");
 
-  const PGCode({required this.code, required this.name, this.inverselyRelated});
+  const PGCode({required this.code, required this.name});
 
   final String name;
   final String code;
-  final String? inverselyRelated;
 }

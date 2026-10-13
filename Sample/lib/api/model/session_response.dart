@@ -13,10 +13,11 @@ class SessionResponse {
 
   SessionResponse(this.sessionId, this.transactionDetails);
 
-  factory SessionResponse.fromJson(Map<String, dynamic> json) => _$SessionResponseFromJson(json);
+  factory SessionResponse.fromJson(Map<String, dynamic> json) =>
+      _$SessionResponseFromJson(json);
 
-  static String? readValue(Map map, String key) {
-    dynamic field = map[key];
+  static Object? readValue(Map map, String key) {
+    final field = map[key];
     if (field is Map) {
       String jsonString = json.encode(field);
       return jsonString;

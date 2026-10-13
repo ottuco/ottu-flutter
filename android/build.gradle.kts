@@ -1,10 +1,10 @@
 import java.nio.file.Files
 import java.util.Properties
 
-rootProject.buildDir = file("../build")
+rootProject.layout.buildDirectory.set(file("../build"))
 
 subprojects {
-    project.buildDir = file("${rootProject.buildDir}/${project.name}")
+    project.layout.buildDirectory.set(rootProject.layout.buildDirectory.dir(project.name))
 }
 
 val localProperties = Properties()
@@ -20,20 +20,25 @@ val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "
 
 plugins {
     id("com.android.library")
-    kotlin("android")
+    kotlin("android") apply false
     kotlin("plugin.serialization") version "2.2.20"
+}
+
+// AGP 9 creates this extension for built-in Kotlin. Older AGP versions (and
+// AGP 9 hosts that disable built-in Kotlin) need the Kotlin Android plugin.
+if (extensions.findByName("kotlin") == null) {
+    pluginManager.apply("org.jetbrains.kotlin.android")
 }
 
 group = "com.ottu.flutter.checkout"
 version = "1.0.3"
 
 android {
-    compileSdk = 36
+    compileSdk = 37
     namespace = "com.ottu.flutter.checkout"
 
     defaultConfig {
         minSdk = 26
-        //targetSdk = 34
         //versionCode = flutterVersionCode.toInt()
         //versionName = flutterVersionName
     }
@@ -43,17 +48,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
     buildFeatures {
         viewBinding = true
     }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
-            isShrinkResources = false
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -63,8 +63,16 @@ android {
     }
 }
 
+extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension> {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+    }
+}
+
 allprojects {
     repositories {
+        google()
+        mavenCentral()
         maven { url = uri("https://www.jitpack.io") }
     }
 }

@@ -12,7 +12,7 @@ const _methodVerifyPayment = "METHOD_VERIFY_PAYMENT";
 const _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT";
 const _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT";
 const _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT";
-const _methodChannel = MethodChannel('com.ottu.sample/checkout');
+const _methodChannel = MethodChannel('com.ottu.flutter/checkout');
 
 const _defaultCheckoutViewHeight = 200;
 
@@ -21,14 +21,48 @@ typedef VerifyPaymentDelegate = Future<CardVerificationResult<void, String>> Fun
 
 class OttuCheckoutWidget extends StatefulWidget {
   final CheckoutArguments arguments;
+
+  /// Optional initial route for the merchant view in a separate Flutter engine.
+  ///
+  /// Omit this or pass null/empty to create checkout without a merchant view.
+  /// The host app must register any supplied route in the nested engine.
+  /// This is applied when the native checkout view is created.
+  final String? merchantWidgetRoute;
   final VerifyPaymentDelegate? _verifyPayment;
   final Function(String message)? _successCallback;
   final Function(String message)? _cancelCallback;
   final Function(String message)? _errorCallback;
 
+  /// Creates an embedded native Ottu checkout view for Android or iOS.
+  ///
+  /// [arguments] supplies the merchant credentials, checkout session, amount,
+  /// payment options, and appearance settings used to create the native view.
+  /// The widget adjusts its height to match the native checkout content.
+  ///
+  /// [merchantWidgetRoute] optionally embeds merchant Flutter content inside
+  /// checkout using a separate Flutter engine. The host app must register this
+  /// route in that engine and wrap its content in [NestedWrapperWidget]. The
+  /// nested engine has its own Dart state. Omitting the route, passing `null`,
+  /// or passing an empty string skips both the merchant view and nested engine.
+  /// Supplied routes are not checked for availability automatically.
+  ///
+  /// [verifyPayment] asynchronously validates the nullable payload supplied by
+  /// the native SDK. Return [CardVerificationResult.success] to approve or
+  /// [CardVerificationResult.failure] with a message to reject verification.
+  /// If the native SDK requests verification and no callback is supplied, the
+  /// request fails with an "Unknown error" message.
+  ///
+  /// [successCallback], [cancelCallback], and [errorCallback] receive the native
+  /// SDK's message when payment succeeds, is cancelled, or reports an error,
+  /// respectively. Each callback is optional; omitted callbacks are ignored.
+  ///
+  /// [arguments] and [merchantWidgetRoute] are passed when the native view is
+  /// created. To apply different creation settings, recreate the widget with a
+  /// different [key]. Unsupported platforms render an empty widget.
   const OttuCheckoutWidget({
     super.key,
     required this.arguments,
+    this.merchantWidgetRoute,
     VerifyPaymentDelegate? verifyPayment,
     Function(String message)? successCallback,
     Function(String message)? cancelCallback,
@@ -111,7 +145,7 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   Widget build(BuildContext context) {
     final argsMap = widget.arguments.toJson();
     final jsonArg = json.encode(argsMap);
-    final args = {"args": jsonArg};
+    final args = {"args": jsonArg, "merchantWidgetRoute": widget.merchantWidgetRoute};
     return ValueListenableBuilder<int>(
         valueListenable: _checkoutHeight,
         builder: (BuildContext context, int height, Widget? child) {
