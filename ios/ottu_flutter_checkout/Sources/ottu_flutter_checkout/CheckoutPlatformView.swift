@@ -12,14 +12,15 @@ import ottu_checkout_sdk
 //  Created by Vi on 25.09.2024.
 //
 
-private let checkoutChannelName = "com.ottu.sample/checkout"
+private let checkoutChannelName = "com.ottu.flutter/checkout"
 private let methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT"
+private let nestedChannelName = "com.ottu.flutter/checkout/nested"
+private let methodNestedHeight = "METHOD_NESTED_WIDGET_HEIGHT"
 private let _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT"
 private let _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT"
 private let _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT"
 private let _methodOnWidgetDetached = "METHOD_ON_WIDGET_DETACHED"
 private let _methodVerifyPayment = "METHOD_VERIFY_PAYMENT"
-private let nestedWidgetHeight: CGFloat = 56
 
 public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let viewId: Int64
@@ -29,8 +30,12 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private var checkout: Checkout?
     private var nestedFlutterVC: FlutterViewController?
     private var nestedEngine: FlutterEngine?
+    private var nestedMethodChannel: FlutterMethodChannel?
+    private var nestedContainerLayout: UIView?
+    private var nestedHeightConstraint: NSLayoutConstraint?
     
     deinit {
+        nestedMethodChannel?.setMethodCallHandler(nil)
         if let nestedFlutterVC, nestedFlutterVC.parent != nil {
             nestedFlutterVC.willMove(toParent: nil)
             nestedFlutterVC.view.removeFromSuperview()
@@ -135,18 +140,57 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         let flutterVC = FlutterViewController(engine: engine, nibName: nil, bundle: nil)
         self.nestedFlutterVC = flutterVC
         
-        flutterVC.view.frame = CGRect(
-            x: 0,
-            y: 0,
-            width: _view.bounds.width,
-            height: nestedWidgetHeight
-        )
-        flutterVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
+        let container = UIView()
+        nestedContainerLayout = container
+        flutterVC.view.translatesAutoresizingMaskIntoConstraints = false
         flutterVC.isViewOpaque = false
         flutterVC.view.backgroundColor = .clear
-        
-        return flutterVC.view
+        container.addSubview(flutterVC.view)
+
+        let heightConstraint = container.heightAnchor.constraint(equalToConstant: 1)
+        nestedHeightConstraint = heightConstraint
+        NSLayoutConstraint.activate([
+            heightConstraint,
+            flutterVC.view.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            flutterVC.view.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            flutterVC.view.topAnchor.constraint(equalTo: container.topAnchor),
+            flutterVC.view.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+        ])
+
+        let nestedChannel = FlutterMethodChannel(
+            name: nestedChannelName,
+            binaryMessenger: engine.binaryMessenger
+        )
+        nestedMethodChannel = nestedChannel
+        nestedChannel.setMethodCallHandler { [weak self] call, result in
+            guard call.method == methodNestedHeight else {
+                result(FlutterMethodNotImplemented)
+                return
+            }
+            guard let height = call.arguments as? NSNumber,
+                  CFGetTypeID(height) != CFBooleanGetTypeID(),
+                  height.doubleValue.isFinite, height.doubleValue >= 0 else {
+                result(FlutterError(code: "INVALID_HEIGHT",
+                                    message: "Expected a finite, non-negative height",
+                                    details: nil))
+                return
+            }
+            guard let self else {
+                result(nil)
+                return
+            }
+            // Flutter logical pixels map directly to UIKit points.
+            let points = CGFloat(height.doubleValue)
+            if self.nestedHeightConstraint?.constant != points {
+                self.nestedHeightConstraint?.constant = points
+                self.nestedContainerLayout?.invalidateIntrinsicContentSize()
+                self.nestedContainerLayout?.superview?.setNeedsLayout()
+                self.paymentViewController?.view.setNeedsLayout()
+                self._view.setNeedsLayout()
+            }
+            result(nil)
+        }
+        return container
     }
     
     fileprivate func showSdkError() {
@@ -267,6 +311,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             )
             if let cht = checkout {
                 self.paymentViewController = cht.paymentViewController()
+                constrainNestedWidgetToSDKContainer()
                 tryAttachController()
             }
         } catch {
@@ -275,6 +320,19 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         }
     }
     
+    private func constrainNestedWidgetToSDKContainer() {
+        guard let widget = nestedContainerLayout,
+              let container = widget.superview else { return }
+
+        // The SDK pins the widget horizontally, but its stack wrapper needs a
+        // vertical constraint chain to track later Flutter height updates.
+        // Preserve the SDK's 20-point padding beneath the nested content.
+        NSLayoutConstraint.activate([
+            widget.topAnchor.constraint(equalTo: container.topAnchor),
+            container.bottomAnchor.constraint(equalTo: widget.bottomAnchor, constant: 20),
+        ])
+    }
+
     func tryAttachController() {
         Logger.sdk.info("tryAttachController")
         guard let pvc = self.paymentViewController else { return }

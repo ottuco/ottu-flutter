@@ -2,15 +2,18 @@ package com.ottu.flutter.checkout
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Resources
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import com.ottu.checkout.Checkout
 import com.ottu.checkout.data.model.payment.CardVerificationResult
 import com.ottu.checkout.network.model.payment.TransactionDetails
@@ -38,7 +41,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.abs
+import kotlin.math.ceil
 
 private const val METHOD_CHECKOUT_HEIGHT = "METHOD_CHECKOUT_HEIGHT"
 private const val METHOD_PAYMENT_SUCCESS_RESULT = "METHOD_PAYMENT_SUCCESS_RESULT"
@@ -46,7 +49,9 @@ private const val METHOD_PAYMENT_ERROR_RESULT = "METHOD_PAYMENT_ERROR_RESULT"
 private const val METHOD_PAYMENT_CANCEL_RESULT = "METHOD_PAYMENT_CANCEL_RESULT"
 private const val METHOD_ON_WIDGET_DETACHED = "METHOD_ON_WIDGET_DETACHED"
 private const val METHOD_VERIFY_PAYMENT = "METHOD_VERIFY_PAYMENT"
-private const val CHANNEL = "com.ottu.sample/checkout"
+private const val CHANNEL = "com.ottu.flutter/checkout"
+private const val NESTED_WIDGET_CHANNEL = "com.ottu.flutter/checkout/nested"
+private const val METHOD_NESTED_WIDGET_HEIGHT = "METHOD_NESTED_WIDGET_HEIGHT"
 private const val TAG = "CheckoutView"
 
 private val sessionCoroutineExceptionHandler = CoroutineExceptionHandler { _, t ->
@@ -74,10 +79,47 @@ internal class CheckoutView(
     private val checkoutView: FrameLayout = LayoutInflater.from(context)
         .inflate(R.layout.fragment_checkout_wrapper_view, null) as FrameLayout
 
+    private val checkoutContentLayout =
+        checkoutView.findViewById<FrameLayout>(R.id.checkout_fragment_container)
+    private var lastCheckoutHeight: Int? = null
+    private val checkoutLayoutChangeListener = View.OnLayoutChangeListener {
+            view, _, top, _, bottom, _, _, _, _ ->
+        val contentHeightPx = bottom - top
+        if (view.width > 0 && contentHeightPx > 0) {
+            val density = view.resources.displayMetrics.density.toDouble()
+            val logicalHeight = ceil((contentHeightPx + defaultCheckoutPadding) / density).toInt()
+            if (lastCheckoutHeight != logicalHeight) {
+                lastCheckoutHeight = logicalHeight
+                Log.d(TAG, "Checkout content: ${contentHeightPx}px, Flutter height: $logicalHeight")
+                methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, logicalHeight)
+            }
+        }
+    }
+
     private var initializerErrorDialog: AlertDialog? = null
 
-    private val nestedContainerLayout = FrameLayout(context)
+    private val nestedContainerLayout = NestedContainerLayout(context)
     private var nestedFlutterView: FlutterView? = null
+    private var nestedMethodChannel: MethodChannel? = null
+    private var nestedLifecycle: Lifecycle? = null
+    private val nestedLifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onResume(owner: LifecycleOwner) {
+            nestedEngine?.lifecycleChannel?.appIsResumed()
+        }
+
+        override fun onPause(owner: LifecycleOwner) {
+            nestedEngine?.lifecycleChannel?.appIsInactive()
+        }
+
+        override fun onStop(owner: LifecycleOwner) {
+            nestedEngine?.lifecycleChannel?.appIsPaused()
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            nestedEngine?.lifecycleChannel?.appIsDetached()
+        }
+    }
+
 
     init {
         val vParams: FrameLayout.LayoutParams = FrameLayout.LayoutParams(
@@ -85,23 +127,66 @@ internal class CheckoutView(
         )
         checkoutView.layoutParams = vParams
         methodChannel = MethodChannel(messenger, CHANNEL)
+        checkoutContentLayout.addOnLayoutChangeListener(checkoutLayoutChangeListener)
 
         nestedEngine?.let { engine ->
+            nestedMethodChannel = MethodChannel(engine.dartExecutor.binaryMessenger, NESTED_WIDGET_CHANNEL).apply {
+                setMethodCallHandler { call, result ->
+                    if (call.method != METHOD_NESTED_WIDGET_HEIGHT) {
+                        result.notImplemented()
+                        return@setMethodCallHandler
+                    }
+                    val height = (call.arguments as? Number)?.toDouble()
+                    val pixels = height?.times(context.resources.displayMetrics.density.toDouble())
+                    if (height == null || !height.isFinite() || height < 0 ||
+                        pixels == null || !pixels.isFinite() || pixels > Int.MAX_VALUE) {
+                        result.error("INVALID_HEIGHT", "Expected a finite, non-negative height", null)
+                        return@setMethodCallHandler
+                    }
+                    val heightPx = ceil(pixels).toInt()
+                    nestedContainerLayout.updateHeight(heightPx)
+                    result.success(null)
+                }
+            }
             nestedFlutterView = FlutterView(context, RenderMode.texture).apply {
                 attachToFlutterEngine(engine)
+
             }
 
             val layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
-                98
+                FrameLayout.LayoutParams.MATCH_PARENT,
             )
             nestedContainerLayout.addView(nestedFlutterView, layoutParams)
+            // Attaching a FlutterView does not resume its engine. Without these
+            // events the first frame paints, but setState cannot schedule more.
+            nestedLifecycle = generateSequence(context) {
+                (it as? ContextWrapper)?.baseContext
+            }.filterIsInstance<LifecycleOwner>().firstOrNull()?.lifecycle
+            nestedLifecycle?.addObserver(nestedLifecycleObserver)
+
+            nestedContainerLayout.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                1,
+            )
+
+            nestedFlutterView?.post {
+                nestedFlutterView?.requestLayout()
+                nestedContainerLayout.requestLayout()
+            }
         }
     }
+
 
     override fun getView(): View = checkoutView
 
     override fun dispose() {
+        nestedLifecycle?.removeObserver(nestedLifecycleObserver)
+        nestedLifecycle = null
+        nestedEngine?.lifecycleChannel?.appIsDetached()
+        checkoutContentLayout.removeOnLayoutChangeListener(checkoutLayoutChangeListener)
+        nestedMethodChannel?.setMethodCallHandler(null)
+        nestedMethodChannel = null
         nestedFlutterView?.detachFromFlutterEngine()
         nestedEngine?.destroy()
         nestedFlutterView = null
@@ -144,18 +229,6 @@ internal class CheckoutView(
         }
 
 
-        checkoutView.findViewById<FrameLayout>(R.id.checkout_fragment_container)
-            ?.addOnLayoutChangeListener(CheckoutLayoutChangeListener { height ->
-                val scroll =
-                    checkoutView.findViewById<ScrollView>(R.id.checkout_fragment_container_scroll)
-                val maxScroll = scroll.maxScrollAmount
-                val density = checkoutView.context.resources.displayMetrics.density
-                val height = ((height + defaultCheckoutPadding) / density).toInt()
-                Log.d(
-                    TAG, "addOnLayoutChangeListener, height in px: $height, max scroll: $maxScroll"
-                )
-                methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, height)
-            })
     }
 
     private fun initCheckoutFragment(
@@ -398,26 +471,26 @@ internal class CheckoutView(
     }
 
 
-    private class CheckoutLayoutChangeListener(val onHeightChanged: (Int) -> Unit) :
-        View.OnLayoutChangeListener {
-        override fun onLayoutChange(
-            p0: View?,
-            left: Int,
-            top: Int,
-            right: Int,
-            bottom: Int,
-            oldLeft: Int,
-            oldTop: Int,
-            oldRight: Int,
-            oldBottom: Int,
-        ) {
-            val height = bottom - top
-            val oldHeight = oldBottom - oldTop
-            Log.d(
-                TAG,
-                "onLayoutChange, height has been changed, height: $height, oldHeight: $oldHeight"
-            )
-            onHeightChanged(abs(height))
+}
+
+/** Keeps the Flutter viewport measurable even when the SDK applies WRAP_CONTENT. */
+private class NestedContainerLayout(context: Context) : FrameLayout(context) {
+    private var contentHeightPx = 1
+
+    fun updateHeight(heightPx: Int) {
+        if (contentHeightPx == heightPx) return
+        contentHeightPx = heightPx
+        layoutParams?.let { params ->
+            params.height = heightPx
+            layoutParams = params
         }
+        requestLayout()
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(
+            widthMeasureSpec,
+            MeasureSpec.makeMeasureSpec(contentHeightPx, MeasureSpec.EXACTLY),
+        )
     }
 }

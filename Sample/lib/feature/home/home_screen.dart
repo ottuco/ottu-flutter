@@ -309,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         children: [
                           Checkbox(
-                            checkColor: Colors.red,
+                            checkColor: Colors.white,
                             value: state.showMerchantWidget ?? false,
                             onChanged: (bool? value) {
                               context.read<HomeScreenCubit>().onShowMerchantWidget(value);

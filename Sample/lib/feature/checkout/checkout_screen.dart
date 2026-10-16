@@ -52,6 +52,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: 46),
             Text(

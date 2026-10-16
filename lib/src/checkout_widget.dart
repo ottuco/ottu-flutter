@@ -12,7 +12,7 @@ const _methodVerifyPayment = "METHOD_VERIFY_PAYMENT";
 const _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT";
 const _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT";
 const _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT";
-const _methodChannel = MethodChannel('com.ottu.sample/checkout');
+const _methodChannel = MethodChannel('com.ottu.flutter/checkout');
 
 const _defaultCheckoutViewHeight = 200;
 
