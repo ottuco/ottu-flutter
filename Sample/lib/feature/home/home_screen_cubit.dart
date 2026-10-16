@@ -144,6 +144,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     );
     result.onResult(
       success: (sessionResponse) {
+        _logger.d("getSessionId, session: ${sessionResponse.sessionId}");
         emit(
           state.copyWith(
             sessionId: sessionResponse.sessionId,
@@ -249,6 +250,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     emit(state.copyWith(failPaymentValidation: isChecked == true));
   }
 
+  void onShowMerchantWidget(bool? isChecked) {
+    emit(state.copyWith(showMerchantWidget: isChecked == true));
+  }
+
   void onPay() async {
     _logger.d("onPay");
     final amount = state.amount != null ? double.tryParse(state.amount!) ?? 0.1 : 0.1;
@@ -280,7 +285,11 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     );
     _navigator.push(
       "/checkout",
-      extra: {"args": args, "failPaymentValidation": state.failPaymentValidation ?? false},
+      extra: {
+        "args": args,
+        "failPaymentValidation": state.failPaymentValidation ?? false,
+        "showMerchantWidget": state.showMerchantWidget,
+      },
     );
   }
 

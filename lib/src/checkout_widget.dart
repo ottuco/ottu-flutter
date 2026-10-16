@@ -12,7 +12,7 @@ const _methodVerifyPayment = "METHOD_VERIFY_PAYMENT";
 const _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT";
 const _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT";
 const _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT";
-const _methodChannel = MethodChannel('com.ottu.sample/checkout');
+const _methodChannel = MethodChannel('com.ottu.flutter/checkout');
 
 const _defaultCheckoutViewHeight = 200;
 
@@ -21,6 +21,10 @@ typedef VerifyPaymentDelegate = Future<CardVerificationResult<void, String>> Fun
 
 class OttuCheckoutWidget extends StatefulWidget {
   final CheckoutArguments arguments;
+
+  /// Whether to embed the merchant Flutter view when creating checkout.
+  /// The host app must register `/merchantNestedWidget` for the nested engine.
+  final bool showMerchantWidget;
   final VerifyPaymentDelegate? _verifyPayment;
   final Function(String message)? _successCallback;
   final Function(String message)? _cancelCallback;
@@ -29,6 +33,7 @@ class OttuCheckoutWidget extends StatefulWidget {
   const OttuCheckoutWidget({
     super.key,
     required this.arguments,
+    this.showMerchantWidget = false,
     VerifyPaymentDelegate? verifyPayment,
     Function(String message)? successCallback,
     Function(String message)? cancelCallback,
@@ -111,7 +116,7 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   Widget build(BuildContext context) {
     final argsMap = widget.arguments.toJson();
     final jsonArg = json.encode(argsMap);
-    final args = {"args": jsonArg};
+    final args = {"args": jsonArg, "showMerchantWidget": widget.showMerchantWidget};
     return ValueListenableBuilder<int>(
         valueListenable: _checkoutHeight,
         builder: (BuildContext context, int height, Widget? child) {

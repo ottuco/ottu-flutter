@@ -33,7 +33,7 @@ android {
 
     defaultConfig {
         minSdk = 26
-        //targetSdk = 34
+        targetSdk = 37
         //versionCode = flutterVersionCode.toInt()
         //versionName = flutterVersionName
     }

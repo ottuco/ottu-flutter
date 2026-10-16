@@ -10,7 +10,6 @@ import 'package:ottu_flutter_checkout_sample/main.dart' show ThemeModeNotifierHo
 import 'package:provider/provider.dart';
 
 final class HomeModule implements Module {
-
   late final GetIt _service;
 
   @override
@@ -24,16 +23,14 @@ final class HomeModule implements Module {
     return [
       GoRoute(
         path: '/',
-        builder: (context, state) =>
-            BlocProvider(
-              create: (_) =>
-                  HomeScreenCubit(
-                      navigator: GoRouter.of(context),
-                      themeModeNotifier: context.watch<ThemeModeNotifierHolder>(),
-                      api: _service<OttuApi>()
-                  ),
-              child: const HomeScreen(),
-            ),
+        builder: (context, state) => BlocProvider(
+          create: (_) => HomeScreenCubit(
+            navigator: GoRouter.of(context),
+            themeModeNotifier: context.watch<ThemeModeNotifierHolder>(),
+            api: _service<OttuApi>(),
+          ),
+          child: const HomeScreen(),
+        ),
       ),
     ];
   }

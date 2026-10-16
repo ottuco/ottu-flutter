@@ -35,15 +35,23 @@ void main() {
   runApp(OttuApp(modules: [HomeModule(), ThemeModule(), CheckoutModule()]));
 }
 
+// @pragma('vm:entry-point')
+// void merchantNestedWidgetMain() {
+//   runApp(const MaterialApp(
+//     debugShowCheckedModeBanner: false,
+//     home: MerchantNestedWidget(),
+//   ));
+// }
+
 class OttuApp extends StatelessWidget {
   final List<Module> modules;
-  final routes = <RouteBase>[];
   late final GoRouter _router;
 
   OttuApp({required this.modules, super.key}) {
     modules.forEach((final module) => module.init(_service));
-    modules.forEach((final module) => routes.addAll(module.router()));
-    _router = GoRouter(routes: routes);
+    _router = GoRouter(
+      routes: [for (final module in modules) ...module.router()],
+    );
   }
 
   @override

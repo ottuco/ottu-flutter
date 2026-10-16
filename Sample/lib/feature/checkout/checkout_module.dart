@@ -5,10 +5,10 @@ import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/di/Module.dart';
 import 'package:ottu_flutter_checkout_sample/feature/checkout/checkout_screen.dart';
+import 'package:ottu_flutter_checkout_sample/feature/checkout/merchant_nested_widget.dart';
 
 final class CheckoutModule implements Module {
   final _logger = Logger();
-
   @override
   void init(GetIt service) {}
 
@@ -21,17 +21,32 @@ final class CheckoutModule implements Module {
           final Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
           final args = extra["args"] as CheckoutArguments;
           final failPaymentValidation = extra["failPaymentValidation"] as bool;
+          final showMerchantWidget = extra["showMerchantWidget"] as bool;
           return PopScope(
             onPopInvokedWithResult: (didPop, _) => _canPop(context, didPop),
             child: CheckoutScreen(
               title: "Checkout",
               checkoutArguments: args,
               failPaymentValidation: failPaymentValidation,
+              showMerchantWidget: showMerchantWidget,
             ),
           );
         },
         onExit: (BuildContext, GoRouterState) async {
           _logger.d("router, /checkout, exit");
+          return true;
+        },
+      ),
+
+      // Native checkout engines start here with their own Dart state.
+      // Keep this route available independently of the main app checkbox.
+      GoRoute(
+        path: '/merchantNestedWidget',
+        builder: (context, state) {
+          return MerchantNestedWidget();
+        },
+        onExit: (BuildContext, GoRouterState) async {
+          _logger.d("router, /merchantNestedWidget, exit");
           return true;
         },
       ),

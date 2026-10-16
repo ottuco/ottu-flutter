@@ -9,29 +9,44 @@ import Flutter
 import Foundation
 
 public class CheckoutViewFactory: NSObject,
-    @preconcurrency FlutterPlatformViewFactory
+                                  @preconcurrency FlutterPlatformViewFactory
 {
-
+    
     private var messenger: FlutterBinaryMessenger
-
+    
+    private lazy var engineGroup = FlutterEngineGroup(name: "checkout-nested-group", project: nil)
+    
     init(messenger: FlutterBinaryMessenger) {
         self.messenger = messenger
         super.init()
     }
-
+    
     @MainActor public func create(
         withFrame frame: CGRect,
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
+
+        let creationParams = args as? [String: Any]
+        let showMerchantWidget = creationParams?["showMerchantWidget"] as? Bool ?? false
+        let nestedEngine: FlutterEngine?
+        if showMerchantWidget {
+            let options = FlutterEngineGroupOptions()
+            options.initialRoute = "/merchantNestedWidget"
+            nestedEngine = engineGroup.makeEngine(with: options)
+        } else {
+            nestedEngine = nil
+        }
+
         return CheckoutPlatformView(
             messenger: messenger,
             frame: frame,
             viewId: viewId,
-            args: args
+            args: args,
+            nestedEngine: nestedEngine,
         )
     }
-
+    
     public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
         return FlutterStandardMessageCodec.sharedInstance()
     }

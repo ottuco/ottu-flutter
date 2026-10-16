@@ -10,11 +10,13 @@ class CheckoutScreen extends StatefulWidget {
     required this.title,
     required this.checkoutArguments,
     required this.failPaymentValidation,
+    required this.showMerchantWidget,
   });
 
   final String title;
   final CheckoutArguments checkoutArguments;
   final bool failPaymentValidation;
+  final bool showMerchantWidget;
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -50,6 +52,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: 46),
             Text(
@@ -69,6 +72,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               padding: const EdgeInsets.all(12.0),
               child: OttuCheckoutWidget(
                 arguments: widget.checkoutArguments,
+                showMerchantWidget: widget.showMerchantWidget,
                 verifyPayment: _verifyPayment,
                 successCallback: (message) => _checkoutMessage.value = ("Success", message),
                 cancelCallback: (message) => _checkoutMessage.value = ("Cancel", message),

@@ -31,7 +31,7 @@ android {
     defaultConfig {
         applicationId = "com.ottu.sample"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = flutterVersionCode.toInt()
         versionName = flutterVersionName
 
