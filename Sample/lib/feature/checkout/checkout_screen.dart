@@ -71,6 +71,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               padding: const EdgeInsets.all(12.0),
               child: OttuCheckoutWidget(
                 arguments: widget.checkoutArguments,
+                showMerchantWidget: widget.showMerchantWidget,
                 verifyPayment: _verifyPayment,
                 successCallback: (message) => _checkoutMessage.value = ("Success", message),
                 cancelCallback: (message) => _checkoutMessage.value = ("Cancel", message),

@@ -214,7 +214,7 @@ internal class CheckoutView(
 
         Log.d(
             TAG,
-            "initCheckoutFragment, has nested view: ${nestedContainerLayout != null}"
+            "initCheckoutFragment, has nested view: ${nestedFlutterView != null}"
         )
 
         coroutineScope.launch {
@@ -240,7 +240,7 @@ internal class CheckoutView(
                     },
                     verifyPayment = ::verifyPayment,
                     payButtonText = arguments.payButtonText?.toPayButtonText(),
-                    nestedWidget = nestedContainerLayout,
+                    nestedWidget = nestedContainerLayout.takeIf { nestedFlutterView != null },
                 )
 
                 onInitialized(sdkFragment)

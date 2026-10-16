@@ -9,7 +9,6 @@ import 'package:ottu_flutter_checkout_sample/feature/checkout/merchant_nested_wi
 
 final class CheckoutModule implements Module {
   final _logger = Logger();
-
   @override
   void init(GetIt service) {}
 
@@ -39,6 +38,8 @@ final class CheckoutModule implements Module {
         },
       ),
 
+      // Native checkout engines start here with their own Dart state.
+      // Keep this route available independently of the main app checkbox.
       GoRoute(
         path: '/merchantNestedWidget',
         builder: (context, state) {

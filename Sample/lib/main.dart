@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart' as ch;
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart' show CustomerUiMode;
 import 'package:ottu_flutter_checkout_sample/feature/checkout/checkout_module.dart';
-import 'package:ottu_flutter_checkout_sample/feature/checkout/merchant_nested_widget.dart';
 import 'package:ottu_flutter_checkout_sample/feature/home/home_module.dart';
 import 'package:ottu_flutter_checkout_sample/feature/theme/theme_module.dart';
 import 'package:ottu_flutter_checkout_sample/util/transformation_notifier.dart';
@@ -46,13 +45,13 @@ void main() {
 
 class OttuApp extends StatelessWidget {
   final List<Module> modules;
-  final routes = <RouteBase>[];
   late final GoRouter _router;
 
   OttuApp({required this.modules, super.key}) {
     modules.forEach((final module) => module.init(_service));
-    modules.forEach((final module) => routes.addAll(module.router()));
-    _router = GoRouter(routes: routes);
+    _router = GoRouter(
+      routes: [for (final module in modules) ...module.router()],
+    );
   }
 
   @override

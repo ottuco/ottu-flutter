@@ -28,12 +28,12 @@ group = "com.ottu.flutter.checkout"
 version = "1.0.3"
 
 android {
-    compileSdk = 37
+    compileSdk = 36
     namespace = "com.ottu.flutter.checkout"
 
     defaultConfig {
         minSdk = 26
-        //targetSdk = 34
+        targetSdk = 37
         //versionCode = flutterVersionCode.toInt()
         //versionName = flutterVersionName
     }

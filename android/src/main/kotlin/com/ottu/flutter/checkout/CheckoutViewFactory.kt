@@ -28,14 +28,17 @@ class CheckoutViewFactory(private val messenger: BinaryMessenger) :
             throw NotFoundException("There are no argument to start Checkout SDK")
         }
 
-        if (engineGroup == null) {
-            engineGroup = FlutterEngineGroup(context.applicationContext)
+        val showMerchantWidget = creationParams["showMerchantWidget"] as? Boolean ?: false
+        val nestedEngine = if (showMerchantWidget) {
+            if (engineGroup == null) {
+                engineGroup = FlutterEngineGroup(context.applicationContext)
+            }
+            val options = FlutterEngineGroup.Options(context)
+                .setInitialRoute("/merchantNestedWidget")
+            engineGroup?.createAndRunEngine(options)
+        } else {
+            null
         }
-
-        val options = FlutterEngineGroup.Options(context)
-            .setInitialRoute("/merchantNestedWidget")
-
-        val nestedEngine = engineGroup?.createAndRunEngine(options)
 
         Log.d(TAG, "create, with arguments")
         return CheckoutView(

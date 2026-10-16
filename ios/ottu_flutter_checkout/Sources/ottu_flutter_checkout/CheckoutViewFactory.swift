@@ -14,7 +14,7 @@ public class CheckoutViewFactory: NSObject,
     
     private var messenger: FlutterBinaryMessenger
     
-    private let engineGroup = FlutterEngineGroup(name: "checkout-nested-group", project: nil)
+    private lazy var engineGroup = FlutterEngineGroup(name: "checkout-nested-group", project: nil)
     
     init(messenger: FlutterBinaryMessenger) {
         self.messenger = messenger
@@ -27,10 +27,16 @@ public class CheckoutViewFactory: NSObject,
         arguments args: Any?
     ) -> FlutterPlatformView {
 
-        let options = FlutterEngineGroupOptions()
-                options.initialRoute = "/merchantNestedWidget"
-                let nestedEngine = engineGroup.makeEngine(with: options)
-                nestedEngine.run()
+        let creationParams = args as? [String: Any]
+        let showMerchantWidget = creationParams?["showMerchantWidget"] as? Bool ?? false
+        let nestedEngine: FlutterEngine?
+        if showMerchantWidget {
+            let options = FlutterEngineGroupOptions()
+            options.initialRoute = "/merchantNestedWidget"
+            nestedEngine = engineGroup.makeEngine(with: options)
+        } else {
+            nestedEngine = nil
+        }
 
         return CheckoutPlatformView(
             messenger: messenger,

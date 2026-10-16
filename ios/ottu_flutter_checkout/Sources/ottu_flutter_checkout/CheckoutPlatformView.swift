@@ -65,7 +65,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         frame: CGRect,
         viewId: Int64,
         args: Any?,
-        nestedEngine: FlutterEngine,
+        nestedEngine: FlutterEngine?,
     ) {
         
         self.viewId = viewId
@@ -77,7 +77,12 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         self.nestedEngine = nestedEngine
         super.init()
         
-        let nestedWidget = setupNestedFlutterWidget(with: nestedEngine)
+        let nestedWidget: UIView?
+        if let nestedEngine {
+            nestedWidget = setupNestedFlutterWidget(with: nestedEngine)
+        } else {
+            nestedWidget = nil
+        }
         
         self.channel.setMethodCallHandler { [weak self] call, _ in
             guard let self else { return }
