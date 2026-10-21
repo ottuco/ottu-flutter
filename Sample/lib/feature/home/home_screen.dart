@@ -463,11 +463,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: state.sessionId?.isNotEmpty == true
-                            ? null
-                            : () {
+                            ? () {
                                 FocusManager.instance.primaryFocus?.unfocus();
                                 context.read<HomeScreenCubit>().onPay();
-                              },
+                              }
+                            : null,
                         child: const Text("Pay"),
                       ),
                     ],
