@@ -15,6 +15,7 @@ final class HomeScreenState extends Equatable {
   final String? amount;
   final String? currencyCode;
   final String? phoneNumber;
+  final String? email;
   final String? customerId;
   final String? cardExpiryTime;
   final String paymentsListItemCount;
@@ -42,6 +43,7 @@ final class HomeScreenState extends Equatable {
     this.amount,
     this.currencyCode,
     this.phoneNumber,
+    this.email,
     this.customerId,
     this.cardExpiryTime,
     this.paymentsListItemCount = "$_defaultPaymentsListItemCount",
@@ -64,9 +66,7 @@ final class HomeScreenState extends Equatable {
   }) : formsOfPaymentChecked = formsOfPaymentChecked == null
            ? null
            : Map.unmodifiable(formsOfPaymentChecked),
-       pgCodesChecked = pgCodesChecked == null
-           ? null
-           : Map.unmodifiable(pgCodesChecked);
+       pgCodesChecked = pgCodesChecked == null ? null : Map.unmodifiable(pgCodesChecked);
 
   HomeScreenState copyWith({
     String? merchantId,
@@ -75,6 +75,7 @@ final class HomeScreenState extends Equatable {
     String? amount,
     String? currencyCode,
     String? phoneNumber,
+    String? email,
     String? customerId,
     String? cardExpiryTime,
     String? paymentsListItemCount,
@@ -102,27 +103,23 @@ final class HomeScreenState extends Equatable {
       amount: amount ?? this.amount,
       currencyCode: currencyCode ?? this.currencyCode,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      email: email ?? this.email,
       customerId: customerId ?? this.customerId,
       cardExpiryTime: cardExpiryTime ?? this.cardExpiryTime,
-      paymentsListItemCount:
-          paymentsListItemCount ?? this.paymentsListItemCount,
-      defaultSelectedPayment:
-          defaultSelectedPayment ?? this.defaultSelectedPayment,
+      paymentsListItemCount: paymentsListItemCount ?? this.paymentsListItemCount,
+      defaultSelectedPayment: defaultSelectedPayment ?? this.defaultSelectedPayment,
       language: language ?? this.language,
       showPaymentDetails: showPaymentDetails ?? this.showPaymentDetails,
       noForms: noForms ?? this.noForms,
       preloadPayload: preloadPayload ?? this.preloadPayload,
       isAutoDebit: isAutoDebit ?? this.isAutoDebit,
-      failPaymentValidation:
-          failPaymentValidation ?? this.failPaymentValidation,
+      failPaymentValidation: failPaymentValidation ?? this.failPaymentValidation,
       isSessionLoading: isSessionLoading ?? this.isSessionLoading,
       useCustomText: useCustomText ?? this.useCustomText,
       showMerchantWidget: showMerchantWidget ?? this.showMerchantWidget,
       hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
-      paymentOptionsDisplayMode:
-          paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
-      formsOfPaymentChecked:
-          formsOfPaymentChecked ?? this.formsOfPaymentChecked,
+      paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
+      formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
       pgCodesChecked: pgCodesChecked ?? this.pgCodesChecked,
       apiTransactionDetails: apiTransactionDetails == _unset
           ? this.apiTransactionDetails
@@ -154,6 +151,7 @@ final class HomeScreenState extends Equatable {
     useCustomText,
     showMerchantWidget,
     phoneNumber,
+    email,
     hasSessionLoaded,
     paymentOptionsDisplayMode?.name,
     _formsOfPaymentEquality.hash(formsOfPaymentChecked),

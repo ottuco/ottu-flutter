@@ -108,7 +108,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       language: language,
       customerFirstName: customerFirstName,
       customerLastName: customerLastName,
-      customerEmail: customerEmail,
+      customerEmail: state.email,
       billingAddress: BillingAddress(
         country: billingCountry,
         city: billingCity,
@@ -455,6 +455,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       phoneNumber: _customerPhone,
       customerId: customerId,
       language: Platform.localeName.split("_")[0],
+      email: customerEmail,
       formsOfPaymentChecked: {
         FormsOfPayment.redirect: true,
         FormsOfPayment.flex: true,
