@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -20,10 +21,7 @@ const merchantId = String.fromEnvironment(
   'MERCHANT_ID',
   defaultValue: "add your merchant Id there",
 );
-const apiKey = String.fromEnvironment(
-  'API_KEY',
-  defaultValue: "add your Api key there",
-);
+const apiKey = String.fromEnvironment('API_KEY', defaultValue: "add your Api key there");
 const customerId = "john2";
 const currencyCode = "KWD";
 const transactionType = "e_commerce";
@@ -35,6 +33,8 @@ const billingCity = "Kuwait City";
 
 //    const customerPhone = "966557877988"
 const _customerPhone = "99459272";
+
+const defaultLanguages = ["en", "ar"];
 
 final class HomeScreenStateStore {
   HomeScreenState? state;
@@ -59,9 +59,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
        super(stateStore.state ?? _initialState()) {
     final nativePayment = _nativePaymentMethod();
     if (hasNativePaymentAllowed() && nativePayment != null) {
-      final fopList = Map<FormsOfPayment, bool>.of(
-        state.formsOfPaymentChecked ?? {},
-      );
+      final fopList = Map<FormsOfPayment, bool>.of(state.formsOfPaymentChecked ?? {});
       fopList[nativePayment] = true;
       emit(state.copyWith(formsOfPaymentChecked: fopList));
     }
@@ -73,10 +71,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     _stateStore.state = change.nextState;
   }
 
-  void getSessionId({
-    required String merchantId,
-    required String apiKey,
-  }) async {
+  void getSessionId({required String merchantId, required String apiKey}) async {
     _logger.d("getSessionId");
     emit(
       state.copyWith(
@@ -92,17 +87,13 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     final cardExpiryTime = state.cardExpiryTime?.isNotEmpty == true
         ? int.tryParse(state.cardExpiryTime!)
         : null;
-    final amount = state.amount != null
-        ? double.tryParse(state.amount!)?.toString()
-        : null;
+    final amount = state.amount != null ? double.tryParse(state.amount!)?.toString() : null;
     final request = CreateTransactionRequest(
       amount: amount ?? "0.0",
       currencyCode: state.currencyCode ?? "",
       pgCodes: _pgCodesNative(),
       type: transactionType,
-      customerId: state.customerId?.isNotEmpty == true
-          ? state.customerId
-          : null,
+      customerId: state.customerId?.isNotEmpty == true ? state.customerId : null,
       customerPhone: state.phoneNumber,
       includeSdkSetupPreload: state.preloadPayload ?? false,
       language: language,
@@ -117,12 +108,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       cardAcceptanceCriteria: cardExpiryTime != null
           ? CardAcceptanceCriteria(minExpiryTime: cardExpiryTime)
           : null,
-      paymentType: state.isAutoDebit == true
-          ? TransactionPaymentType.autoDebit
-          : null,
-      agreement: state.isAutoDebit == true
-          ? TransactionAgreement.defaultAgreement()
-          : null,
+      paymentType: state.isAutoDebit == true ? TransactionPaymentType.autoDebit : null,
+      agreement: state.isAutoDebit == true ? TransactionAgreement.defaultAgreement() : null,
       brandingOptions: _brandingOptions(),
     );
 
@@ -148,23 +135,16 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
         final message = error is ApiError
             ? error.message
             : 'Unable to create a checkout session. Check the form and try again.';
-        emit(
-          state.copyWith(isSessionLoading: false, sessionErrorMessage: message),
-        );
+        emit(state.copyWith(isSessionLoading: false, sessionErrorMessage: message));
       },
     );
   }
 
   void onFormsOfPaymentChecked(FormsOfPayment key, bool isChecked) {
-    final payments = Map<FormsOfPayment, bool>.of(
-      state.formsOfPaymentChecked ?? {},
-    );
+    final payments = Map<FormsOfPayment, bool>.of(state.formsOfPaymentChecked ?? {});
     payments[key] = isChecked;
     emit(
-      state.copyWith(
-        formsOfPaymentChecked: Map.from(payments),
-        noForms: isChecked ? false : null,
-      ),
+      state.copyWith(formsOfPaymentChecked: Map.from(payments), noForms: isChecked ? false : null),
     );
   }
 
@@ -211,6 +191,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     emit(state.copyWith(phoneNumber: number));
   }
 
+  void onEmailChanged(String number) async {
+    emit(state.copyWith(email: number));
+  }
+
   void onCardExpiryTimeChanged(String time) async {
     emit(state.copyWith(cardExpiryTime: time));
   }
@@ -253,22 +237,31 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
     emit(state.copyWith(showMerchantWidget: isChecked == true));
   }
 
+  void clearSession() {
+    if (isClosed) return;
+    emit(
+      state.copyWith(
+        sessionId: null,
+        hasSessionLoaded: false,
+        isSessionLoading: false,
+        apiTransactionDetails: null,
+        sessionErrorMessage: null,
+      ),
+    );
+  }
+
   void onPay() async {
+    if (state.sessionId?.isNotEmpty != true) return;
     _logger.d("onPay");
-    final amount = state.amount != null
-        ? double.tryParse(state.amount!) ?? 0.1
-        : 0.1;
-    final paymentsListItemCount =
-        int.tryParse(state.paymentsListItemCount) ?? 0;
+    final amount = state.amount != null ? double.tryParse(state.amount!) ?? 0.1 : 0.1;
+    final paymentsListItemCount = int.tryParse(state.paymentsListItemCount) ?? 0;
     final formOfPayments = state.formsOfPaymentChecked?.entries
         .where((entry) => entry.value)
         .map((entry) => entry.key)
         .toList();
 
     final displaySettings = PaymentOptionsDisplaySettings(
-      mode:
-          state.paymentOptionsDisplayMode ??
-          PaymentOptionsDisplayMode.BOTTOM_SHEET,
+      mode: state.paymentOptionsDisplayMode ?? PaymentOptionsDisplayMode.BOTTOM_SHEET,
       visibleItemsCount: paymentsListItemCount,
       defaultSelectedPgCode: state.defaultSelectedPayment,
     );
@@ -280,12 +273,8 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       amount: amount,
       showPaymentDetails: state.showPaymentDetails,
       paymentOptionsDisplaySettings: displaySettings,
-      setupPreload: state.preloadPayload == true
-          ? state.apiTransactionDetails
-          : null,
-      formsOfPayment: formOfPayments?.isNotEmpty == true
-          ? formOfPayments
-          : null,
+      setupPreload: state.preloadPayload == true ? state.apiTransactionDetails : null,
+      formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
       theme: _themeModeNotifier.themeNotifier.value,
       payButtonText: state.useCustomText == true
           ? PayButtonText(en: "Checkout", ar: "الدفع")
@@ -295,10 +284,9 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       "/checkout",
       extra: {
         "args": args,
+        "onCheckoutCompleted": clearSession,
         "failPaymentValidation": state.failPaymentValidation ?? false,
-        "merchantWidgetRoute": state.showMerchantWidget
-            ? "/merchantNestedWidget"
-            : null,
+        "merchantWidgetRoute": state.showMerchantWidget ? "/merchantNestedWidget" : null,
       },
     );
   }
@@ -350,9 +338,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       return null;
     }
 
-    final brandingOptionsRequest = BrandingOptionsRequest(
-      paymentMethods: BrandingPaymentMethods(),
-    );
+    final brandingOptionsRequest = BrandingOptionsRequest(paymentMethods: BrandingPaymentMethods());
     state.pgCodesChecked?.forEach((code, isSelected) {
       if (isSelected) {
         switch (code) {
@@ -447,6 +433,10 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
   }
 
   static HomeScreenState _initialState() {
+    String initialLanguage = Platform.localeName.split("_")[0];
+    initialLanguage =
+        defaultLanguages.firstWhereOrNull((l) => l == initialLanguage) ?? defaultLanguages[0];
+
     return HomeScreenState(
       amount: "10",
       merchantId: merchantId,
@@ -454,7 +444,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       currencyCode: currencyCode,
       phoneNumber: _customerPhone,
       customerId: customerId,
-      language: Platform.localeName.split("_")[0],
+      language: initialLanguage,
       email: customerEmail,
       formsOfPaymentChecked: {
         FormsOfPayment.redirect: true,

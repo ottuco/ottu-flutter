@@ -10,12 +10,14 @@ class CheckoutScreen extends StatefulWidget {
     required this.title,
     required this.checkoutArguments,
     required this.failPaymentValidation,
+    required this.onCheckoutCompleted,
     this.merchantWidgetRoute,
   });
 
   final String title;
   final CheckoutArguments checkoutArguments;
   final bool failPaymentValidation;
+  final VoidCallback onCheckoutCompleted;
   final String? merchantWidgetRoute;
 
   @override
@@ -36,8 +38,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _checkoutMessage.removeListener(_showMessageDialog);
+    _checkoutMessage.dispose();
+    super.dispose();
   }
 
   @override
@@ -73,11 +76,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 merchantWidgetRoute: widget.merchantWidgetRoute,
                 verifyPayment: _verifyPayment,
                 successCallback: (message) =>
-                    _checkoutMessage.value = ("Success", message),
+                    _handleCheckoutResult("Success", message),
                 cancelCallback: (message) =>
-                    _checkoutMessage.value = ("Cancel", message),
+                    _handleCheckoutResult("Cancel", message),
                 errorCallback: (message) =>
-                    _checkoutMessage.value = ("Error", message),
+                    _handleCheckoutResult("Error", message),
               ),
             ),
             const SizedBox(height: 20),
@@ -95,6 +98,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  void _handleCheckoutResult(String title, String message) {
+    if (!mounted) return;
+    widget.onCheckoutCompleted();
+    _checkoutMessage.value = (title, message);
   }
 
   Future<CardVerificationResult<void, String>> _verifyPayment(

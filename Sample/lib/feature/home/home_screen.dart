@@ -11,7 +11,6 @@ import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_cubit.dart
 import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_state.dart';
 
 const oneDotPattern = r'^\d+(\.)?(\d{1,2})?$';
-const defaultLanguages = ["en", "ar"];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -187,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextFormField(
                         controller: emailEditingController,
                         onChanged: (text) {
-                          context.read<HomeScreenCubit>().onPhoneNumberChanged(text);
+                          context.read<HomeScreenCubit>().onEmailChanged(text);
                         },
                         decoration: const InputDecoration(
                           border: UnderlineInputBorder(),
@@ -463,12 +462,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: state.sessionId != null
-                            ? () {
+                        onPressed: state.sessionId?.isNotEmpty == true
+                            ? null
+                            : () {
                                 FocusManager.instance.primaryFocus?.unfocus();
                                 context.read<HomeScreenCubit>().onPay();
-                              }
-                            : null,
+                              },
                         child: const Text("Pay"),
                       ),
                     ],

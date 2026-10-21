@@ -25,7 +25,7 @@ class _MerchantNestedWidgetState extends State<MerchantNestedWidget> {
                 padding: const EdgeInsets.all(8.0),
                 child: const Text(
                   'I am a Flutter nested Widget inside a Native View and inside Flutter!',
-                  style: TextStyle(color: Colors.black54, fontSize: 16),
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
               SizedBox(height: 24,),

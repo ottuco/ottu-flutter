@@ -32,6 +32,7 @@ final class CheckoutModule implements Module {
               title: "Checkout",
               checkoutArguments: args,
               failPaymentValidation: failPaymentValidation,
+              onCheckoutCompleted: extra["onCheckoutCompleted"] as VoidCallback,
               merchantWidgetRoute: merchantWidgetRoute,
             ),
           );
