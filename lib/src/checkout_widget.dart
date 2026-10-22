@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -12,12 +13,13 @@ const _methodVerifyPayment = "METHOD_VERIFY_PAYMENT";
 const _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT";
 const _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT";
 const _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT";
-const _methodChannel = MethodChannel('com.ottu.flutter/checkout');
+// Allocated before native creation so even initialization callbacks have a handler.
+int _nextCheckoutChannelId = 0;
 
 const _defaultCheckoutViewHeight = 200;
 
-typedef VerifyPaymentDelegate = Future<CardVerificationResult<void, String>> Function(
-    String? payload);
+typedef VerifyPaymentDelegate =
+    Future<CardVerificationResult<void, String>> Function(String? payload);
 
 class OttuCheckoutWidget extends StatefulWidget {
   final CheckoutArguments arguments;
@@ -67,10 +69,10 @@ class OttuCheckoutWidget extends StatefulWidget {
     Function(String message)? successCallback,
     Function(String message)? cancelCallback,
     Function(String message)? errorCallback,
-  })  : _verifyPayment = verifyPayment,
-        _successCallback = successCallback,
-        _cancelCallback = cancelCallback,
-        _errorCallback = errorCallback;
+  }) : _verifyPayment = verifyPayment,
+       _successCallback = successCallback,
+       _cancelCallback = cancelCallback,
+       _errorCallback = errorCallback;
 
   @override
   State<StatefulWidget> createState() => _OttuCheckoutWidgetState();
@@ -78,7 +80,12 @@ class OttuCheckoutWidget extends StatefulWidget {
 
 class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   static const StandardMessageCodec _decoder = StandardMessageCodec();
-  final ValueNotifier<int> _checkoutHeight = ValueNotifier<int>(_defaultCheckoutViewHeight);
+  final MethodChannel _methodChannel = MethodChannel(
+    'com.ottu.flutter/checkout/${_nextCheckoutChannelId++}',
+  );
+  final ValueNotifier<int> _checkoutHeight = ValueNotifier<int>(
+    _defaultCheckoutViewHeight,
+  );
 
   @override
   void initState() {
@@ -95,11 +102,35 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
       print("OttuCheckoutWidget.dispose()");
     }
     _methodChannel.setMethodCallHandler(null);
-    _methodChannel.invokeMethod(_methodOnWidgetDetached);
+    // dispose cannot await; the helper handles asynchronous teardown failures.
+    if (defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      unawaited(_detachNativeView());
+    }
+    _checkoutHeight.dispose();
     super.dispose();
   }
 
-  Future<dynamic> _handleChannelMethod(call) async {
+  Future<void> _detachNativeView() async {
+    try {
+      await _methodChannel.invokeMethod<void>(_methodOnWidgetDetached);
+    } on MissingPluginException {
+      // The platform view may already have removed its native handler.
+    } on PlatformException {
+      // Native view disposal remains the fallback. Do not expose native payloads.
+      if (kDebugMode) {
+        debugPrint('Ottu checkout native detach failed.');
+      }
+    }
+  }
+
+  Future<dynamic> _handleChannelMethod(MethodCall call) async {
+    if (!mounted) {
+      throw PlatformException(
+        code: 'CHECKOUT_DISPOSED',
+        message: 'Checkout was disposed',
+      );
+    }
     switch (call.method) {
       case _methodCheckoutHeight:
         {
@@ -126,16 +157,30 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
       case _methodVerifyPayment:
         {
           final result = await widget._verifyPayment?.call(call.arguments);
+          if (!mounted) {
+            throw PlatformException(
+              code: 'CHECKOUT_DISPOSED',
+              message: 'Checkout was disposed',
+            );
+          }
           if (kDebugMode) {
-            print("CheckoutWidget, verifyPayment, result: ${result.runtimeType}");
+            print(
+              "CheckoutWidget, verifyPayment, result: ${result.runtimeType}",
+            );
           }
           switch (result) {
             case Success():
               return "";
             case Failure(:final message):
-              throw PlatformException(code: _methodVerifyPayment, message: message);
+              throw PlatformException(
+                code: _methodVerifyPayment,
+                message: message,
+              );
             case null:
-              throw PlatformException(code: _methodVerifyPayment, message: "Unknown error");
+              throw PlatformException(
+                code: _methodVerifyPayment,
+                message: "Unknown error",
+              );
           }
         }
     }
@@ -145,23 +190,31 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   Widget build(BuildContext context) {
     final argsMap = widget.arguments.toJson();
     final jsonArg = json.encode(argsMap);
-    final args = {"args": jsonArg, "merchantWidgetRoute": widget.merchantWidgetRoute};
+    final args = {
+      "args": jsonArg,
+      "merchantWidgetRoute": widget.merchantWidgetRoute,
+      "channelName": _methodChannel.name,
+    };
     return ValueListenableBuilder<int>(
-        valueListenable: _checkoutHeight,
-        builder: (BuildContext context, int height, Widget? child) {
-          return SizedBox(
-              height: height.toDouble(),
-              child: defaultTargetPlatform == TargetPlatform.android
-                  ? AndroidView(
-                      viewType: _checkoutViewType,
-                      creationParams: args,
-                      creationParamsCodec: _decoder)
-                  : defaultTargetPlatform == TargetPlatform.iOS
-                      ? UiKitView(
-                          viewType: _checkoutViewType,
-                          creationParams: args,
-                          creationParamsCodec: _decoder)
-                      : SizedBox.shrink());
-        });
+      valueListenable: _checkoutHeight,
+      builder: (BuildContext context, int height, Widget? child) {
+        return SizedBox(
+          height: height.toDouble(),
+          child: defaultTargetPlatform == TargetPlatform.android
+              ? AndroidView(
+                  viewType: _checkoutViewType,
+                  creationParams: args,
+                  creationParamsCodec: _decoder,
+                )
+              : defaultTargetPlatform == TargetPlatform.iOS
+              ? UiKitView(
+                  viewType: _checkoutViewType,
+                  creationParams: args,
+                  creationParamsCodec: _decoder,
+                )
+              : SizedBox.shrink(),
+        );
+      },
+    );
   }
 }

@@ -40,7 +40,8 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.math.ceil
 
 private const val METHOD_CHECKOUT_HEIGHT = "METHOD_CHECKOUT_HEIGHT"
@@ -49,7 +50,6 @@ private const val METHOD_PAYMENT_ERROR_RESULT = "METHOD_PAYMENT_ERROR_RESULT"
 private const val METHOD_PAYMENT_CANCEL_RESULT = "METHOD_PAYMENT_CANCEL_RESULT"
 private const val METHOD_ON_WIDGET_DETACHED = "METHOD_ON_WIDGET_DETACHED"
 private const val METHOD_VERIFY_PAYMENT = "METHOD_VERIFY_PAYMENT"
-private const val CHANNEL = "com.ottu.flutter/checkout"
 private const val NESTED_WIDGET_CHANNEL = "com.ottu.flutter/checkout/nested"
 private const val METHOD_NESTED_WIDGET_HEIGHT = "METHOD_NESTED_WIDGET_HEIGHT"
 private const val TAG = "CheckoutView"
@@ -64,18 +64,25 @@ private val coroutineScope = CoroutineScope(
     CoroutineName(TAG) + dispatcher + sessionCoroutineExceptionHandler,
 )
 
-private val isCheckoutInitializing = AtomicBoolean(false)
+// Checkout is a process-wide singleton. Never overlap initialization or let a
+// superseded platform view release the current view's SDK session.
+private val checkoutInitializationMutex = Mutex()
+private var checkoutOwner: CheckoutView? = null
 
 private const val defaultCheckoutPadding = 40
 
 internal class CheckoutView(
     messenger: BinaryMessenger,
-    id: Int,
+    channelName: String,
     private val context: Context,
     private val arguments: CheckoutArguments,
     private var nestedEngine: FlutterEngine? = null,
 ) : PlatformView {
     private val methodChannel: MethodChannel
+    private var detached = false
+    private var initializationStarted = false
+    private var initializing = false
+    private var sdkFragment: Fragment? = null
     private val checkoutView: FrameLayout = LayoutInflater.from(context)
         .inflate(R.layout.fragment_checkout_wrapper_view, null) as FrameLayout
 
@@ -85,7 +92,7 @@ internal class CheckoutView(
     private val checkoutLayoutChangeListener = View.OnLayoutChangeListener {
             view, _, top, _, bottom, _, _, _, _ ->
         val contentHeightPx = bottom - top
-        if (view.width > 0 && contentHeightPx > 0) {
+        if (!detached && view.width > 0 && contentHeightPx > 0) {
             val density = view.resources.displayMetrics.density.toDouble()
             val logicalHeight = ceil((contentHeightPx + defaultCheckoutPadding) / density).toInt()
             if (lastCheckoutHeight != logicalHeight) {
@@ -126,7 +133,17 @@ internal class CheckoutView(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         )
         checkoutView.layoutParams = vParams
-        methodChannel = MethodChannel(messenger, CHANNEL)
+        checkoutContentLayout.id = View.generateViewId()
+        methodChannel = MethodChannel(messenger, channelName)
+        methodChannel.setMethodCallHandler { call, result ->
+            when (call.method) {
+                METHOD_ON_WIDGET_DETACHED -> {
+                    detachCheckout()
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
         checkoutContentLayout.addOnLayoutChangeListener(checkoutLayoutChangeListener)
 
         nestedEngine?.let { engine ->
@@ -180,7 +197,34 @@ internal class CheckoutView(
 
     override fun getView(): View = checkoutView
 
+    private fun detachCheckout() {
+        if (detached) return
+        detached = true
+        initializerErrorDialog?.dismiss()
+        initializerErrorDialog = null
+        sdkFragment?.let { fragment ->
+            if (fragment.isAdded) {
+                val manager = fragment.parentFragmentManager
+                if (!manager.isDestroyed) {
+                    manager.beginTransaction().remove(fragment).commitNowAllowingStateLoss()
+                }
+            }
+        }
+        sdkFragment = null
+        // A suspended init finishes under the mutex and releases itself there.
+        if (!initializing) releaseOwnedCheckout()
+    }
+
+    private fun releaseOwnedCheckout() {
+        if (checkoutOwner === this) {
+            Checkout.release()
+            checkoutOwner = null
+        }
+    }
+
     override fun dispose() {
+        detachCheckout()
+        methodChannel.setMethodCallHandler(null)
         nestedLifecycle?.removeObserver(nestedLifecycleObserver)
         nestedLifecycle = null
         nestedEngine?.lifecycleChannel?.appIsDetached()
@@ -201,17 +245,8 @@ internal class CheckoutView(
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
 
-        methodChannel.setMethodCallHandler { call, _ ->
-            when (call.method) {
-                METHOD_ON_WIDGET_DETACHED -> {
-                    Log.d(TAG, "onFlutterViewAttached, handle onWidgetDetached")
-                    Checkout.release()
-                }
-            }
-        }
-
-        Log.i(TAG, "onFlutterViewAttached, isCheckoutInitializing: ${isCheckoutInitializing.get()}")
-        if (isCheckoutInitializing.getAndSet(true).not()) {
+        if (!detached && !initializationStarted) {
+            initializationStarted = true
             val fa = checkoutView.context as FragmentActivity
             val fm = fa.supportFragmentManager
             Log.i(TAG, "onFlutterViewAttached, start init")
@@ -221,12 +256,13 @@ internal class CheckoutView(
                 packageName = flutterView.context.packageName
             ) { fragment ->
                 Log.d(TAG, "onFlutterViewAttached, Checkout initialized")
-                fm.beginTransaction().replace(R.id.checkout_fragment_container, fragment)
-                    .commitAllowingStateLoss()
+                if (!detached && checkoutOwner === this && !fm.isDestroyed) {
+                    sdkFragment = fragment
+                    fm.beginTransaction().replace(checkoutContentLayout.id, fragment)
+                        .commitNowAllowingStateLoss()
+                }
             }
 
-        } else {
-            Log.d(TAG, "onFlutterViewAttached, isCheckoutInitializing: $isCheckoutInitializing")
         }
 
 
@@ -276,10 +312,6 @@ internal class CheckoutView(
         val apiTransactionDetails =
             arguments.apiTransactionDetails?.let { getApiTransactionDetails(arguments.apiTransactionDetails) }
 
-        if (Checkout.isInitialized) {
-            Log.d(TAG, "initCheckoutFragment, release")
-            Checkout.release()
-        }
 
         Log.d(
             TAG,
@@ -292,42 +324,51 @@ internal class CheckoutView(
         )
 
         coroutineScope.launch {
-            try {
-                val sdkFragment = Checkout.init(
-                    context = checkoutView.context,
-                    builder = builder,
-                    setupPreload = apiTransactionDetails,
-                    successCallback = {
-                        Log.d(TAG, "successCallback: $it")
-                        methodChannel.invokeMethod(METHOD_PAYMENT_SUCCESS_RESULT, it.toString())
-                    },
-                    cancelCallback = {
-                        Log.i(TAG, "cancelCallback: $it")
-                        methodChannel.invokeMethod(METHOD_PAYMENT_CANCEL_RESULT, it.toString())
-                    },
-                    errorCallback = { errorData, throwable ->
-                        Log.e(TAG, "errorCallback: $errorData", throwable)
-                        methodChannel.invokeMethod(
-                            METHOD_PAYMENT_ERROR_RESULT,
-                            errorData.toString()
-                        )
-                    },
-                    verifyPayment = ::verifyPayment,
-                    payButtonText = arguments.payButtonText?.toPayButtonText(),
-                    nestedWidget = nestedContainerLayout.takeIf { nestedFlutterView != null },
-                )
+            checkoutInitializationMutex.withLock {
+                if (detached) return@withLock
+                checkoutOwner?.detachCheckout()
+                checkoutOwner = this@CheckoutView
+                initializing = true
+                try {
+                    if (Checkout.isInitialized) Checkout.release()
+                    val sdkFragment = Checkout.init(
+                        context = checkoutView.context,
+                        builder = builder,
+                        setupPreload = apiTransactionDetails,
+                        successCallback = {
+                            Log.d(TAG, "successCallback: $it")
+                            if (!detached) methodChannel.invokeMethod(METHOD_PAYMENT_SUCCESS_RESULT, it.toString())
+                        },
+                        cancelCallback = {
+                            Log.i(TAG, "cancelCallback: $it")
+                            if (!detached) methodChannel.invokeMethod(METHOD_PAYMENT_CANCEL_RESULT, it.toString())
+                        },
+                        errorCallback = { errorData, throwable ->
+                            Log.e(TAG, "errorCallback: $errorData", throwable)
+                            if (!detached) methodChannel.invokeMethod(
+                                METHOD_PAYMENT_ERROR_RESULT,
+                                errorData.toString()
+                            )
+                        },
+                        verifyPayment = ::verifyPayment,
+                        payButtonText = arguments.payButtonText?.toPayButtonText(),
+                        nestedWidget = nestedContainerLayout.takeIf { nestedFlutterView != null },
+                    )
 
-                onInitialized(sdkFragment)
-            } catch (e: Exception) {
-                Log.e(TAG, "initCheckoutFragment, error", e)
-                handleInitException(e)
-            } finally {
-                isCheckoutInitializing.set(false)
+                    if (!detached) onInitialized(sdkFragment)
+                } catch (e: Exception) {
+                    releaseOwnedCheckout()
+                    if (!detached) handleInitException(e)
+                } finally {
+                    initializing = false
+                    if (detached) releaseOwnedCheckout()
+                }
             }
         }
     }
 
     private suspend fun verifyPayment(payload: String?): CardVerificationResult<Nothing> {
+        if (detached) return CardVerificationResult.Failure("Checkout was disposed")
         val deferredResult = CompletableDeferred<CardVerificationResult<Nothing>>()
         methodChannel.invokeMethod(
             METHOD_VERIFY_PAYMENT,
@@ -335,7 +376,10 @@ internal class CheckoutView(
             object : MethodChannel.Result {
                 override fun success(result: Any?) {
                     Log.i(TAG, "verifyPayment, success")
-                    deferredResult.complete(CardVerificationResult.Success(null))
+                    deferredResult.complete(
+                        if (detached) CardVerificationResult.Failure("Checkout was disposed")
+                        else CardVerificationResult.Success(null)
+                    )
                 }
 
                 override fun error(errorCode: String, errorMessage: String?, errorDetails: Any?) {

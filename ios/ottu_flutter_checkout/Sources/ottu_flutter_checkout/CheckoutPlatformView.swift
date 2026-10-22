@@ -12,7 +12,6 @@ import ottu_checkout_sdk
 //  Created by Vi on 25.09.2024.
 //
 
-private let checkoutChannelName = "com.ottu.flutter/checkout"
 private let methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT"
 private let nestedChannelName = "com.ottu.flutter/checkout/nested"
 private let methodNestedHeight = "METHOD_NESTED_WIDGET_HEIGHT"
@@ -23,6 +22,7 @@ private let _methodOnWidgetDetached = "METHOD_ON_WIDGET_DETACHED"
 private let _methodVerifyPayment = "METHOD_VERIFY_PAYMENT"
 
 public class CheckoutPlatformView: NSObject, FlutterPlatformView {
+    private var detached = false
     private let viewId: Int64
     private let channel: FlutterMethodChannel
     private let _view: CheckoutContainerView
@@ -35,6 +35,15 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private var nestedHeightConstraint: NSLayoutConstraint?
     
     deinit {
+        channel.setMethodCallHandler(nil)
+        deinitCheckout()
+    }
+
+    private func deinitCheckout() {
+        guard !detached else { return }
+        detached = true
+        _view.onHeightChanged = nil
+        _view.heightHandlerView.onHeightChanged = nil
         nestedMethodChannel?.setMethodCallHandler(nil)
         if let nestedFlutterVC, nestedFlutterVC.parent != nil {
             nestedFlutterVC.willMove(toParent: nil)
@@ -46,22 +55,13 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         nestedEngine?.destroyContext()
         nestedEngine = nil
         
-        print("CheckoutPlatformView successfully deallocated and memory cleaned up.")
-    }
-    
-    private func deinitCheckout() {
-        guard let pvc = paymentViewController,
-              let parentVC = findRootViewController() as? FlutterViewController
-        else { return }
-        
-        if parentVC.children.contains(pvc) {
-            pvc.willMove(toParent: nil)
+        if let pvc = paymentViewController {
+            if pvc.parent != nil { pvc.willMove(toParent: nil) }
             pvc.view.removeFromSuperview()
             pvc.removeFromParent()
-            Logger.sdk.info("CheckoutPlatformView, Removed from parent!")
-        } else {
-            Logger.sdk.debug("CheckoutPlatformView, No parent relationship found, nothing to remove.")
         }
+        paymentViewController = nil
+        checkout = nil
     }
     
     @MainActor
@@ -73,9 +73,12 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         nestedEngine: FlutterEngine?,
     ) {
         
+        guard let channelName = (args as? [String: Any])?["channelName"] as? String else {
+            preconditionFailure("Missing checkout view channel")
+        }
         self.viewId = viewId
         self.channel = FlutterMethodChannel(
-            name: checkoutChannelName,
+            name: channelName,
             binaryMessenger: messenger
         )
         _view = CheckoutContainerView()
@@ -89,11 +92,13 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             nestedWidget = nil
         }
         
-        self.channel.setMethodCallHandler { [weak self] call, _ in
-            guard let self else { return }
-            if call.method == _methodOnWidgetDetached {
-                self.deinitCheckout()
+        self.channel.setMethodCallHandler { [weak self] call, result in
+            guard call.method == _methodOnWidgetDetached else {
+                result(FlutterMethodNotImplemented)
+                return
             }
+            self?.deinitCheckout()
+            result(nil)
         }
         let jsonData: Data? =
         if args != nil {
@@ -112,7 +117,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 )
                 
                 self._view.onHeightChanged = { [weak self] (height: Int) in
-                    guard let self else { return }
+                    guard let self, !self.detached else { return }
                     Logger.sdk.debug(
                         "CheckoutPlatformView, onHeightChanged: \(height)"
                     )
@@ -335,7 +340,7 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
 
     func tryAttachController() {
         Logger.sdk.info("tryAttachController")
-        guard let pvc = self.paymentViewController else { return }
+        guard !detached, let pvc = self.paymentViewController else { return }
         
         let rootViewController = findRootViewController()
         Logger.sdk.info(
@@ -355,8 +360,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
             Logger.sdk.info(
                 "tryAttachController, PVC hasn found, waiting for parent..."
             )
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.tryAttachController()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.tryAttachController()
             }
         }
     }
@@ -595,10 +600,18 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         return await withCheckedContinuation { continuation in
             Logger.sdk.info("CheckoutPlatformView.verifyPaymentCallback")
             DispatchQueue.main.async {
+                guard !self.detached else {
+                    continuation.resume(returning: CardVerificationResult.failure("Checkout was disposed"))
+                    return
+                }
                 self.channel.invokeMethod(
                     _methodVerifyPayment,
                     arguments: payload,
                     result: { [weak self] (result) -> Void in
+                        guard let self, !self.detached else {
+                            continuation.resume(returning: CardVerificationResult.failure("Checkout was disposed"))
+                            return
+                        }
                         if let data = result as? String {
                             continuation.resume(
                                 returning: CardVerificationResult.success(())
@@ -655,6 +668,7 @@ extension CheckoutPlatformView: OttuDelegate {
         Logger.sdk.debug("errorCallback\n")
         DispatchQueue.main
             .async {
+                guard !self.detached else { return }
                 if let message = data?.description {
                     self.channel.invokeMethod(
                         _methodPaymentErrorResult,
@@ -676,6 +690,7 @@ extension CheckoutPlatformView: OttuDelegate {
         Logger.sdk.debug("cancelCallback\n")
         DispatchQueue.main
             .async {
+                guard !self.detached else { return }
                 if let message = data?.description {
                     self.channel.invokeMethod(
                         _methodPaymentCancelResult,
@@ -695,6 +710,7 @@ extension CheckoutPlatformView: OttuDelegate {
     public func successCallback(_ data: [String: Any]?) {
         Logger.sdk.debug("successCallback")
         DispatchQueue.main.async {
+            guard !self.detached else { return }
             if let message = data?.description {
                 self.channel.invokeMethod(
                     _methodPaymentSuccessResult,

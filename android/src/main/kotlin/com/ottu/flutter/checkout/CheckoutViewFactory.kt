@@ -28,6 +28,9 @@ class CheckoutViewFactory(private val messenger: BinaryMessenger) :
             throw NotFoundException("There are no argument to start Checkout SDK")
         }
 
+        val channelName = requireNotNull(creationParams["channelName"] as? String) {
+            "Missing checkout view channel"
+        }
         val merchantWidgetRoute = (creationParams["merchantWidgetRoute"] as? String)
             ?.takeIf { it.isNotEmpty() }
         val nestedEngine = if (merchantWidgetRoute != null) {
@@ -44,7 +47,7 @@ class CheckoutViewFactory(private val messenger: BinaryMessenger) :
         Log.d(TAG, "create, with arguments")
         return CheckoutView(
             context = context,
-            id = viewId,
+            channelName = channelName,
             arguments = checkoutArguments,
             messenger = messenger,
             nestedEngine = nestedEngine,
