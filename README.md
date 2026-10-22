@@ -64,6 +64,23 @@ flutter pub get
 flutter build apk --debug
 ```
 
+Android builds also create a named APK in `build/app/outputs/flutter-apk/`
+and a named app bundle in `build/app/outputs/named-bundle/<variant>/` when building an AAB:
+
+```sh
+flutter build apk --release --dart-define-from-file=env.var.alpha.json
+flutter build appbundle --release --dart-define-from-file=env.var.alpha.json
+```
+
+The filename is `<App name>_<flavour>_<environment>_<dd_MM_yyyy_mm:HH>.apk`
+(or `.aab`). The app name is always `FlutterAndroid`, the flavour
+uses the product flavor when configured and otherwise the build type, and the
+environment uses `MERCHANT_ID` from the Dart defines. A missing `MERCHANT_ID`
+leaves the environment segment empty. The timestamp uses local build time,
+with minutes before hours, for example `FlutterAndroid_release__22_10_2026_05:14.apk`.
+Split APK names append the ABI before `.apk`. Standard Flutter output files are
+also retained for `flutter build` and `flutter run`.
+
 ### iOS Sample App
 
 In order to install the Flutter iOS plugin and run the demo app, it is required to perform the following initial steps:
