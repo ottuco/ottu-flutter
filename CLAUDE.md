@@ -81,7 +81,7 @@ BLoC (Cubits) + GetIt DI + GoRouter + Dio. Each feature defines a `Module` with 
 ## Platform Requirements
 
 - **Dart SDK**: ^3.6.0
-- **Android**: minSdk 26, compileSdk 36, Kotlin 2.2.20, AGP 8.9.3
+- **Android**: minSdk 26, compileSdk 36, Kotlin 2.3.20, AGP 8.9.3
 - **iOS**: iOS 15+, Swift tools 5.5
 - **Localization**: English and Arabic (Kuwait) for error messages on both platforms
 

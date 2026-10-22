@@ -89,19 +89,23 @@ internal class CheckoutView(
     private val checkoutContentLayout =
         checkoutView.findViewById<FrameLayout>(R.id.checkout_fragment_container)
     private var lastCheckoutHeight: Int? = null
-    private val checkoutLayoutChangeListener = View.OnLayoutChangeListener {
-            view, _, top, _, bottom, _, _, _, _ ->
-        val contentHeightPx = bottom - top
-        if (!detached && view.width > 0 && contentHeightPx > 0) {
-            val density = view.resources.displayMetrics.density.toDouble()
-            val logicalHeight = ceil((contentHeightPx + defaultCheckoutPadding) / density).toInt()
-            if (lastCheckoutHeight != logicalHeight) {
-                lastCheckoutHeight = logicalHeight
-                Log.d(TAG, "Checkout content: ${contentHeightPx}px, Flutter height: $logicalHeight")
-                methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, logicalHeight)
+    private val checkoutLayoutChangeListener =
+        View.OnLayoutChangeListener { view, _, top, _, bottom, _, _, _, _ ->
+            val contentHeightPx = bottom - top
+            if (!detached && view.width > 0 && contentHeightPx > 0) {
+                val density = view.resources.displayMetrics.density.toDouble()
+                val logicalHeight =
+                    ceil((contentHeightPx + defaultCheckoutPadding) / density).toInt()
+                if (lastCheckoutHeight != logicalHeight) {
+                    lastCheckoutHeight = logicalHeight
+                    Log.d(
+                        TAG,
+                        "Checkout content: ${contentHeightPx}px, Flutter height: $logicalHeight"
+                    )
+                    methodChannel.invokeMethod(METHOD_CHECKOUT_HEIGHT, logicalHeight)
+                }
             }
         }
-    }
 
     private var initializerErrorDialog: AlertDialog? = null
 
@@ -141,30 +145,38 @@ internal class CheckoutView(
                     detachCheckout()
                     result.success(null)
                 }
+
                 else -> result.notImplemented()
             }
         }
         checkoutContentLayout.addOnLayoutChangeListener(checkoutLayoutChangeListener)
 
         nestedEngine?.let { engine ->
-            nestedMethodChannel = MethodChannel(engine.dartExecutor.binaryMessenger, NESTED_WIDGET_CHANNEL).apply {
-                setMethodCallHandler { call, result ->
-                    if (call.method != METHOD_NESTED_WIDGET_HEIGHT) {
-                        result.notImplemented()
-                        return@setMethodCallHandler
+            nestedMethodChannel =
+                MethodChannel(engine.dartExecutor.binaryMessenger, NESTED_WIDGET_CHANNEL).apply {
+                    setMethodCallHandler { call, result ->
+                        if (call.method != METHOD_NESTED_WIDGET_HEIGHT) {
+                            result.notImplemented()
+                            return@setMethodCallHandler
+                        }
+                        val height = (call.arguments as? Number)?.toDouble()
+                        val pixels =
+                            height?.times(context.resources.displayMetrics.density.toDouble())
+                        if (height == null || !height.isFinite() || height < 0 ||
+                            pixels == null || !pixels.isFinite() || pixels > Int.MAX_VALUE
+                        ) {
+                            result.error(
+                                "INVALID_HEIGHT",
+                                "Expected a finite, non-negative height",
+                                null
+                            )
+                            return@setMethodCallHandler
+                        }
+                        val heightPx = ceil(pixels).toInt()
+                        nestedContainerLayout.updateHeight(heightPx)
+                        result.success(null)
                     }
-                    val height = (call.arguments as? Number)?.toDouble()
-                    val pixels = height?.times(context.resources.displayMetrics.density.toDouble())
-                    if (height == null || !height.isFinite() || height < 0 ||
-                        pixels == null || !pixels.isFinite() || pixels > Int.MAX_VALUE) {
-                        result.error("INVALID_HEIGHT", "Expected a finite, non-negative height", null)
-                        return@setMethodCallHandler
-                    }
-                    val heightPx = ceil(pixels).toInt()
-                    nestedContainerLayout.updateHeight(heightPx)
-                    result.success(null)
                 }
-            }
             nestedFlutterView = FlutterView(context, RenderMode.texture).apply {
                 attachToFlutterEngine(engine)
 
@@ -337,11 +349,17 @@ internal class CheckoutView(
                         setupPreload = apiTransactionDetails,
                         successCallback = {
                             Log.d(TAG, "successCallback: $it")
-                            if (!detached) methodChannel.invokeMethod(METHOD_PAYMENT_SUCCESS_RESULT, it.toString())
+                            if (!detached) methodChannel.invokeMethod(
+                                METHOD_PAYMENT_SUCCESS_RESULT,
+                                it.toString()
+                            )
                         },
                         cancelCallback = {
                             Log.i(TAG, "cancelCallback: $it")
-                            if (!detached) methodChannel.invokeMethod(METHOD_PAYMENT_CANCEL_RESULT, it.toString())
+                            if (!detached) methodChannel.invokeMethod(
+                                METHOD_PAYMENT_CANCEL_RESULT,
+                                it.toString()
+                            )
                         },
                         errorCallback = { errorData, throwable ->
                             Log.e(TAG, "errorCallback: $errorData", throwable)
@@ -352,7 +370,9 @@ internal class CheckoutView(
                         },
                         verifyPayment = ::verifyPayment,
                         payButtonText = arguments.payButtonText?.toPayButtonText(),
-                        nestedWidget = nestedContainerLayout.takeIf { nestedFlutterView != null },
+                        nestedWidgetFactory = if (nestedFlutterView != null) {
+                            { _ -> nestedContainerLayout }
+                        } else null,
                     )
 
                     if (!detached) onInitialized(sdkFragment)

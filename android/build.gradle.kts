@@ -21,7 +21,7 @@ val flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "
 plugins {
     id("com.android.library")
     kotlin("android") apply false
-    kotlin("plugin.serialization") version "2.2.20"
+    kotlin("plugin.serialization") version "2.3.20"
 }
 
 // AGP 9 creates this extension for built-in Kotlin. Older AGP versions (and

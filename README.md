@@ -33,7 +33,7 @@ Sample and the standalone plugin build use Android Gradle Plugin 9.3.3 and Gradl
 Merchant apps choose their own AGP and compatible Gradle versions. The plugin
 supports AGP 8.x with the Kotlin Android plugin and AGP 9.x with built-in Kotlin.
 It applies the Kotlin Android plugin only when built-in Kotlin is unavailable or disabled.
-AGP 8.x hosts must provide Kotlin 2.2.20 on their build classpath, matching the
+AGP 9.x hosts must provide Kotlin 2.3.20 on their build classpath, matching the
 plugin's serialization compiler plugin. The plugin compiles against Android SDK 36;
 Sample compiles and targets SDK 37. Older AGP 8.x releases may still be limited
 by the minimum AGP and compile SDK requirements of AndroidX and Kotlin dependencies.
@@ -47,7 +47,7 @@ Install Android SDK Platform 36 for the plugin and Platform 37 for Sample.
 When `ottuSdk` points to a local native SDK composite build, that SDK must use
 the same AGP version as the host app.
 
-ARM64 debug APK builds were verified with Kotlin 2.2.20 in isolated hosts:
+ARM64 debug APK builds were verified with Kotlin 2.3.20 in isolated hosts:
 
 | AGP | Gradle | Kotlin support |
 | --- | --- | --- |
