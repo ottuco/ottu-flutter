@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -12,31 +13,66 @@ const _methodVerifyPayment = "METHOD_VERIFY_PAYMENT";
 const _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT";
 const _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT";
 const _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT";
-const _methodChannel = MethodChannel('com.ottu.sample/checkout');
+// Allocated before native creation so even initialization callbacks have a handler.
+int _nextCheckoutChannelId = 0;
 
 const _defaultCheckoutViewHeight = 200;
 
-typedef VerifyPaymentDelegate = Future<CardVerificationResult<void, String>> Function(
-    String? payload);
+typedef VerifyPaymentDelegate =
+    Future<CardVerificationResult<void, String>> Function(String? payload);
 
 class OttuCheckoutWidget extends StatefulWidget {
   final CheckoutArguments arguments;
+
+  /// Optional initial route for the merchant view in a separate Flutter engine.
+  ///
+  /// Omit this or pass null/empty to create checkout without a merchant view.
+  /// The host app must register any supplied route in the nested engine.
+  /// This is applied when the native checkout view is created.
+  final String? merchantWidgetRoute;
   final VerifyPaymentDelegate? _verifyPayment;
   final Function(String message)? _successCallback;
   final Function(String message)? _cancelCallback;
   final Function(String message)? _errorCallback;
 
+  /// Creates an embedded native Ottu checkout view for Android or iOS.
+  ///
+  /// [arguments] supplies the merchant credentials, checkout session, amount,
+  /// payment options, and appearance settings used to create the native view.
+  /// The widget adjusts its height to match the native checkout content.
+  ///
+  /// [merchantWidgetRoute] optionally embeds merchant Flutter content inside
+  /// checkout using a separate Flutter engine. The host app must register this
+  /// route in that engine and wrap its content in [NestedWrapperWidget]. The
+  /// nested engine has its own Dart state. Omitting the route, passing `null`,
+  /// or passing an empty string skips both the merchant view and nested engine.
+  /// Supplied routes are not checked for availability automatically.
+  ///
+  /// [verifyPayment] asynchronously validates the nullable payload supplied by
+  /// the native SDK. Return [CardVerificationResult.success] to approve or
+  /// [CardVerificationResult.failure] with a message to reject verification.
+  /// If the native SDK requests verification and no callback is supplied, the
+  /// request fails with an "Unknown error" message.
+  ///
+  /// [successCallback], [cancelCallback], and [errorCallback] receive the native
+  /// SDK's message when payment succeeds, is cancelled, or reports an error,
+  /// respectively. Each callback is optional; omitted callbacks are ignored.
+  ///
+  /// [arguments] and [merchantWidgetRoute] are passed when the native view is
+  /// created. To apply different creation settings, recreate the widget with a
+  /// different [key]. Unsupported platforms render an empty widget.
   const OttuCheckoutWidget({
     super.key,
     required this.arguments,
+    this.merchantWidgetRoute,
     VerifyPaymentDelegate? verifyPayment,
     Function(String message)? successCallback,
     Function(String message)? cancelCallback,
     Function(String message)? errorCallback,
-  })  : _verifyPayment = verifyPayment,
-        _successCallback = successCallback,
-        _cancelCallback = cancelCallback,
-        _errorCallback = errorCallback;
+  }) : _verifyPayment = verifyPayment,
+       _successCallback = successCallback,
+       _cancelCallback = cancelCallback,
+       _errorCallback = errorCallback;
 
   @override
   State<StatefulWidget> createState() => _OttuCheckoutWidgetState();
@@ -44,7 +80,12 @@ class OttuCheckoutWidget extends StatefulWidget {
 
 class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   static const StandardMessageCodec _decoder = StandardMessageCodec();
-  final ValueNotifier<int> _checkoutHeight = ValueNotifier<int>(_defaultCheckoutViewHeight);
+  final MethodChannel _methodChannel = MethodChannel(
+    'com.ottu.flutter/checkout/${_nextCheckoutChannelId++}',
+  );
+  final ValueNotifier<int> _checkoutHeight = ValueNotifier<int>(
+    _defaultCheckoutViewHeight,
+  );
 
   @override
   void initState() {
@@ -61,11 +102,35 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
       print("OttuCheckoutWidget.dispose()");
     }
     _methodChannel.setMethodCallHandler(null);
-    _methodChannel.invokeMethod(_methodOnWidgetDetached);
+    // dispose cannot await; the helper handles asynchronous teardown failures.
+    if (defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      unawaited(_detachNativeView());
+    }
+    _checkoutHeight.dispose();
     super.dispose();
   }
 
-  Future<dynamic> _handleChannelMethod(call) async {
+  Future<void> _detachNativeView() async {
+    try {
+      await _methodChannel.invokeMethod<void>(_methodOnWidgetDetached);
+    } on MissingPluginException {
+      // The platform view may already have removed its native handler.
+    } on PlatformException {
+      // Native view disposal remains the fallback. Do not expose native payloads.
+      if (kDebugMode) {
+        debugPrint('Ottu checkout native detach failed.');
+      }
+    }
+  }
+
+  Future<dynamic> _handleChannelMethod(MethodCall call) async {
+    if (!mounted) {
+      throw PlatformException(
+        code: 'CHECKOUT_DISPOSED',
+        message: 'Checkout was disposed',
+      );
+    }
     switch (call.method) {
       case _methodCheckoutHeight:
         {
@@ -92,16 +157,30 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
       case _methodVerifyPayment:
         {
           final result = await widget._verifyPayment?.call(call.arguments);
+          if (!mounted) {
+            throw PlatformException(
+              code: 'CHECKOUT_DISPOSED',
+              message: 'Checkout was disposed',
+            );
+          }
           if (kDebugMode) {
-            print("CheckoutWidget, verifyPayment, result: ${result.runtimeType}");
+            print(
+              "CheckoutWidget, verifyPayment, result: ${result.runtimeType}",
+            );
           }
           switch (result) {
             case Success():
               return "";
             case Failure(:final message):
-              throw PlatformException(code: _methodVerifyPayment, message: message);
+              throw PlatformException(
+                code: _methodVerifyPayment,
+                message: message,
+              );
             case null:
-              throw PlatformException(code: _methodVerifyPayment, message: "Unknown error");
+              throw PlatformException(
+                code: _methodVerifyPayment,
+                message: "Unknown error",
+              );
           }
         }
     }
@@ -111,23 +190,31 @@ class _OttuCheckoutWidgetState extends State<OttuCheckoutWidget> {
   Widget build(BuildContext context) {
     final argsMap = widget.arguments.toJson();
     final jsonArg = json.encode(argsMap);
-    final args = {"args": jsonArg};
+    final args = {
+      "args": jsonArg,
+      "merchantWidgetRoute": widget.merchantWidgetRoute,
+      "channelName": _methodChannel.name,
+    };
     return ValueListenableBuilder<int>(
-        valueListenable: _checkoutHeight,
-        builder: (BuildContext context, int height, Widget? child) {
-          return SizedBox(
-              height: height.toDouble(),
-              child: defaultTargetPlatform == TargetPlatform.android
-                  ? AndroidView(
-                      viewType: _checkoutViewType,
-                      creationParams: args,
-                      creationParamsCodec: _decoder)
-                  : defaultTargetPlatform == TargetPlatform.iOS
-                      ? UiKitView(
-                          viewType: _checkoutViewType,
-                          creationParams: args,
-                          creationParamsCodec: _decoder)
-                      : SizedBox.shrink());
-        });
+      valueListenable: _checkoutHeight,
+      builder: (BuildContext context, int height, Widget? child) {
+        return SizedBox(
+          height: height.toDouble(),
+          child: defaultTargetPlatform == TargetPlatform.android
+              ? AndroidView(
+                  viewType: _checkoutViewType,
+                  creationParams: args,
+                  creationParamsCodec: _decoder,
+                )
+              : defaultTargetPlatform == TargetPlatform.iOS
+              ? UiKitView(
+                  viewType: _checkoutViewType,
+                  creationParams: args,
+                  creationParamsCodec: _decoder,
+                )
+              : SizedBox.shrink(),
+        );
+      },
+    );
   }
 }

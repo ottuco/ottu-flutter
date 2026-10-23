@@ -19,8 +19,7 @@ class ThemeCustomizationScreen extends StatefulWidget {
 
 const dividerPadding = 4.0;
 
-class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
-    with TickerProviderStateMixin {
+class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen> {
   final _logger = Logger();
   final uiModeController = TextEditingController();
 
@@ -478,57 +477,16 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
   }
 
   Widget _expandableOptionItem({required String title, required Widget child}) {
-    final AnimationController rotationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    final ValueNotifier expanded = ValueNotifier(false);
-    // final Animation<double> curve =
-    //     CurvedAnimation(parent: rotationController, curve: Curves.easeOutQuint);
-    expanded.addListener(() {
-      if (expanded.value) {
-        rotationController..reverse(from: 0.5);
-      } else {
-        rotationController..forward(from: 0.0);
-      }
-    });
-    return ValueListenableBuilder(
-      valueListenable: expanded,
-      builder: (context, btnValue, __) => Column(
-        children: [
-          InkWell(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(title),
-                  RotationTransition(
-                    turns: Tween(begin: 0.0, end: 1.0).animate(rotationController),
-                    child: Icon(
-                      Icons.arrow_drop_down_circle,
-                      color: Colors.lightBlue[200],
-                      size: 24.0,
-                      semanticLabel: 'Expand button',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            onTap: () {
-              expanded.value = !expanded.value;
-            },
-          ),
-          expanded.value
-              ? Padding(padding: const EdgeInsets.only(left: 14.0), child: child)
-              : SizedBox.shrink(),
-        ],
-      ),
-    );
+    return _ExpandableOptionItem(title: title, child: child);
   }
 
   Widget _buttonModifier(ch.ButtonComponent? button, Function(ch.ButtonComponent button) onChange) {
     final ValueNotifier btn = ValueNotifier(button);
+    void updateButton(ch.ButtonComponent button) {
+      btn.value = button;
+      onChange(button);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -540,8 +498,10 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           builder: (context, btnValue, __) =>
               _colorOptionItem(btnValue?.rippleColor?.color, "Button Color", (color) {
                 final button = (btnValue ?? ch.ButtonComponent());
-                btn.value = button.copyWith(
-                  rippleColor: (button.rippleColor ?? ch.RippleColor()).copyWith(color: color),
+                updateButton(
+                  button.copyWith(
+                    rippleColor: (button.rippleColor ?? ch.RippleColor()).copyWith(color: color),
+                  ),
                 );
               }),
         ),
@@ -555,9 +515,11 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
             "Button Disabled Color",
             (color) {
               final button = (btnValue ?? ch.ButtonComponent());
-              btn.value = button.copyWith(
-                rippleColor: (button.rippleColor ?? ch.RippleColor()).copyWith(
-                  colorDisabled: color,
+              updateButton(
+                button.copyWith(
+                  rippleColor: (button.rippleColor ?? ch.RippleColor()).copyWith(
+                    colorDisabled: color,
+                  ),
                 ),
               );
             },
@@ -570,8 +532,10 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           builder: (context, btnValue, __) =>
               _colorOptionItem(btnValue?.borderColor?.color, "Button Border Color", (color) {
                 final button = (btnValue ?? ch.ButtonComponent());
-                btn.value = button.copyWith(
-                  borderColor: (button.borderColor ?? ch.ColorState()).copyWith(color: color),
+                updateButton(
+                  button.copyWith(
+                    borderColor: (button.borderColor ?? ch.ColorState()).copyWith(color: color),
+                  ),
                 );
               }),
         ),
@@ -580,14 +544,14 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
         const SizedBox(height: dividerPadding),
         _numberModifier("Button Border Width", button?.borderWidth, (number) {
           final component = btn.value ?? ch.ButtonComponent();
-          btn.value = component.copyWith(borderWidth: number);
+          updateButton(component.copyWith(borderWidth: number));
         }),
         const SizedBox(height: dividerPadding),
         subDivider(),
         const SizedBox(height: dividerPadding),
         _numberModifier("Button Corner Radius", button?.cornerRadius, (number) {
           final component = btn.value ?? ch.ButtonComponent();
-          btn.value = component.copyWith(cornerRadius: number);
+          updateButton(component.copyWith(cornerRadius: number));
         }),
         const SizedBox(height: dividerPadding),
         subDivider(),
@@ -602,7 +566,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           btn.value?.fontFamily,
           (selection) {
             final component = btn.value ?? ch.ButtonComponent();
-            btn.value = component.copyWith(fontFamily: selection);
+            updateButton(component.copyWith(fontFamily: selection));
           },
         ),
         const SizedBox(height: dividerPadding),
@@ -614,7 +578,7 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
               _colorOptionItem(btnValue?.textColor?.color, "Text Color", (color) {
                 final button = (btnValue ?? ch.ButtonComponent());
                 final c = button.textColor ?? ch.ColorState();
-                btn.value = button.copyWith(textColor: c.copyWith(color: color));
+                updateButton(button.copyWith(textColor: c.copyWith(color: color)));
               }),
         ),
         const SizedBox(height: dividerPadding),
@@ -626,15 +590,8 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
               _colorOptionItem(btnValue?.textColor?.colorDisabled, "Text disabled Color", (color) {
                 final button = (btnValue ?? ch.ButtonComponent());
                 final c = button.textColor ?? ch.ColorState();
-                btn.value = button.copyWith(textColor: c.copyWith(colorDisabled: color));
+                updateButton(button.copyWith(textColor: c.copyWith(colorDisabled: color)));
               }),
-        ),
-        const SizedBox(height: 10),
-        ElevatedButton(
-          child: const Text('Apply'),
-          onPressed: () {
-            onChange(btn.value);
-          },
         ),
       ],
     );
@@ -894,12 +851,11 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
   }
 
   Widget _numberModifier(String title, double? number, Function(double number) onChange) {
-    final controller = TextEditingController(text: number?.toString() ?? "");
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(child: Text(title)),
-        _numberInput(controller, (newNumber) {
+        _numberInput(number?.toString() ?? "", (newNumber) {
           final nd = double.tryParse(newNumber);
           if (nd != null) {
             onChange(nd);
@@ -910,16 +866,13 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
     );
   }
 
-  SizedBox _numberInput(
-    TextEditingController controller,
-    Function(String newNumber) onTextChanged,
-  ) {
+  SizedBox _numberInput(String initialValue, Function(String newNumber) onTextChanged) {
     return SizedBox(
       width: 64,
       child: TextFormField(
         maxLength: 4,
         textAlign: TextAlign.center,
-        controller: controller,
+        initialValue: initialValue,
         decoration: InputDecoration(
           counterText: "",
           isDense: true,
@@ -1116,6 +1069,57 @@ class _ThemeCustomizationScreenState extends State<ThemeCustomizationScreen>
           underline: Container(height: 2, color: Colors.lightBlueAccent),
         );
       },
+    );
+  }
+}
+
+class _ExpandableOptionItem extends StatefulWidget {
+  const _ExpandableOptionItem({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  State<_ExpandableOptionItem> createState() => _ExpandableOptionItemState();
+}
+
+class _ExpandableOptionItemState extends State<_ExpandableOptionItem> {
+  bool expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        InkWell(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(widget.title),
+                AnimatedRotation(
+                  turns: expanded ? 0.5 : 0.0,
+                  duration: const Duration(milliseconds: 400),
+                  child: Icon(
+                    Icons.arrow_drop_down_circle,
+                    color: Colors.lightBlue[200],
+                    size: 24.0,
+                    semanticLabel: 'Expand button',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          onTap: () {
+            setState(() {
+              expanded = !expanded;
+            });
+          },
+        ),
+        expanded
+            ? Padding(padding: const EdgeInsets.only(left: 14.0), child: widget.child)
+            : SizedBox.shrink(),
+      ],
     );
   }
 }

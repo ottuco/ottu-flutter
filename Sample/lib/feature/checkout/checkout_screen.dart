@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/painting/text_style.dart' as ts;
+import 'package:flutter/painting.dart' as painting;
 import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/l10n/app_localizations.dart';
@@ -10,21 +10,23 @@ class CheckoutScreen extends StatefulWidget {
     required this.title,
     required this.checkoutArguments,
     required this.failPaymentValidation,
+    required this.onCheckoutCompleted,
+    this.merchantWidgetRoute,
   });
 
   final String title;
   final CheckoutArguments checkoutArguments;
   final bool failPaymentValidation;
+  final VoidCallback onCheckoutCompleted;
+  final String? merchantWidgetRoute;
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  final ValueNotifier<(String, String)> _checkoutMessage = ValueNotifier<(String, String)>((
-    "",
-    "",
-  ));
+  final ValueNotifier<(String, String)> _checkoutMessage =
+      ValueNotifier<(String, String)>(("", ""));
 
   final logger = Logger();
 
@@ -36,8 +38,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _checkoutMessage.removeListener(_showMessageDialog);
+    _checkoutMessage.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,12 +53,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: 46),
             Text(
               "Customer Application",
               textAlign: TextAlign.center,
-              style: ts.TextStyle(fontSize: 24),
+              style: painting.TextStyle(fontSize: 24),
             ),
             //Start of Merchant content
             const Padding(
@@ -69,10 +73,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               padding: const EdgeInsets.all(12.0),
               child: OttuCheckoutWidget(
                 arguments: widget.checkoutArguments,
+                merchantWidgetRoute: widget.merchantWidgetRoute,
                 verifyPayment: _verifyPayment,
-                successCallback: (message) => _checkoutMessage.value = ("Success", message),
-                cancelCallback: (message) => _checkoutMessage.value = ("Cancel", message),
-                errorCallback: (message) => _checkoutMessage.value = ("Error", message),
+                successCallback: (message) =>
+                    _handleCheckoutResult("Success", message),
+                cancelCallback: (message) =>
+                    _handleCheckoutResult("Cancel", message),
+                errorCallback: (message) =>
+                    _handleCheckoutResult("Error", message),
               ),
             ),
             const SizedBox(height: 20),
@@ -92,14 +100,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Future<CardVerificationResult<void, String>> _verifyPayment(String? payload) async {
+  void _handleCheckoutResult(String title, String message) {
+    if (!mounted) return;
+    widget.onCheckoutCompleted();
+    _checkoutMessage.value = (title, message);
+  }
+
+  Future<CardVerificationResult<void, String>> _verifyPayment(
+    String? payload,
+  ) async {
     logger.d("verifyPayment, payload: $payload");
+    final prepaymentFailureMessage = AppLocalizations.of(
+      context,
+    )!.prepaymentFailureMessage;
 
     //merchant Api call for payload validation
     return Future.delayed(Duration(seconds: 2)).then((_) {
-      logger.d("verifyPayment, fail verification: ${widget.failPaymentValidation}");
+      logger.d(
+        "verifyPayment, fail verification: ${widget.failPaymentValidation}",
+      );
       return widget.failPaymentValidation
-          ? CardVerificationResult.failure(AppLocalizations.of(context)!.prepaymentFailureMessage)
+          ? CardVerificationResult.failure(prepaymentFailureMessage)
           : CardVerificationResult.success();
     });
   }
@@ -112,7 +133,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text(_checkoutMessage.value.$1),
-            content: SingleChildScrollView(child: Text(_checkoutMessage.value.$2)),
+            content: SingleChildScrollView(
+              child: Text(_checkoutMessage.value.$2),
+            ),
             actions: <Widget>[
               TextButton(
                 child: const Text('Close'),

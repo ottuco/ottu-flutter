@@ -5,10 +5,10 @@ import 'package:logger/logger.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/di/Module.dart';
 import 'package:ottu_flutter_checkout_sample/feature/checkout/checkout_screen.dart';
+import 'package:ottu_flutter_checkout_sample/feature/checkout/merchant_nested_widget.dart';
 
 final class CheckoutModule implements Module {
   final _logger = Logger();
-
   @override
   void init(GetIt service) {}
 
@@ -18,33 +18,43 @@ final class CheckoutModule implements Module {
       GoRoute(
         path: '/checkout',
         builder: (context, state) {
-          final Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
+          final Map<String, dynamic> extra =
+              state.extra as Map<String, dynamic>;
           final args = extra["args"] as CheckoutArguments;
           final failPaymentValidation = extra["failPaymentValidation"] as bool;
+          final merchantWidgetRoute = extra["merchantWidgetRoute"] as String?;
           return PopScope(
-            onPopInvokedWithResult: (didPop, _) => _canPop(context, didPop),
+            onPopInvokedWithResult: (didPop, _) {
+              final canPopSwipe = !Navigator.of(context).userGestureInProgress;
+              _logger.d("canPop: $canPopSwipe, didPop: $didPop");
+            },
             child: CheckoutScreen(
               title: "Checkout",
               checkoutArguments: args,
               failPaymentValidation: failPaymentValidation,
+              onCheckoutCompleted: extra["onCheckoutCompleted"] as VoidCallback,
+              merchantWidgetRoute: merchantWidgetRoute,
             ),
           );
         },
-        onExit: (BuildContext, GoRouterState) async {
+        onExit: (context, state) async {
           _logger.d("router, /checkout, exit");
+          return true;
+        },
+      ),
+
+      // Native checkout engines start here with their own Dart state.
+      // Keep this route available independently of the main app checkbox.
+      GoRoute(
+        path: '/merchantNestedWidget',
+        builder: (context, state) {
+          return MerchantNestedWidget();
+        },
+        onExit: (context, state) async {
+          _logger.d("router, /merchantNestedWidget, exit");
           return true;
         },
       ),
     ];
   }
-}
-
-_onPopInvoked(BuildContext context, bool didPop, dynamic result) {
-  print("_onPopInvoked: $didPop, result: $result");
-}
-
-_canPop(BuildContext context, bool didPop) async {
-  final canPopSwipe = !(Navigator.of(context).userGestureInProgress);
-  print("canPop: $canPopSwipe, didPop: $didPop");
-  return canPopSwipe;
 }

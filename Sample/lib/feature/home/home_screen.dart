@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late TextEditingController apiKeyEditingController;
   late TextEditingController customerIdEditingController;
   late TextEditingController phoneNumberEditingController;
+  late TextEditingController emailEditingController;
   late TextEditingController cardExpiryTimeController;
   late TextEditingController paymentsListItemCountController;
   late TextEditingController defaultSelectedPaymentController;
@@ -42,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     apiKeyEditingController = TextEditingController(text: state.apiKey);
     customerIdEditingController = TextEditingController(text: state.customerId);
     phoneNumberEditingController = TextEditingController(text: state.phoneNumber);
+    emailEditingController = TextEditingController(text: state.email);
     cardExpiryTimeController = TextEditingController(text: state.cardExpiryTime);
     paymentsListItemCountController = TextEditingController(text: state.paymentsListItemCount);
     defaultSelectedPaymentController = TextEditingController(text: state.defaultSelectedPayment);
@@ -51,13 +54,29 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final oneDotRegExp = RegExp(oneDotPattern);
+    String initialLanguage = Platform.localeName.split("_")[0];
+    initialLanguage =
+        defaultLanguages.firstWhereOrNull((l) => l == initialLanguage) ?? defaultLanguages[0];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Customer App Form'), actions: <Widget>[]),
       body: BlocListener<HomeScreenCubit, HomeScreenState>(
         listenWhen: (previous, current) =>
-            previous.hasSessionLoaded != current.hasSessionLoaded && current.hasSessionLoaded,
+            previous.hasSessionLoaded != current.hasSessionLoaded ||
+            previous.sessionErrorMessage != current.sessionErrorMessage,
         listener: (context, state) {
+          if (state.sessionErrorMessage?.isNotEmpty == true) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                duration: const Duration(seconds: 4),
+                content: Text(state.sessionErrorMessage!),
+              ),
+            );
+            return;
+          }
+          if (!state.hasSessionLoaded) {
+            return;
+          }
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               duration: Duration(seconds: 1),
@@ -76,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       DropdownMenu<String>(
-                        initialSelection: Platform.localeName.split("_")[0],
+                        initialSelection: initialLanguage,
                         controller: languageController,
                         requestFocusOnTap: true,
                         label: const Text('Language'),
@@ -84,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onSelected: (String? lang) {
                           context.read<HomeScreenCubit>().onLanguageChanged(lang);
                         },
-                        dropdownMenuEntries: ["en", "ar"].map<DropdownMenuEntry<String>>((
+                        dropdownMenuEntries: defaultLanguages.map<DropdownMenuEntry<String>>((
                           String lang,
                         ) {
                           return DropdownMenuEntry<String>(value: lang, label: lang);
@@ -161,6 +180,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: const InputDecoration(
                           border: UnderlineInputBorder(),
                           labelText: 'Phone number',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: emailEditingController,
+                        onChanged: (text) {
+                          context.read<HomeScreenCubit>().onEmailChanged(text);
+                        },
+                        decoration: const InputDecoration(
+                          border: UnderlineInputBorder(),
+                          labelText: 'Email',
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -286,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Checkbox(
                             checkColor: Colors.white,
-                            value: state.useCustomText ?? false,
+                            value: state.useCustomText,
                             onChanged: (bool? value) {
                               context.read<HomeScreenCubit>().onUseCustomTextChecked(value);
                             },
@@ -304,6 +334,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
                           Text('Fail payment validation', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            checkColor: Colors.white,
+                            value: state.showMerchantWidget,
+                            onChanged: (bool? value) {
+                              context.read<HomeScreenCubit>().onShowMerchantWidget(value);
+                            },
+                          ),
+                          Text('Show merchant widget'),
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -403,11 +445,24 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           }
                         },
-                        child: const Text("Get Session Id"),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (state.isSessionLoading) ...[
+                              const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                            const Text("Get Session Id"),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: state.sessionId != null
+                        onPressed: state.sessionId?.isNotEmpty == true
                             ? () {
                                 FocusManager.instance.primaryFocus?.unfocus();
                                 context.read<HomeScreenCubit>().onPay();
