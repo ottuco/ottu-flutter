@@ -125,3 +125,26 @@ You may find this sample in the ```home_screen_cubit.dart``` at ```onPay``` meth
 Please note that the callbacks are native (Android/iOS). They can be found in the following files:
 * Android: `https://github.com/ottuco/ottu-flutter/blob/main/android/src/main/kotlin/com/ottu/flutter/checkout/CheckoutView.kt`
 * iOS: `https://github.com/ottuco/ottu-flutter/blob/main/ios/ottu_flutter_checkout/Sources/ottu_flutter_checkout/CheckoutPlatformView.swift`
+
+## Standalone payment button (Android)
+
+Set `isSplitPayButton: true` in the `CheckoutArguments` passed to
+`OttuCheckoutWidget`, then place `PayButtonWidget` below checkout or elsewhere
+in the same screen. The native SDK controls the button's text, branding,
+visibility, enabled state, and payment action. Continue handling payment and
+verification callbacks on `OttuCheckoutWidget`.
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: [
+    OttuCheckoutWidget(arguments: arguments), // isSplitPayButton: true
+    const Text('Merchant content'),
+    const PayButtonWidget(),
+  ],
+)
+```
+
+The widget measures the native button and follows its height on Android,
+collapsing when the button is hidden. Other platforms render an empty widget. The Android
+host must use `FlutterFragmentActivity`, as required by the checkout widget.

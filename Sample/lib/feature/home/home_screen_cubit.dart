@@ -279,6 +279,7 @@ class HomeScreenCubit extends Cubit<HomeScreenState> {
       payButtonText: state.useCustomText == true
           ? PayButtonText(en: "Checkout", ar: "الدفع")
           : null,
+      isSplitPayButton: state.isSplitPayButton,
     );
     _navigator.push(
       "/checkout",

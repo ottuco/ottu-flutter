@@ -187,6 +187,10 @@ internal class CheckoutView(
             TAG,
             "initCheckoutFragment, with apiTransactionDetails"
         )
+        Log.d(
+            TAG,
+            "initCheckoutFragment, isSplitPayButton: ${arguments.isSplitPayButton}"
+        )
         coroutineScope.launch {
             try {
                 val sdkFragment = Checkout.init(
@@ -210,6 +214,7 @@ internal class CheckoutView(
                     },
                     verifyPayment = ::verifyPayment,
                     payButtonText = arguments.payButtonText?.toPayButtonText(),
+                    isSplitPayButton = arguments.isSplitPayButton,
                 )
 
                 onInitialized(sdkFragment)

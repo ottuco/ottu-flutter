@@ -5,6 +5,10 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 
 class CheckoutViewPlugin : FlutterPlugin {
     override fun onAttachedToEngine(binding: FlutterPluginBinding) {
+        binding.platformViewRegistry.registerViewFactory(
+            "PayButtonWidget",
+            PayButtonViewFactory(binding.binaryMessenger),
+        )
         binding
             .platformViewRegistry
             .registerViewFactory(
