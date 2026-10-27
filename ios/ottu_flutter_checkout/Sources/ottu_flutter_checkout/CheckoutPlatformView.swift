@@ -11,8 +11,8 @@ import ottu_checkout_sdk
 //  Created by Vi on 25.09.2024.
 //
 
-private let checkoutChannelName = "com.ottu.sample/checkout"
 private let methodCheckoutHeight = "METHOD_CHECKOUT_HEIGHT"
+private let nestedChannelName = "com.ottu.flutter/checkout/nested"
 private let _methodPaymentSuccessResult = "METHOD_PAYMENT_SUCCESS_RESULT"
 private let _methodPaymentErrorResult = "METHOD_PAYMENT_ERROR_RESULT"
 private let _methodPaymentCancelResult = "METHOD_PAYMENT_CANCEL_RESULT"
@@ -211,7 +211,8 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 setupPreload: transactionDetails,
                 delegate: self,
                 verifyPayment: verifyPaymentCallback,
-                payButtonText: arguments.payButtonText?.toPayButtonText()
+                payButtonText: arguments.payButtonText?.toPayButtonText(),
+                isSplitPayButton: arguments.isSplitPayButton,
             )
             if let cht = checkout {
                 self.paymentViewController = cht.paymentViewController()

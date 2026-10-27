@@ -41,8 +41,8 @@ class OttuApp extends StatelessWidget {
   late final GoRouter _router;
 
   OttuApp({required this.modules, super.key}) {
-    modules.forEach((final module) => module.init(_service));
-    modules.forEach((final module) => routes.addAll(module.router()));
+    modules.forEach((module) => module.init(_service));
+    modules.forEach((module) => routes.addAll(module.router()));
     _router = GoRouter(routes: routes);
   }
 

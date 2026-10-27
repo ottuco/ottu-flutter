@@ -16,6 +16,7 @@ final class CheckoutArguments {
   final List<FormsOfPayment>? formsOfPayment;
   final CheckoutTheme? theme;
   final PayButtonText? payButtonText;
+  final bool isSplitPayButton;
 
   CheckoutArguments({
     required this.merchantId,
@@ -28,6 +29,7 @@ final class CheckoutArguments {
     this.formsOfPayment,
     this.theme,
     this.payButtonText,
+    this.isSplitPayButton = false
   });
 
   factory CheckoutArguments.fromJson(Map<String, dynamic> json) =>

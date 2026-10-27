@@ -28,6 +28,7 @@ CheckoutArguments _$CheckoutArgumentsFromJson(Map<String, dynamic> json) =>
           : PayButtonText.fromJson(
               json['payButtonText'] as Map<String, dynamic>,
             ),
+      isSplitPayButton: json['isSplitPayButton'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
@@ -44,6 +45,7 @@ Map<String, dynamic> _$CheckoutArgumentsToJson(CheckoutArguments instance) =>
           .toList(),
       'theme': instance.theme,
       'payButtonText': instance.payButtonText,
+      'isSplitPayButton': instance.isSplitPayButton,
     };
 
 const _$FormsOfPaymentEnumMap = {

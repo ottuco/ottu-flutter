@@ -16,4 +16,5 @@ struct CheckoutArguments: Decodable {
     let formsOfPayment: [String]?
     let theme: CustomerTheme?
     let payButtonText: PayButtonText?
+    let isSplitPayButton: Bool
 }

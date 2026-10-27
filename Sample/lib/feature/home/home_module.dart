@@ -6,17 +6,18 @@ import 'package:ottu_flutter_checkout_sample/api/ottu_api.dart';
 import 'package:ottu_flutter_checkout_sample/di/Module.dart';
 import 'package:ottu_flutter_checkout_sample/feature/home/home_screen.dart';
 import 'package:ottu_flutter_checkout_sample/feature/home/home_screen_cubit.dart';
-import 'package:ottu_flutter_checkout_sample/main.dart' show ThemeModeNotifierHolder;
+import 'package:ottu_flutter_checkout_sample/main.dart'
+    show ThemeModeNotifierHolder;
 import 'package:provider/provider.dart';
 
 final class HomeModule implements Module {
-
   late final GetIt _service;
 
   @override
   void init(GetIt service) {
-    this._service = service;
+    _service = service;
     service.registerSingleton<OttuApi>(OttuApiImpl());
+    service.registerSingleton<HomeScreenStateStore>(HomeScreenStateStore());
   }
 
   @override
@@ -24,16 +25,15 @@ final class HomeModule implements Module {
     return [
       GoRoute(
         path: '/',
-        builder: (context, state) =>
-            BlocProvider(
-              create: (_) =>
-                  HomeScreenCubit(
-                      navigator: GoRouter.of(context),
-                      themeModeNotifier: context.watch<ThemeModeNotifierHolder>(),
-                      api: _service<OttuApi>()
-                  ),
-              child: const HomeScreen(),
-            ),
+        builder: (context, state) => BlocProvider(
+          create: (_) => HomeScreenCubit(
+            navigator: GoRouter.of(context),
+            themeModeNotifier: context.watch<ThemeModeNotifierHolder>(),
+            api: _service<OttuApi>(),
+            stateStore: _service<HomeScreenStateStore>(),
+          ),
+          child: const HomeScreen(),
+        ),
       ),
     ];
   }

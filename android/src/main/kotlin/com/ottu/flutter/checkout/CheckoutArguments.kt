@@ -16,4 +16,5 @@ data class CheckoutArguments(
     val theme: CustomerTheme?,
     val paymentOptionsDisplaySettings: PaymentOptionsDisplaySettings,
     val payButtonText: PayButtonText?,
+    val isSplitPayButton: Boolean,
 )
