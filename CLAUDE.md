@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **ottu-flutter-checkout** is a Flutter plugin that wraps native Ottu payment checkout SDKs for Android and iOS using Platform Views. The Dart layer is a thin bridge — all payment processing, card input, and CHD handling happens exclusively in the native SDKs:
 
-- **Android**: `com.github.ottuco:ottu-android-checkout:2.1.7` (JitPack)
+- **Android**: `com.github.ottuco:ottu-android-checkout:2.2.8` (JitPack)
 - **iOS**: `ottu_checkout_sdk` from `https://github.com/ottuco/ottu-ios` (from 2.1.10, SPM)
 
 The plugin is private (`publish_to: 'none'`), consumed via git dependency by merchant apps.
@@ -80,10 +80,44 @@ BLoC (Cubits) + GetIt DI + GoRouter + Dio. Each feature defines a `Module` with 
 
 ## Platform Requirements
 
-- **Dart SDK**: ^3.6.0
-- **Android**: minSdk 26, compileSdk 36, Kotlin 2.2.20, AGP 8.9.3
+- **Dart SDK**: ^3.8.0
+- **Android library**: minSdk 26, compileSdk 37, JVM target 1.8. The library requests Kotlin serialization plugin 2.3.20 in `android/build.gradle.kts`.
+- **Android development toolchain**: standalone plugin settings select AGP 9.3.3; sample settings select AGP 9.2.1. Both Gradle wrappers use 9.5.0. The sample enables AGP built-in Kotlin and sets `android.newDsl=false` for Flutter's legacy DSL integration.
+- **Merchant Android hosts**: use `FlutterFragmentActivity`. The host selects AGP/Kotlin versions when consuming this plugin as a subproject; the plugin's standalone `settings.gradle.kts` and wrapper do not upgrade the host.
 - **iOS**: iOS 15+, Swift tools 5.5
 - **Localization**: English and Arabic (Kuwait) for error messages on both platforms
+
+### Android merchant toolchain compatibility
+
+The conditional application of `org.jetbrains.kotlin.android` in
+`android/build.gradle.kts` supports the configuration paths for both external
+Kotlin (AGP 8.x) and built-in Kotlin (AGP 9.x). It does not guarantee compatibility
+with every host toolchain. In particular, the library pins the serialization
+compiler plugin to 2.3.20; hosts must avoid loading a conflicting version and must
+align the Kotlin compiler and serialization compiler plugin versions.
+
+The current compile SDK 37 platform has an officially supported minimum of
+AGP 9.1.1; see Android's [API-level tool requirements](https://developer.android.com/build/releases/about-agp#api-level-support).
+Do not describe AGP 8.x consumption as supported based only on the conditional
+Kotlin application or a successful Gradle configuration.
+
+Compatibility probes on 2026-10-28 used an isolated Android application consuming
+an unchanged copy of this plugin's Android sources and build script as a
+subproject, with the installed Flutter embedding JAR supplied as a compile-only
+dependency. They used Gradle 8.13, JDK 21, minSdk 26, compileSdk/targetSdk 37, and
+the installed Android SDK platform `android-37.0`. These were Android Gradle
+probes, not full Flutter application builds.
+
+| Host AGP | Host Kotlin / serialization plugins | Result |
+| --- | --- | --- |
+| 8.9.3 | 2.2.20 / 2.2.20 | Configuration fails: serialization plugin 2.3.20 is requested by the library while 2.2.20 is already on the host classpath. |
+| 8.9.3 | 2.3.20 / 2.3.20 | Configuration succeeds, exercising the external Kotlin apply path. `:app:assembleDebug` fails resolving `android-37`; this AGP does not resolve the installed `android-37.0` platform and warns that its tested maximum is compile SDK 36. |
+
+No AGP 8.x end-to-end consumption was verified. Restoring that support requires
+resolving the compile SDK/toolchain and compiler-plugin version constraints, then
+building a real merchant Flutter host. Do not hide unsupported-SDK warnings or
+skip Kotlin metadata checks as a compatibility fix. Check debug and release
+builds when revisiting this, since the plugin enables release minification.
 
 ## Known Code Issues
 
@@ -209,7 +243,7 @@ NO essays. Every finding must reference concrete code locations.
 
 **Known state of this codebase:**
 - Android SDK from JitPack (no artifact signing — lower trust than Maven Central)
-- Android: `isMinifyEnabled = false` in release build — no obfuscation (`build.gradle.kts:55-56`)
+- Android: `isMinifyEnabled = true` in release build — there is an obfuscation (`build.gradle.kts:55-56`)
 - ProGuard `-keep class com.ottu.** { *; }` keeps everything even if minification were enabled
 - iOS PrivacyInfo.xcprivacy declares zero data collection/API usage — likely App Store rejection risk
 - `pubspec.lock` is gitignored (not committed)
