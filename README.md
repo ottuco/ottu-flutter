@@ -39,71 +39,24 @@ Per each next launch, the iOS app is simply opened in Xcode.
 
 ## Implementation
 
-All steps those you will find bellow have already been implemented in the `Sample` app.
-
-Here are steps to implement Ottu checkout widget from scratch:
-1. You have successfully setup the plugin that mentioned above.
-2. In your screen-widget override this method
-    ```
-    @override
-    void didChangeDependencies()
-   ```
-3. Then in that method implement ```MethodChannel.setMethodCallHandler()``` with ```METHOD_CHECKOUT_HEIGHT``` method name.
-   See ```chackout_screen.dart``` for instance in the `Sample` app.
-4. Next, define ```ValueNotifier<int>``` property in a State class of a Widget. 
-   It is essential to handle the height change of the native view.
-5. Now, in the ```MethodCallHandler``` handle callback of a native method and assign ```int``` argument to the ```ValueNotifier```
-6. This step is to add ```OttuCheckoutWidget```, so next decide a place on your screen where you want to show the checkout widget.
-7. Wrap the ```OttuCheckoutWidget``` with ```SizedBox``` other container widget, is just for checkout view constraint.
-8. After, wrap the ```SizedBox``` with ```ValueListenableBuilder<int>``` and pass ```int``` argument of the handler to the ```SizedBox``` as a height parameter.
-9. Last, is to define arguments for ```OttuCheckoutWidget``` which described in the next chapter.
-
-## Code sample
+Import `package:ottu_flutter_checkout/ottu_flutter_checkout.dart`, create
+`CheckoutArguments` for your session, and add `OttuCheckoutWidget` to your screen.
+The widget manages native checkout height and platform channels internally.
+Pass payment and verification callbacks directly to `OttuCheckoutWidget`.
 
 ```dart
-Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: SingleChildScrollView(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        SizedBox(height: 46),
-        Text(
-          "Customer Application",
-          textAlign: TextAlign.center,
-          style: ts.TextStyle(fontSize: 24),
-        ),
-        //Start of Merchant content
-        const Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-                "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements")),
-        //End of Merchant content
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: ValueListenableBuilder<int>(
-            builder: (BuildContext context, int height, Widget? child) {
-              return SizedBox(
-                height: height.toDouble(),
-                child: OttuCheckoutWidget(arguments: widget.checkoutArguments),
-              );
-            },
-            valueListenable: _checkoutHeight,
-          ),
-        ),
-        const SizedBox(height: 20),
-        //Start of Merchant content
-        const Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-                "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements,"
-                " Some users UI elements, Some users UI elements, Some users UI elements,"
-                " Some users UI elements, Some users UI elements, Some users UI elements")),
-        //End of Merchant content
-      ])), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+OttuCheckoutWidget(
+  arguments: checkoutArguments,
+  verifyPayment: verifyPayment,
+  successCallback: onSuccess,
+  errorCallback: onError,
+  cancelCallback: onCancel,
+)
 ```
+
+The callback names above refer to your application's existing handlers. See
+[the sample checkout screen](Sample/lib/feature/checkout/checkout_screen.dart)
+for an implementation.
 
 ## Checkout arguments initialisation
 Below you may find sample of ```CheckoutArguments``` initialisation that requires  ```OttuCheckoutWidget```. 
@@ -116,7 +69,11 @@ You may find this sample in the ```home_screen_cubit.dart``` at ```onPay``` meth
         sessionId: state.sessionId ?? "",
         amount: amount,
         showPaymentDetails: state.showPaymentDetails,
-        apiTransactionDetails: state.preloadPayload == true ? _apiTransactionDetails : null,
+        paymentOptionsDisplaySettings: PaymentOptionsDisplaySettings(
+          mode: PaymentOptionsDisplayMode.LIST,
+          visibleItemsCount: 5,
+        ),
+        setupPreload: state.preloadPayload == true ? _apiTransactionDetails : null,
         formsOfPayment: formOfPayments?.isNotEmpty == true ? formOfPayments : null,
         theme: _theme);
 ```
@@ -125,3 +82,28 @@ You may find this sample in the ```home_screen_cubit.dart``` at ```onPay``` meth
 Please note that the callbacks are native (Android/iOS). They can be found in the following files:
 * Android: `https://github.com/ottuco/ottu-flutter/blob/main/android/src/main/kotlin/com/ottu/flutter/checkout/CheckoutView.kt`
 * iOS: `https://github.com/ottuco/ottu-flutter/blob/main/ios/ottu_flutter_checkout/Sources/ottu_flutter_checkout/CheckoutPlatformView.swift`
+
+## Separate Pay button (Android and iOS)
+
+`CheckoutArguments.isSplitPayButton` controls where the native Pay button is
+shown. The default, `false`, keeps it inside checkout. With `true`, the merchant
+keeps `OttuCheckoutWidget` for checkout content and places `PayButtonWidget`
+wherever it is needed on the same screen, including a fixed bottom footer.
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: [
+    OttuCheckoutWidget(arguments: arguments), // isSplitPayButton: true
+    const Text('Merchant content'),
+    const PayButtonWidget(),
+  ],
+)
+```
+
+The native SDK controls the button's appearance, visibility, enabled state, and
+payment action. Height updates are automatic on Android and iOS. Keep payment
+and verification callbacks on `OttuCheckoutWidget`.
+
+See the [separate Pay button guide](docs/split-pay-button.md) for argument setup,
+inline and fixed-bottom examples, platform requirements, and branch changes.

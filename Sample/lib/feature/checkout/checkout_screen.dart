@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/painting/text_style.dart' as ts;
 import 'package:logger/logger.dart';
@@ -64,6 +65,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements",
               ),
             ),
+            if (widget.checkoutArguments.isSplitPayButton)
+              const Padding(
+                padding: EdgeInsets.all(12.0),
+                child: PayButtonWidget(),
+              ),
             //End of Merchant content
             Padding(
               padding: const EdgeInsets.all(12.0),
@@ -75,10 +81,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 errorCallback: (message) => _checkoutMessage.value = ("Error", message),
               ),
             ),
-            const SizedBox(height: 20),
+            //const SizedBox(height: 20),
             //Start of Merchant content
             const Padding(
-              padding: EdgeInsets.all(12.0),
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
                 "Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements, Some users UI elements,"
                 " Some users UI elements, Some users UI elements, Some users UI elements,"

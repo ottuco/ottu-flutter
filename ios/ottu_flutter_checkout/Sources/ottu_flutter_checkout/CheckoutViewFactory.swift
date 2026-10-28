@@ -14,7 +14,10 @@ public class CheckoutViewFactory: NSObject,
 
     private var messenger: FlutterBinaryMessenger
 
-    init(messenger: FlutterBinaryMessenger) {
+    private let payButtonCoordinator: PayButtonCoordinator
+
+    init(messenger: FlutterBinaryMessenger, payButtonCoordinator: PayButtonCoordinator) {
+        self.payButtonCoordinator = payButtonCoordinator
         self.messenger = messenger
         super.init()
     }
@@ -28,7 +31,8 @@ public class CheckoutViewFactory: NSObject,
             messenger: messenger,
             frame: frame,
             viewId: viewId,
-            args: args
+            args: args,
+            payButtonCoordinator: payButtonCoordinator
         )
     }
 

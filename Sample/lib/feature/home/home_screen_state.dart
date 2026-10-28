@@ -1,8 +1,12 @@
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:ottu_flutter_checkout/ottu_flutter_checkout.dart';
 import 'package:ottu_flutter_checkout_sample/api/model/pg_codes.dart';
 
-const _default_payments_list__item_count = 5;
+const _defaultPaymentsListItemCount = 5;
+const _unset = Object();
+const _formsOfPaymentEquality = MapEquality<FormsOfPayment, bool>();
+const _pgCodeEquality = MapEquality<PGCode, bool>();
 
 final class HomeScreenState extends Equatable {
   final String merchantId;
@@ -11,6 +15,7 @@ final class HomeScreenState extends Equatable {
   final String? amount;
   final String? currencyCode;
   final String? phoneNumber;
+  final String? email;
   final String? customerId;
   final String? cardExpiryTime;
   final String paymentsListItemCount;
@@ -21,23 +26,27 @@ final class HomeScreenState extends Equatable {
   final bool? preloadPayload;
   final bool? isAutoDebit;
   final bool hasSessionLoaded;
+  final bool isSessionLoading;
   final bool? failPaymentValidation;
   final bool useCustomText;
+  final bool isSplitPayButton;
   final PaymentOptionsDisplayMode? paymentOptionsDisplayMode;
   final Map<FormsOfPayment, bool>? formsOfPaymentChecked;
   final Map<PGCode, bool>? pgCodesChecked;
   final String? apiTransactionDetails;
+  final String? sessionErrorMessage;
 
-  const HomeScreenState({
+  HomeScreenState({
     required this.merchantId,
     required this.apiKey,
     this.sessionId,
     this.amount,
     this.currencyCode,
     this.phoneNumber,
+    this.email,
     this.customerId,
     this.cardExpiryTime,
-    this.paymentsListItemCount = "$_default_payments_list__item_count",
+    this.paymentsListItemCount = "$_defaultPaymentsListItemCount",
     this.defaultSelectedPayment,
     this.language,
     this.showPaymentDetails = true,
@@ -45,21 +54,28 @@ final class HomeScreenState extends Equatable {
     this.isAutoDebit = false,
     this.noForms,
     this.hasSessionLoaded = false,
+    this.isSessionLoading = false,
     this.failPaymentValidation = false,
     this.paymentOptionsDisplayMode,
-    this.formsOfPaymentChecked,
-    this.pgCodesChecked,
+    Map<FormsOfPayment, bool>? formsOfPaymentChecked,
+    Map<PGCode, bool>? pgCodesChecked,
     this.useCustomText = false,
+    this.isSplitPayButton = false,
     this.apiTransactionDetails,
-  });
+    this.sessionErrorMessage,
+  }) : formsOfPaymentChecked = formsOfPaymentChecked == null
+           ? null
+           : Map.unmodifiable(formsOfPaymentChecked),
+       pgCodesChecked = pgCodesChecked == null ? null : Map.unmodifiable(pgCodesChecked);
 
   HomeScreenState copyWith({
     String? merchantId,
     String? apiKey,
-    String? sessionId,
+    Object? sessionId = _unset,
     String? amount,
     String? currencyCode,
     String? phoneNumber,
+    String? email,
     String? customerId,
     String? cardExpiryTime,
     String? paymentsListItemCount,
@@ -70,20 +86,24 @@ final class HomeScreenState extends Equatable {
     bool? preloadPayload,
     bool? isAutoDebit,
     bool? hasSessionLoaded,
+    bool? isSessionLoading,
     bool? failPaymentValidation,
     bool? useCustomText,
+    bool? isSplitPayButton,
     PaymentOptionsDisplayMode? paymentOptionsDisplayMode,
     Map<FormsOfPayment, bool>? formsOfPaymentChecked,
     Map<PGCode, bool>? pgCodesChecked,
-    String? apiTransactionDetails,
+    Object? apiTransactionDetails = _unset,
+    Object? sessionErrorMessage = _unset,
   }) {
     return HomeScreenState(
       merchantId: merchantId ?? this.merchantId,
       apiKey: apiKey ?? this.apiKey,
-      sessionId: sessionId ?? this.sessionId,
+      sessionId: sessionId == _unset ? this.sessionId : sessionId as String?,
       amount: amount ?? this.amount,
       currencyCode: currencyCode ?? this.currencyCode,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      email: email ?? this.email,
       customerId: customerId ?? this.customerId,
       cardExpiryTime: cardExpiryTime ?? this.cardExpiryTime,
       paymentsListItemCount: paymentsListItemCount ?? this.paymentsListItemCount,
@@ -94,12 +114,19 @@ final class HomeScreenState extends Equatable {
       preloadPayload: preloadPayload ?? this.preloadPayload,
       isAutoDebit: isAutoDebit ?? this.isAutoDebit,
       failPaymentValidation: failPaymentValidation ?? this.failPaymentValidation,
+      isSessionLoading: isSessionLoading ?? this.isSessionLoading,
       useCustomText: useCustomText ?? this.useCustomText,
+      isSplitPayButton: isSplitPayButton ?? this.isSplitPayButton,
       hasSessionLoaded: hasSessionLoaded ?? this.hasSessionLoaded,
       paymentOptionsDisplayMode: paymentOptionsDisplayMode ?? this.paymentOptionsDisplayMode,
       formsOfPaymentChecked: formsOfPaymentChecked ?? this.formsOfPaymentChecked,
       pgCodesChecked: pgCodesChecked ?? this.pgCodesChecked,
-      apiTransactionDetails: apiTransactionDetails ?? this.apiTransactionDetails,
+      apiTransactionDetails: apiTransactionDetails == _unset
+          ? this.apiTransactionDetails
+          : apiTransactionDetails as String?,
+      sessionErrorMessage: sessionErrorMessage == _unset
+          ? this.sessionErrorMessage
+          : sessionErrorMessage as String?,
     );
   }
 
@@ -120,12 +147,16 @@ final class HomeScreenState extends Equatable {
     preloadPayload,
     isAutoDebit,
     failPaymentValidation,
+    isSessionLoading,
     useCustomText,
+    isSplitPayButton,
     phoneNumber,
+    email,
     hasSessionLoaded,
     paymentOptionsDisplayMode?.name,
-    formsOfPaymentChecked.hashCode,
-    pgCodesChecked.hashCode,
+    _formsOfPaymentEquality.hash(formsOfPaymentChecked),
+    _pgCodeEquality.hash(pgCodesChecked),
     apiTransactionDetails,
+    sessionErrorMessage,
   ];
 }
