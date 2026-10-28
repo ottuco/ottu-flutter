@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 const _methodPayButtonHeight = 'METHOD_PAY_BUTTON_HEIGHT';
+const _viewType = 'PayButtonWidget';
 
-/// The native Android payment button for the active `OttuCheckoutWidget` session.
+/// The native Android or iOS payment button for the active `OttuCheckoutWidget` session.
 ///
 /// Set `CheckoutArguments.isSplitPayButton` to `true`. The native SDK manages
 /// presentation and payment dispatch; callbacks remain on `OttuCheckoutWidget`.
@@ -57,15 +58,23 @@ class _PayButtonWidgetState extends State<PayButtonWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+    if (kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.android &&
+            defaultTargetPlatform != TargetPlatform.iOS)) {
       return const SizedBox.shrink();
     }
+
     return SizedBox(
       height: _height,
-      child: AndroidView(
-        viewType: 'PayButtonWidget',
-        onPlatformViewCreated: _onPlatformViewCreated,
-      ),
+      child: defaultTargetPlatform == TargetPlatform.iOS
+          ? UiKitView(
+              viewType: _viewType,
+              onPlatformViewCreated: _onPlatformViewCreated,
+            )
+          : AndroidView(
+              viewType: _viewType,
+              onPlatformViewCreated: _onPlatformViewCreated,
+            ),
     );
   }
 }

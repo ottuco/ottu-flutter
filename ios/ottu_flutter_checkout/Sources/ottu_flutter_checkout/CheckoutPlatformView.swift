@@ -25,8 +25,10 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
     private let _view: CheckoutContainerView
     private weak var paymentViewController: UIViewController?
     private var checkout: Checkout?
+    private let payButtonCoordinator: PayButtonCoordinator
 
     private func deinitCheckout() {
+        payButtonCoordinator.clear(checkout)
         guard let pvc = paymentViewController,
             let parentVC = findRootViewController() as? FlutterViewController
         else { return }
@@ -46,9 +48,11 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
         messenger: FlutterBinaryMessenger,
         frame: CGRect,
         viewId: Int64,
-        args: Any?
+        args: Any?,
+        payButtonCoordinator: PayButtonCoordinator
     ) {
 
+        self.payButtonCoordinator = payButtonCoordinator
         self.viewId = viewId
         self.channel = FlutterMethodChannel(
             name: checkoutChannelName,
@@ -216,7 +220,10 @@ public class CheckoutPlatformView: NSObject, FlutterPlatformView {
                 isSplitPayButton: arguments.isSplitPayButton,
             )
             if let cht = checkout {
-                self.paymentViewController = cht.paymentViewController()
+                self.paymentViewController = arguments.isSplitPayButton
+                    ? cht.paymentContentViewController()
+                    : cht.paymentViewController()
+                payButtonCoordinator.checkout = cht
                 tryAttachController()
             }
         } catch {

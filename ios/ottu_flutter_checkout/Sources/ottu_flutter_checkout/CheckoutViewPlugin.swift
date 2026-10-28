@@ -14,8 +14,17 @@ public class CheckoutViewPlugin: NSObject, FlutterPlugin {
         with registrar: FlutterPluginRegistrar
     ) {
         print("CheckoutViewPlugin, registering")
+        let payButtonCoordinator = PayButtonCoordinator()
         let viewFactory = CheckoutViewFactory(
-            messenger: registrar.messenger()
+            messenger: registrar.messenger(),
+            payButtonCoordinator: payButtonCoordinator
+        )
+        registrar.register(
+            PayButtonViewFactory(
+                messenger: registrar.messenger(),
+                coordinator: payButtonCoordinator
+            ),
+            withId: "PayButtonWidget"
         )
         registrar
             .register(
