@@ -37,7 +37,15 @@ class _PayButtonWidgetState extends State<PayButtonWidget> {
       }
     });
     // The native view may have completed layout before this handler was bound.
-    final height = await channel.invokeMethod<num>(_methodPayButtonHeight);
+    final num? height;
+    try {
+      height = await channel.invokeMethod<num>(_methodPayButtonHeight);
+    } on PlatformException {
+      // The native view may have been disposed while the query was pending.
+      return;
+    } on MissingPluginException {
+      return;
+    }
     if (mounted && identical(_channel, channel) && !receivedHeight) {
       _updateHeight(height);
     }
