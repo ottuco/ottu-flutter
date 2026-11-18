@@ -10,14 +10,14 @@ A Flutter plugin for the Ottu Checkout SDK integration on iOS.
   s.author           = { 'Ottu' => 'support@ottu.com' }
   s.source           = { :path => '.' }
 
-  s.ios.deployment_target = '14.0'
+  s.ios.deployment_target = '15.0'
   s.swift_version = '5.5'
 
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
 
   s.dependency 'Flutter'
-  s.dependency 'ottu_checkout_sdk', '~> 2.2.12'
+  s.dependency 'ottu_checkout_sdk', '~> 2.3.0'
   s.dependency 'Sentry', '~> 8.46.0'
 
   # Resources (Privacy and Assets)
