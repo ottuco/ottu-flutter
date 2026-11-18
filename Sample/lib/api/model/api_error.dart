@@ -11,9 +11,7 @@ sealed class ApiError implements Exception {
     if (statusCode != null) {
       return ApiResponseError(
         statusCode: statusCode,
-        message:
-            responseMessage ??
-            'Session request failed with status code $statusCode.',
+        message: responseMessage ?? 'Session request failed with status code $statusCode.',
       );
     }
 
@@ -21,9 +19,7 @@ sealed class ApiError implements Exception {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return const ApiNetworkError(
-          'The request timed out. Check your connection and try again.',
-        );
+        return const ApiNetworkError('The request timed out. Check your connection and try again.');
       case DioExceptionType.connectionError:
         return const ApiNetworkError(
           'Unable to reach the merchant host. Check the host and connection.',
@@ -31,14 +27,12 @@ sealed class ApiError implements Exception {
       case DioExceptionType.cancel:
         return const ApiNetworkError('The session request was cancelled.');
       case DioExceptionType.badCertificate:
-        return const ApiNetworkError(
-          'The merchant host returned an invalid certificate.',
-        );
+        return const ApiNetworkError('The merchant host returned an invalid certificate.');
       case DioExceptionType.badResponse:
       case DioExceptionType.unknown:
-        return ApiNetworkError(
-          error.message ?? 'Unable to create a checkout session.',
-        );
+        return ApiNetworkError(error.message ?? 'Unable to create a checkout session.');
+      case DioExceptionType.transformTimeout:
+        return const ApiNetworkError('Transformation error');
     }
   }
 
@@ -60,8 +54,7 @@ sealed class ApiError implements Exception {
 }
 
 final class ApiResponseError extends ApiError {
-  const ApiResponseError({required this.statusCode, required String message})
-    : super(message);
+  const ApiResponseError({required this.statusCode, required String message}) : super(message);
 
   final int statusCode;
 }
@@ -71,6 +64,5 @@ final class ApiNetworkError extends ApiError {
 }
 
 final class EmptySessionResponseError extends ApiError {
-  const EmptySessionResponseError()
-    : super('The merchant returned an empty session response.');
+  const EmptySessionResponseError() : super('The merchant returned an empty session response.');
 }
